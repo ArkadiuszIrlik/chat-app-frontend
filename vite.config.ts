@@ -10,6 +10,8 @@ export default defineConfig({
       { find: '@assets', replacement: '/src/assets' },
       { find: '@components', replacement: '/src/components' },
       { find: '@containers', replacement: '/src/containers' },
+      { find: '@helpers', replacement: '/src/helpers' },
+      { find: '@hooks', replacement: '/src/hooks' },
     ],
   },
 });
