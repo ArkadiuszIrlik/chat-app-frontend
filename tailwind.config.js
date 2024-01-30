@@ -22,7 +22,7 @@ export default {
         },
       },
       fontFamily: {
-        main: ['Inter', 'sans-serif'],
+        ui: ['"Nunito Sans"', 'sans-serif'],
       },
     },
   },
