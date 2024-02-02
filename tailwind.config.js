@@ -23,6 +23,7 @@ export default {
       },
       fontFamily: {
         ui: ['"Nunito Sans"', 'sans-serif'],
+        beluga: ['Reef', 'sans-serif'],
       },
     },
   },
