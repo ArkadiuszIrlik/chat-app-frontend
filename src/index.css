@@ -33,6 +33,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    @apply bg-gray-800;
+  }
+}
+
+@layer components {
+  .beluga-mask {
+    mask-image: url(./assets/beluga-black-logo.png);
+    mask-mode: alpha;
+    mask-size: contain;
+    mask-position: center;
+  }
+}
+
 @layer utilities {
   .scrollbar-none {
     -ms-overflow-style: none; /* IE */
@@ -40,5 +59,40 @@
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none; /* Chromium and Safari */
+  }
+  .mask-content {
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  @supports not (
+    (
+        (mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0))
+          and (mask-composite: exclude)
+      )
+      or
+      (
+        (
+            -webkit-mask: linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0)
+          )
+          and (-webkit-mask-composite: xor)
+      )
+  ) {
+    .mask-content::before {
+      content: '';
+      position: absolute;
+      box-sizing: content-box;
+      border-radius: inherit;
+      inset: 3px;
+      padding: inherit;
+      @apply bg-gray-700;
+    }
   }
 }
