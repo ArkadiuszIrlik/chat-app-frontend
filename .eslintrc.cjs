@@ -45,4 +45,12 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      files: ['index.ts'],
+      rules: {
+        'import/export': 'off',
+      },
+    },
+  ],
 };
