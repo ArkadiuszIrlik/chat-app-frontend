@@ -4,6 +4,12 @@ import eslint from 'vite-plugin-eslint';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    https: {
+      cert: './localhost.pem',
+      key: './localhost-key.pem',
+    },
+  },
   plugins: [react(), eslint()],
   resolve: {
     alias: [

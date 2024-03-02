@@ -26,3 +26,7 @@ bun.lockb
 *.sw?
 
 prototype
+
+# dev https certificates
+localhost-key.pem
+localhost.pem
