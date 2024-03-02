@@ -20,8 +20,9 @@ function HomeScreen() {
           src={WaveImage}
           alt=""
           srcSet=""
-          className="absolute -left-[80%] -top-[0%] w-[250%] max-w-none -rotate-12
-           object-center sm:-left-[20%] sm:-top-[23%] sm:w-full sm:-rotate-6"
+          draggable="false"
+          className="visual-search-none absolute -left-[80%] -top-[0%] w-[250%] max-w-none -rotate-12
+           select-none object-center sm:-left-[20%] sm:-top-[23%] sm:w-full sm:-rotate-6"
         />
 
         <div className="absolute left-0 right-0 top-[15%] sm:left-[10%] sm:top-[8%]">

@@ -102,4 +102,7 @@
       @apply bg-gray-700;
     }
   }
+  .visual-search-none {
+    pointer-events: none;
+  }
 }
