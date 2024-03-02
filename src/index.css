@@ -50,6 +50,13 @@
     mask-size: contain;
     mask-position: center;
   }
+
+  .exclamation-mask {
+    mask-image: url(./assets/exclamation-point-128.png);
+    mask-mode: alpha;
+    mask-size: contain;
+    mask-position: center;
+  }
 }
 
 @layer utilities {
