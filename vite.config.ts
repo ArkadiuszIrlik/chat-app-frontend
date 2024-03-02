@@ -19,6 +19,7 @@ export default defineConfig({
       { find: '@helpers', replacement: '/src/helpers' },
       { find: '@hooks', replacement: '/src/hooks' },
       { find: '@constants', replacement: '/src/constants' },
+      { find: '@src', replacement: '/src' },
     ],
   },
 });

@@ -29,7 +29,8 @@
       "@containers/*": ["src/containers/*"],
       "@helpers/*": ["src/helpers/*"],
       "@hooks/*": ["src/hooks/*"],
-      "@constants/*": ["src/constants/*"]
+      "@constants/*": ["src/constants/*"],
+      "@src/*": ["src/*"]
     }
   },
   "include": ["src"],
