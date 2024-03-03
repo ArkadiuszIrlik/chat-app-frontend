@@ -1,16 +1,20 @@
 import { ReactNode } from 'react';
 
-interface PrimaryButtonInterface {
+type PrimaryButtonType = RegularButton | SubmitButton;
+
+interface RegularButton {
   type: HTMLButtonElement['type'];
   children: ReactNode;
   onClickHandler: () => void;
 }
 
-function PrimaryButton({
-  type,
-  children,
-  onClickHandler,
-}: PrimaryButtonInterface) {
+interface SubmitButton {
+  type: 'submit';
+  children: ReactNode;
+  onClickHandler?: never;
+}
+
+function PrimaryButton({ type, children, onClickHandler }: PrimaryButtonType) {
   return (
     <div className="w-full shadow">
       <button
