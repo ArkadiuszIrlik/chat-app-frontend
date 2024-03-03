@@ -1,10 +1,9 @@
 import WaveImage from '@assets/wave.svg';
-import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
-import SecondaryButton from '@components/SecondaryButton/SecondaryButton';
 import PhoneImage from '@assets/phone-placeholder.svg';
 import LaptopImage from '@assets/laptop-placeholder.svg';
 import { useMediaQuery } from '@uidotdev/usehooks';
 import styleConsts from '@constants/styleConsts';
+import { PrimaryLink, SecondaryLink } from '@components/Link';
 
 function HomeScreen() {
   const isSmallScreen = useMediaQuery(
@@ -60,12 +59,8 @@ function HomeScreen() {
             {isSmallScreen && (
               <p className="text-2xl text-white">Get chatting now</p>
             )}
-            <PrimaryButton type="button" onClickHandler={() => undefined}>
-              Log in
-            </PrimaryButton>
-            <SecondaryButton type="button" onClickHandler={() => undefined}>
-              Create account
-            </SecondaryButton>
+            <PrimaryLink to="/login">Log in</PrimaryLink>
+            <SecondaryLink to="/signup">Create account</SecondaryLink>
           </div>
         </div>
       </div>
