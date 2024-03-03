@@ -4,6 +4,7 @@ import useFetch from '@hooks/useFetch';
 import { Formik, Form } from 'formik';
 import { useState } from 'react';
 import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
 
 function LoginForm() {
   const [postData, setPostData] = useState({});
@@ -69,12 +70,12 @@ function LoginForm() {
               autoComplete="current-password"
             />
           </div>
-          <a
-            href="#_"
+          <Link
+            to="#_"
             className="ml-auto mt-1 underline-offset-2 hover:underline"
           >
             Forgot password?
-          </a>
+          </Link>
           <div className="mt-10 w-44 self-center">
             <PrimaryButton type="submit" onClickHandler={() => undefined}>
               Log&nbsp;in
@@ -82,12 +83,12 @@ function LoginForm() {
           </div>
           <p className="mt-14 self-center text-gray-300">
             Don&apos;t have an account yet?{' '}
-            <a
-              href="/signup"
+            <Link
+              to="/signup"
               className="text-blue-400 underline-offset-2 hover:underline"
             >
               Sign&nbsp;up
-            </a>
+            </Link>
           </p>
         </Form>
       </Formik>

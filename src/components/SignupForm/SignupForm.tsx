@@ -5,6 +5,7 @@ import useFetch from '@hooks/useFetchNew';
 
 import { Formik, Form } from 'formik';
 import { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
 
 const initialData = {};
@@ -123,12 +124,12 @@ function SignupForm() {
           </div>
           <p className="mt-14 self-center text-gray-300">
             Already have an account?{' '}
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="text-blue-400 underline-offset-2 hover:underline"
             >
               Log&nbsp;in
-            </a>
+            </Link>
           </p>
         </Form>
       </Formik>
