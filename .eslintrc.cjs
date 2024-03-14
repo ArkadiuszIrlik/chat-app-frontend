@@ -32,6 +32,7 @@ module.exports = {
     ],
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'warn',
+    '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
     'import/extensions': [
       'error',
       'ignorePackages',
