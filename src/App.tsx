@@ -1,6 +1,6 @@
 // import useSocketStatus from '@hooks/useSocketStatus';
 import { Outlet } from 'react-router-dom';
-import AuthProvider from '@components/AuthProvider/AuthProvider';
+import { AuthProvider } from '@hooks/useAuth';
 
 function App() {
   // const isSocketConnected = useSocketStatus();

@@ -1,5 +1,13 @@
 import { getURL } from '@helpers/fetch';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 interface UserAuth {
   _id: string;
@@ -49,4 +57,15 @@ function useAuth() {
   return authObj;
 }
 
-export default useAuth;
+const AuthContext = createContext<ReturnType<typeof useAuth> | null>(null);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const auth = useAuth();
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+}
+
+function AuthConsumer() {
+  return useContext(AuthContext);
+}
+
+export default AuthConsumer;
