@@ -4,6 +4,7 @@ import { LoginScreen } from '@containers/LoginScreen';
 import { SignupScreen } from '@containers/SignupScreen';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@src/App';
+import { ProtectedRoute } from '@components/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
@@ -22,8 +23,13 @@ const router = createBrowserRouter([
         element: <SignupScreen />,
       },
       {
-        path: '/app',
-        element: <AppScreen />,
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: '/app',
+            element: <AppScreen />,
+          },
+        ],
       },
     ],
   },
