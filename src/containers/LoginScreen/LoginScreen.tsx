@@ -2,8 +2,20 @@ import WaveImage from '@assets/wave.svg';
 import LoginForm from '@components/LoginForm/LoginForm';
 import { useMediaQuery } from '@uidotdev/usehooks';
 import styleConsts from '@constants/styleConsts';
+import { useAuth } from '@hooks/index';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function LoginScreen() {
+  const { isAuthenticated } = useAuth()!;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/app', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
   const isMediumScreen = useMediaQuery(
     `only screen and (min-width: ${styleConsts.screens.md}`,
   );
