@@ -1,0 +1,3 @@
+interface BackendError {
+  message: string;
+}
