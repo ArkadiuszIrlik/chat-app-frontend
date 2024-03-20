@@ -1,11 +1,11 @@
-import TextInput from '@components/formControls/TextInput';
-import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
+import TextInput from '@components/form-controls/TextInput';
 import useFetch from '@hooks/useFetch';
-import { Formik, Form } from 'formik';
-import { useState } from 'react';
+import { Formik, Form, useFormikContext } from 'formik';
+import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@hooks/index';
+import { SubmitButtonPrimary } from '@components/form-controls';
 
 function LoginForm() {
   const [postData, setPostData] = useState({});
@@ -13,8 +13,8 @@ function LoginForm() {
   const { refetch, hasError, errorMessage, data, isLoading } = useFetch({
     initialUrl: 'auth/login',
     method: 'POST',
-    start: false,
-    data: postData,
+    onMount: false,
+    postData,
   });
 
   const { login } = useAuth()!;
@@ -40,21 +40,21 @@ function LoginForm() {
             .max(100, "Password can't be longer than 100 characters.")
             .required('Please enter your password.'),
         })}
-        // onSubmit={async (values, { setSubmitting }) => {
-        onSubmit={async (values) => {
+        onSubmit={(values) => {
           setPostData(values);
-          await refresh();
-          console.log(postData);
-          console.log(result);
-          // setTimeout(() => {
-          //   useFetch({ url: 'login', method: 'POST', start: false });
-
-          //   alert(JSON.stringify(values, null, 2));
-          //   setSubmitting(false);
-          // }, 400);
+          refetch();
         }}
       >
         <Form className="flex flex-col">
+          {hasError && (
+            <div
+              className="mb-2 flex items-center gap-3 rounded-lg border-[1px]
+             border-red-300 bg-red-900 px-3 py-2 text-red-300"
+            >
+              <div className="exclamation-mask aspect-square h-5 w-5 bg-red-300" />
+              {errorMessage}
+            </div>
+          )}
           <div>
             <TextInput
               label="E-mail"
@@ -79,10 +79,9 @@ function LoginForm() {
           >
             Forgot password?
           </Link>
+          <SubmittingUpdater isFetchLoading={isLoading} />
           <div className="mt-10 w-44 self-center">
-            <PrimaryButton type="submit" onClickHandler={() => undefined}>
-              Log&nbsp;in
-            </PrimaryButton>
+            <SubmitButtonPrimary>Log&nbsp;in</SubmitButtonPrimary>
           </div>
           <p className="mt-14 self-center text-gray-300">
             Don&apos;t have an account yet?{' '}
@@ -98,4 +97,16 @@ function LoginForm() {
     </div>
   );
 }
+
+function SubmittingUpdater({ isFetchLoading }: { isFetchLoading: boolean }) {
+  const { setSubmitting } = useFormikContext();
+  useEffect(() => {
+    if (!isFetchLoading) {
+      setSubmitting(false);
+    }
+  }, [isFetchLoading, setSubmitting]);
+
+  return null;
+}
+
 export default LoginForm;

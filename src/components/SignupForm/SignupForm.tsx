@@ -1,40 +1,20 @@
-import TextInput from '@components/formControls/TextInput';
-import { FormikValueTracker } from '@components/FormikValueTracker';
-import PrimaryButton from '@components/PrimaryButton/PrimaryButton';
-import useFetch from '@hooks/useFetchNew';
-
-import { Formik, Form } from 'formik';
-import { useCallback, useState } from 'react';
+import { SubmitButtonPrimary } from '@components/form-controls';
+import TextInput from '@components/form-controls/TextInput';
+import useFetch from '@hooks/useFetch';
+import { Formik, Form, useFormikContext } from 'formik';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
 
-const initialData = {};
-
 function SignupForm() {
-  const [postData, setPostData] = useState(initialData);
-  // const { refresh, result } = useFetch({
-  //   url: 'auth/signup',
-  //   method: 'POST',
-  //   start: false,
-  //   data: postData,
-  // });
-  const { refetch, data, hasError, errorMessage } = useFetch({
+  const [postData, setPostData] = useState({});
+
+  const { refetch, hasError, errorMessage, isLoading } = useFetch({
     initialUrl: 'auth/signup',
     method: 'POST',
     onMount: false,
     postData,
   });
-  const [serverError, setServerError] = useState('');
-  if (hasError && errorMessage !== serverError) {
-    setServerError(errorMessage);
-  }
-
-  const handleFormValueChange = useCallback(
-    (nextValues: object) => {
-      setPostData(nextValues);
-    },
-    [setPostData],
-  );
 
   return (
     <div>
@@ -58,37 +38,19 @@ function SignupForm() {
             .oneOf([Yup.ref('password')], "Passwords don't match.")
             .required('Please enter your password again.'),
         })}
-        // onSubmit={async (values, { setSubmitting }) => {
-        onSubmit={() => {
-          setServerError('');
+        onSubmit={(values) => {
+          setPostData(values);
           refetch();
-          // try {
-          //   // await refresh();
-          //   refetch()
-          //   console.log(postData);
-          //   console.log(result);
-          // } catch (err) {
-          //   console.log('runs');
-          //   setServerError(
-          //     'Something went wrong on our side. Try again later.',
-          //   );
-          // }
-          // setTimeout(() => {
-          //   useFetch({ url: 'login', method: 'POST', start: false });
-
-          //   alert(JSON.stringify(values, null, 2));
-          //   setSubmitting(false);
-          // }, 400);
         }}
       >
         <Form className="flex flex-col">
-          {serverError && (
+          {hasError && (
             <div
               className="mb-2 flex items-center gap-3 rounded-lg border-[1px]
              border-red-300 bg-red-900 px-3 py-2 text-red-300"
             >
               <div className="exclamation-mask aspect-square h-5 w-5 bg-red-300" />
-              {serverError}
+              {errorMessage}
             </div>
           )}
           <div>
@@ -118,9 +80,9 @@ function SignupForm() {
               autoComplete="new-password"
             />
           </div>
-          <FormikValueTracker onValueChange={handleFormValueChange} />
+          <SubmittingUpdater isFetchLoading={isLoading} />
           <div className="mt-10 w-44 self-center">
-            <PrimaryButton type="submit">Create&nbsp;account</PrimaryButton>
+            <SubmitButtonPrimary>Create&nbsp;account</SubmitButtonPrimary>
           </div>
           <p className="mt-14 self-center text-gray-300">
             Already have an account?{' '}
@@ -136,4 +98,16 @@ function SignupForm() {
     </div>
   );
 }
+
+function SubmittingUpdater({ isFetchLoading }: { isFetchLoading: boolean }) {
+  const { setSubmitting } = useFormikContext();
+  useEffect(() => {
+    if (!isFetchLoading) {
+      setSubmitting(false);
+    }
+  }, [isFetchLoading, setSubmitting]);
+
+  return null;
+}
+
 export default SignupForm;
