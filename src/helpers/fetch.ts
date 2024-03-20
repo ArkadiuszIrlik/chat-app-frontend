@@ -15,3 +15,34 @@ export function getURL(url: string) {
   }
   return mainURL + nextUrl;
 }
+
+interface ExtendedError extends Error {
+  status: number;
+  data: object;
+}
+
+export async function genericFetcherCredentials(key: string) {
+  const res = await fetch(getURL(key), { credentials: 'include' });
+  if (!res.ok) {
+    const error = new Error(
+      'An error occurred while fetching the data.',
+    ) as ExtendedError;
+    error.data = (await res.json()) as object;
+    error.status = res.status;
+    throw error;
+  }
+  return res.json();
+}
+
+export default async function genericFetcher(key: string) {
+  const res = await fetch(getURL(key));
+  if (!res.ok) {
+    const error = new Error(
+      'An error occurred while fetching the data.',
+    ) as ExtendedError;
+    error.data = (await res.json()) as object;
+    error.status = res.status;
+    throw error;
+  }
+  return res.json();
+}
