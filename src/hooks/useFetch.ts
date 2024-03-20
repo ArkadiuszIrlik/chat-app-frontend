@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { getURL } from '@helpers/fetch';
 
 interface BaseProps {
   initialUrl: string;
