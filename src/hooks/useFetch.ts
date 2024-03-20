@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 interface BaseProps {
   initialUrl: string;
@@ -17,31 +17,16 @@ interface PostProps {
 type ConditionalProps = GetProps | PostProps;
 type Props = BaseProps & ConditionalProps;
 
-function getURL(url: string) {
-  const urlExpression =
-    'https?://(www.)?[-a-zA-Z0-9@:%._+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)';
-  const regex = new RegExp(urlExpression);
-  if (url.match(regex)) {
-    return url;
-  }
-  let mainURL = import.meta.env.VITE_MAIN_API_ENDPOINT;
-  if (mainURL === undefined) return '';
-  if (!mainURL.endsWith('/')) mainURL += '/';
-
-  let nextUrl = url;
-  if (url.length > 0 && url.startsWith('/')) {
-    nextUrl = url.substring(1, url.length);
-  }
-  return mainURL + nextUrl;
-}
+const defaultInitialParams = {};
+const defaultHeaders = {};
 
 function useFetch({
   initialUrl,
-  initialParams = {},
+  initialParams = defaultInitialParams,
   onMount = true,
   postData,
   method = 'GET',
-  headers = {},
+  headers = defaultHeaders,
 }: Props) {
   const [url, updateUrl] = useState(initialUrl);
   const [params, updateParams] = useState(initialParams);
@@ -50,13 +35,16 @@ function useFetch({
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [refetchIndex, setRefetchIndex] = useState(0);
-  const queryString = Object.keys(params)
-    .map(
-      (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`,
-    )
-    .join('&');
-  const refetch = () =>
-    setRefetchIndex((prevRefetchIndex) => prevRefetchIndex + 1);
+  const queryString = useMemo(
+    () =>
+      Object.keys(params)
+        .map(
+          (key) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`,
+        )
+        .join('&'),
+    [params],
+  );
   useEffect(() => {
     async function fetchData() {
       if (onMount === false && refetchIndex === 0) return;
