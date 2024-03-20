@@ -20,7 +20,15 @@ function useAuth() {
 
   const login = useCallback(async () => {
     try {
-      const res = await fetch(getURL('/auth/user'));
+      const res = await fetch(getURL('/users/self'), {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const error = Error();
+        const apiError = (await res.json()) as BackendError;
+        Object.assign(error, apiError);
+        throw error;
+      }
       const nextUser = (await res.json()) as UserAuth;
       setUser(nextUser);
     } catch {
@@ -28,12 +36,16 @@ function useAuth() {
     }
   }, [setUser]);
 
-  const logout = useCallback(() => {
-    setUser(null);
+  const logout = useCallback(async () => {
+    const res = await fetch(getURL('/auth/logout'), {
+      credentials: 'include',
+    });
+    if (res.ok) {
+      setUser(null);
+    }
   }, [setUser]);
 
   useEffect(() => {
-    // eslint-disable-next-line no-void
     void login();
   }, [login]);
 
@@ -54,6 +66,7 @@ function useAuth() {
     }),
     [user, isAuthenticated, logout, login],
   );
+
   return authObj;
 }
 
