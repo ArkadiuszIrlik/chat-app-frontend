@@ -47,6 +47,7 @@ function useFetch({
         .join('&'),
     [params],
   );
+  const refetch = () => setRefetchIndex(refetchIndex + 1);
   useEffect(() => {
     async function fetchData() {
       if (onMount === false && refetchIndex === 0) return;
@@ -89,7 +90,6 @@ function useFetch({
         setIsLoading(false);
       }
     }
-    // eslint-disable-next-line no-void
     void fetchData();
   }, [
     url,
