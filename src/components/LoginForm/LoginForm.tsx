@@ -5,19 +5,22 @@ import { Formik, Form } from 'formik';
 import { useState } from 'react';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@hooks/index';
 
 function LoginForm() {
   const [postData, setPostData] = useState({});
-  const { refresh, result } = useFetch({
-    url: 'login',
+
+  const { refetch, hasError, errorMessage, data, isLoading } = useFetch({
+    initialUrl: 'auth/login',
     method: 'POST',
     start: false,
     data: postData,
   });
 
-  // async function postForm(values: object) {
-  //   await refresh;
-  // }
+  const { login } = useAuth()!;
+  if (data && hasError === false) {
+    void login();
+  }
 
   return (
     <div>
