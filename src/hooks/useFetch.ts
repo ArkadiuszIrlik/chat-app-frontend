@@ -5,6 +5,7 @@ interface BaseProps {
   initialParams?: Record<string, string | number>;
   onMount?: boolean;
   headers?: Record<string, string>;
+  credentials?: RequestCredentials;
 }
 interface GetProps {
   method: 'GET' | 'HEAD';
@@ -27,6 +28,7 @@ function useFetch({
   postData,
   method = 'GET',
   headers = defaultHeaders,
+  credentials = 'include',
 }: Props) {
   const [url, updateUrl] = useState(initialUrl);
   const [params, updateParams] = useState(initialParams);
@@ -60,6 +62,7 @@ function useFetch({
           headers: nextHeaders,
           body: postData ? JSON.stringify(postData) : undefined,
           method,
+          credentials,
         });
         const result = (await response.json()) as Record<
           string,
@@ -97,6 +100,7 @@ function useFetch({
     method,
     postData,
     headers,
+    credentials,
   ]);
   return {
     data,
