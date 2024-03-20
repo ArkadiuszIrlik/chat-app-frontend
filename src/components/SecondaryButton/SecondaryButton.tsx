@@ -2,12 +2,18 @@ import { ReactNode } from 'react';
 
 interface SecondaryButtonInterface {
   type: HTMLButtonElement['type'];
+  disabled?: boolean;
   children: ReactNode;
   onClickHandler: () => void;
 }
 
+SecondaryButton.defaultProps = {
+  disabled: false,
+};
+
 function SecondaryButton({
   type,
+  disabled,
   children,
   onClickHandler,
 }: SecondaryButtonInterface) {
@@ -16,9 +22,10 @@ function SecondaryButton({
       <button
         /* eslint-disable-next-line react/button-has-type */
         type={type}
+        disabled={disabled}
         onClick={onClickHandler}
         className="relative z-0 w-full min-w-full rounded-md px-5 py-2
-        text-white hover:brightness-110 active:brightness-125"
+        text-white hover:brightness-110 active:brightness-125 disabled:brightness-75"
       >
         <span
           className="mask-content absolute inset-0 -z-10 rounded-md bg-gradient-to-tr from-clairvoyant-900
