@@ -49,6 +49,8 @@ function useFetch({
     async function fetchData() {
       if (onMount === false && refetchIndex === 0) return;
       setIsLoading(true);
+      setHasError(false);
+      setErrorMessage('');
       const nextHeaders = { ...headers };
       if (nextHeaders['Content-Type'] === undefined) {
         nextHeaders['Content-Type'] = 'application/json;charset=utf-8';
