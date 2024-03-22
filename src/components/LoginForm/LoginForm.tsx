@@ -18,9 +18,12 @@ function LoginForm() {
   });
 
   const { login } = useAuth()!;
-  if (data && hasError === false) {
-    void login();
-  }
+
+  useEffect(() => {
+    if (data && hasError === false) {
+      void login();
+    }
+  }, [data, hasError, login]);
 
   return (
     <div>
