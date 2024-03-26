@@ -10,5 +10,5 @@ export default {
       fontFamily: styleConsts.fontFamily,
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
 };
