@@ -1,34 +1,33 @@
 import Notification from '@components/NotificationDisplay/Notification';
+import { useMessageEvents } from '@hooks/index';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const NOTIFICATION_DISPLAY_TIME = 5000;
 
-function NotificationDisplay({ messageEvents }: { messageEvents: Message[] }) {
+function NotificationDisplay() {
   const [eventQueue, setEventQueue] = useState<Message[]>([]);
   const [currentEvent, setCurrentEvent] = useState<Message | null>(null);
-  const [previousEvent, setPreviousEvent] = useState<Message | null>(null);
   const { channelId } = useParams();
   const navigate = useNavigate();
 
-  // add latest event to queue
+  const { messageEmitter } = useMessageEvents()!;
+  // add new events to queue
   useEffect(() => {
-    const latestEvent = messageEvents[messageEvents.length - 1];
-    if (latestEvent === undefined) {
-      return;
-    }
-    // don't display notifications for chat that's already on screen
-    if (latestEvent.chatId === channelId) {
-      return;
-    }
-    if (eventQueue.length === 0) {
-      if (latestEvent._id !== previousEvent?._id) {
-        setEventQueue((eq) => [...eq, latestEvent]);
+    function addToEventQueue(newEvent: Message) {
+      // don't display notifications for chat that's already on screen
+      if (newEvent.chatId === channelId) {
+        return;
       }
-    } else if (latestEvent._id !== eventQueue[eventQueue.length - 1]._id) {
-      setEventQueue((eq) => [...eq, latestEvent]);
+      setEventQueue((eq) => [...eq, newEvent]);
     }
-  }, [messageEvents, eventQueue, previousEvent, channelId]);
+
+    messageEmitter.on('new message', addToEventQueue);
+
+    return () => {
+      messageEmitter.off('new message', addToEventQueue);
+    };
+  }, [messageEmitter, channelId]);
 
   // display queued events
   useEffect(() => {
@@ -36,7 +35,6 @@ function NotificationDisplay({ messageEvents }: { messageEvents: Message[] }) {
       setCurrentEvent(eventQueue[0]);
       setTimeout(() => {
         setEventQueue((eq) => eq.slice(1));
-        setPreviousEvent(eventQueue[0]);
         setCurrentEvent(null);
       }, NOTIFICATION_DISPLAY_TIME);
     }
