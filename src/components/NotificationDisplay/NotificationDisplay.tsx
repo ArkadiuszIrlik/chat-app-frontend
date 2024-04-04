@@ -35,7 +35,7 @@ function NotificationDisplay({ messageEvents }: { messageEvents: Message[] }) {
     if (eventQueue.length > 0 && currentEvent === null) {
       setCurrentEvent(eventQueue[0]);
       setTimeout(() => {
-        setEventQueue(eventQueue.slice(1));
+        setEventQueue((eq) => eq.slice(1));
         setPreviousEvent(eventQueue[0]);
         setCurrentEvent(null);
       }, NOTIFICATION_DISPLAY_TIME);
