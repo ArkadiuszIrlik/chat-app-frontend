@@ -5,12 +5,12 @@ import { Outlet } from 'react-router-dom';
 
 function AppScreen() {
   const { logout, user } = useAuth()!;
-  const { messageEvents } = useSocket();
+  useSocket();
 
   return (
     <MessageEventsProvider>
       <div className="flex min-h-screen">
-        <NotificationDisplay messageEvents={messageEvents} />
+        <NotificationDisplay />
         <button
           type="button"
           className="bg-red-500 p-4"
