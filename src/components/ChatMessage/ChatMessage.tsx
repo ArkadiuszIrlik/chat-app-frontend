@@ -1,19 +1,30 @@
+import formatDate from '@components/ChatMessage/ChatMessage.helpers';
+
 function ChatMessage({
-  isMyMessage,
+  authorName,
+  authorImg,
   messageText,
+  postedAt,
 }: {
-  isMyMessage: boolean;
+  authorName: string;
+  authorImg: string;
   messageText: string;
+  postedAt: Date;
 }) {
   return (
-    <div
-      className={`self-start rounded-lg bg-dark-600 p-4 text-white ${
-        isMyMessage
-          ? 'self-end rounded-ee-none bg-primary-600'
-          : 'self-start rounded-es-none bg-dark-600'
-      }`}
-    >
-      <p className="max-w-prose break-words">{messageText}</p>
+    <div className="flex items-start gap-4 rounded-md bg-gray-700 px-3 py-2">
+      <img
+        src={authorImg}
+        alt=""
+        className="aspect-square h-10 w-10 rounded-full"
+      />
+      <div className="flex flex-col">
+        <div>
+          <span className="mr-2 text-blue-400">{authorName}</span>
+          <span className="text-xs text-gray-200">{formatDate(postedAt)}</span>
+        </div>
+        <p className="max-w-prose break-words">{messageText}</p>
+      </div>
     </div>
   );
 }
