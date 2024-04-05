@@ -1,4 +1,5 @@
 import formatDate from '@components/ChatMessage/ChatMessage.helpers';
+import MessageBody from '@components/ChatMessage/MessageBody';
 
 function ChatMessage({
   authorName,
@@ -23,7 +24,7 @@ function ChatMessage({
           <span className="mr-2 text-blue-400">{authorName}</span>
           <span className="text-xs text-gray-200">{formatDate(postedAt)}</span>
         </div>
-        <p className="max-w-prose break-words">{messageText}</p>
+        <MessageBody text={messageText} />
       </div>
     </div>
   );
