@@ -7,8 +7,7 @@ dayjs.extend(localizedFormat);
 
 export default function formatDate(dateObj: Date) {
   return dayjs(dateObj).calendar(null, {
-    sameDay: '[Today at] LT',
-    lastDay: '[Yesterday at] LT',
+    lastWeek: 'L LT',
     sameElse: 'L LT',
   });
 }
