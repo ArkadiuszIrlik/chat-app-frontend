@@ -5,6 +5,7 @@ import { SignupScreen } from '@containers/SignupScreen';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@src/App';
 import { ProtectedRoute } from '@components/ProtectedRoute';
+import { ServerView, ServerViewLoader } from '@components/ServerView';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,14 @@ const router = createBrowserRouter([
           {
             path: '/app',
             element: <AppScreen />,
+            children: [
+              {
+                path: 'channels/:serverId',
+                element: <ServerView />,
+                loader: ServerViewLoader,
+                children: [{ path: ':channelId' }],
+              },
+            ],
           },
         ],
       },
