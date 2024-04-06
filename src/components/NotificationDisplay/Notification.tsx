@@ -15,7 +15,7 @@ function Notification({
     <div className="fixed bottom-10 right-10 z-30">
       <button
         type="button"
-        className="h-40 w-64 items-center rounded-lg bg-gray-600 px-5 py-4 shadow-md"
+        className="h-40 w-64 rounded-lg bg-gray-600 px-5 py-4 shadow-md"
         onClick={onClick}
       >
         <div className="mb-1 flex items-center gap-3">
@@ -35,9 +35,10 @@ function Notification({
             )}
           </div>
         </div>
-        <div className="min-w-0">
-          <p className="line-clamp-3">{text}</p>
-        </div>
+        <div
+          className="line-clamp-3 text-left"
+          dangerouslySetInnerHTML={{ __html: text }}
+        />
       </button>
     </div>
   );
