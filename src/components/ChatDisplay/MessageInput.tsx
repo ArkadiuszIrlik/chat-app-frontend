@@ -8,6 +8,7 @@ import {
 import StarterKit from '@tiptap/starter-kit';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import socket from '@helpers/socket';
+import Placeholder from '@tiptap/extension-placeholder';
 
 // const ShortcutExtension = Extension.create({
 //   addKeyboardShortcuts() {
@@ -21,8 +22,6 @@ import socket from '@helpers/socket';
 //   },
 // });
 // const extensions = [StarterKit, ShortcutExtension];
-
-const content = '<p>Hello World!</p>';
 
 // function submitMessage() {}
 // function handleSendMessage(msgText: string, socketId: string) {
@@ -88,8 +87,13 @@ function MessageInput({ channelSocketId }: { channelSocketId: string }) {
   return (
     <div className="p-4">
       <EditorProvider
-        extensions={[StarterKit, ShortcutExtension]}
-        content={content}
+        extensions={[
+          StarterKit,
+          Placeholder.configure({
+            placeholder: 'Say something...',
+          }),
+          ShortcutExtension,
+        ]}
         editorProps={{
           attributes: {
             class:
