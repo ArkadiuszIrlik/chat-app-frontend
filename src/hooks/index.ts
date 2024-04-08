@@ -4,3 +4,5 @@ export * from './useAuth';
 export { default as useAuth } from './useAuth';
 export * from './useMessageEvents';
 export { default as useMessageEvents } from './useMessageEvents';
+export * from './useMessageStore';
+export { default as useMessageStore } from './useMessageStore';
