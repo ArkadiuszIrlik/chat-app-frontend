@@ -34,6 +34,7 @@ module.exports = {
     'react/prop-types': 'warn',
     '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
     'no-void': 'off',
+    'no-underscore-dangle': ['error', { allow: ['_id'] }],
     'import/extensions': [
       'error',
       'ignorePackages',
