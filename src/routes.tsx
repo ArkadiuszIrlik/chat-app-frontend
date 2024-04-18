@@ -7,6 +7,7 @@ import { ServerView, ServerViewLoader } from '@components/ServerView';
 import { AuthScreen } from '@containers/AuthScreen';
 import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
+import { EmailVerification } from '@components/EmailVerification';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
           {
             path: '/signup',
             element: <SignupForm />,
+          },
+          {
+            path: '/verify-email',
+            element: <EmailVerification />,
           },
         ],
       },
