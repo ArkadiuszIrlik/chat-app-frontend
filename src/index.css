@@ -57,6 +57,13 @@
     mask-size: contain;
     mask-position: center;
   }
+
+  .alpha-mask {
+    mask-image: var(--mask-url);
+    mask-mode: alpha;
+    mask-size: contain;
+    mask-position: center;
+  }
 }
 
 @layer utilities {
