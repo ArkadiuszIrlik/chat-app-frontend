@@ -1,11 +1,12 @@
 import { AppScreen } from '@containers/AppScreen';
 import { HomeScreen } from '@containers/HomeScreen';
-import { LoginScreen } from '@containers/LoginScreen';
-import { SignupScreen } from '@containers/SignupScreen';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@src/App';
 import { ProtectedRoute } from '@components/ProtectedRoute';
 import { ServerView, ServerViewLoader } from '@components/ServerView';
+import { AuthScreen } from '@containers/AuthScreen';
+import { SignupForm } from '@components/SignupForm';
+import { LoginForm } from '@components/LoginForm';
 
 const router = createBrowserRouter([
   {
@@ -16,13 +17,19 @@ const router = createBrowserRouter([
         element: <HomeScreen />,
       },
       {
-        path: '/login',
-        element: <LoginScreen />,
+        element: <AuthScreen />,
+        children: [
+          {
+            path: '/login',
+            element: <LoginForm />,
+          },
+          {
+            path: '/signup',
+            element: <SignupForm />,
+          },
+        ],
       },
-      {
-        path: '/signup',
-        element: <SignupScreen />,
-      },
+
       {
         element: <ProtectedRoute />,
         children: [
