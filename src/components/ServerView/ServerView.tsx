@@ -9,7 +9,7 @@ import ProfileIcon1 from '@assets/profile-icon-1.webp';
 import ProfileIcon2 from '@assets/profile-icon-2.webp';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import loader from '@components/ServerView/ServerView.loader';
-const users = [];
+import UserBar from '@components/ServerView/UserBar';
 
 function getChannelList(channelCategories: ChannelCategory[]) {
   const channelList: Channel[] = [];
@@ -74,12 +74,17 @@ function ServerView() {
         // ) :
         server !== undefined && (
           <>
-            <ChannelList
-              channelCategories={server.channelCategories as ChannelCategory[]}
-              serverName={server.name}
-              activeChannel={activeChannel}
-              onChangeActiveChannel={handleChangeActiveChannel}
-            />
+            <div className="flex w-52 flex-col bg-gray-700 px-2 py-2">
+              <ChannelList
+                channelCategories={
+                  server.channelCategories as ChannelCategory[]
+                }
+                serverName={server.name}
+                activeChannel={activeChannel}
+                onChangeActiveChannel={handleChangeActiveChannel}
+              />
+              <UserBar />
+            </div>
             <ChatDisplay
               channelName={activeChannel?.name ?? ''}
               // channelId={activeChannel._id}
