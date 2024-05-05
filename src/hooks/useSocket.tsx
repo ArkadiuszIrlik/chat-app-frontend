@@ -8,6 +8,7 @@ import {
 } from 'react';
 import socket from '@helpers/socket';
 import { useAuth } from '@hooks/index';
+import { SocketEvents } from '@src/types';
 function useSocket() {
   const { logout } = useAuth()!;
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -52,9 +53,21 @@ function useSocket() {
       socket.off(SocketEvents.AuthenticationError, onAuthError);
     };
   }, [logout]);
+
+
+  const sendChatMessage = useCallback(
+    (
+      message: Parameters<typeof socket.emit<SocketEvents.SendChatMessage>>[1],
+      socketId: string,
+    ) => {
+      socket.emit(SocketEvents.SendChatMessage, message, socketId);
+    },
+    [],
+  );
   return {
     isConnected,
     messageEvents,
+    sendChatMessage,
   };
 }
 
