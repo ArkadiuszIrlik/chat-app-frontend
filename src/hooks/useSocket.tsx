@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import socket from '@helpers/socket';
 import { useAuth } from '@hooks/index';
-
-interface NetworkMessage extends Omit<Message, 'postedAt'> {
-  postedAt: string;
-}
-
 function useSocket() {
   const { logout } = useAuth()!;
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [messageEvents, setMessageEvents] = useState<Message[]>([]);
-
   useEffect(() => {
     socket.connect();
 
@@ -38,21 +39,38 @@ function useSocket() {
         ...nextEvent,
         postedAt: new Date(nextEvent.postedAt),
       };
-      setMessageEvents([...messageEvents, nextMessageEvent]);
+      setMessageEvents((me) => [...me, nextMessageEvent]);
     }
 
     function onAuthError() {
       void logout();
     }
-
-    socket.on('chat message', onMessageEvent);
-    socket.on('authentication error', onAuthError);
+    socket.on(SocketEvents.ChatMessage, onMessageEvent);
+    socket.on(SocketEvents.AuthenticationError, onAuthError);
     return () => {
-      socket.off('chat message', onMessageEvent);
-      socket.off('authentication error', onAuthError);
+      socket.off(SocketEvents.ChatMessage, onMessageEvent);
+      socket.off(SocketEvents.AuthenticationError, onAuthError);
     };
-  }, [logout, messageEvents]);
-
-  return { isConnected, messageEvents };
+  }, [logout]);
+  return {
+    isConnected,
+    messageEvents,
+  };
 }
-export default useSocket;
+
+const SocketContext = createContext<ReturnType<typeof useSocket> | null>(null);
+
+export function SocketProvider({ children }: { children: ReactNode }) {
+  const socketObj = useSocket();
+  return (
+    <SocketContext.Provider value={socketObj}>
+      {children}
+    </SocketContext.Provider>
+  );
+}
+
+function SocketConsumer() {
+  return useContext(SocketContext);
+}
+
+export default SocketConsumer;

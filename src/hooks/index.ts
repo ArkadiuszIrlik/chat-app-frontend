@@ -1,3 +1,4 @@
+export * from './useSocket';
 export { default as useSocket } from './useSocket';
 export { default as useFetch } from './useFetch';
 export * from './useAuth';
