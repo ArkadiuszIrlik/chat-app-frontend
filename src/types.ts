@@ -18,8 +18,15 @@ enum SocketEvents {
   OnlineStatusChanged = 'online status changed',
 }
 
+enum ClientEvents {
+  ChatMessage = 'CHAT MESSAGE',
+  OnlineStatusChanged = 'ONLINE STATUS CHANGED',
+}
+
+
 export {
   UserOnlineStatus,
   type ExtendedCSSProperties,
   SocketEvents,
+  ClientEvents,
 };

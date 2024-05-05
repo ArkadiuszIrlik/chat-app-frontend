@@ -1,4 +1,5 @@
 import { useSocketEvents } from '@hooks/index';
+import { ClientEvents } from '@src/types';
 import {
   ReactNode,
   createContext,
@@ -45,10 +46,10 @@ function useMessageStore() {
       });
     }
 
-    messageEmitter.on('new message', addToMessages);
+    messageEmitter.on(ClientEvents.ChatMessage, addToMessages);
 
     return () => {
-      messageEmitter.off('new message', addToMessages);
+      messageEmitter.off(ClientEvents.ChatMessage, addToMessages);
     };
   }, [messageEmitter]);
 

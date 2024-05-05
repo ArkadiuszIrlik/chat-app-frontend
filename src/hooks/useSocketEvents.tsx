@@ -1,6 +1,7 @@
 import useSocket from '@hooks/useSocket';
 import { ReactNode, createContext, useContext, useEffect } from 'react';
 import EventEmitter from 'eventemitter3';
+import { ClientEvents } from '@src/types';
 
 const messageEmitter = new EventEmitter();
 
@@ -11,7 +12,7 @@ function useSocketEvents() {
     if (latestEvent === undefined) {
       return;
     }
-    messageEmitter.emit('new message', latestEvent);
+    messageEmitter.emit(ClientEvents.ChatMessage, latestEvent);
   }, [messageEvents]);
 
   useEffect(() => {
@@ -19,7 +20,7 @@ function useSocketEvents() {
     if (latestEvent === undefined) {
       return;
     }
-    messageEmitter.emit('online status changed', latestEvent);
+    messageEmitter.emit(ClientEvents.OnlineStatusChanged, latestEvent);
   }, [statusEvents]);
 
   return { messageEmitter };

@@ -2,6 +2,7 @@ import Notification from '@components/NotificationDisplay/Notification';
 import { useMessageEvents } from '@hooks/index';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ClientEvents } from '@src/types';
 
 const NOTIFICATION_DISPLAY_TIME = 5000;
 
@@ -21,10 +22,10 @@ function NotificationDisplay() {
       setEventQueue((eq) => [...eq, newEvent]);
     }
 
-    messageEmitter.on('new message', addToEventQueue);
+    messageEmitter.on(ClientEvents.ChatMessage, addToEventQueue);
 
     return () => {
-      messageEmitter.off('new message', addToEventQueue);
+      messageEmitter.off(ClientEvents.ChatMessage, addToEventQueue);
     };
   }, [messageEmitter, channelId]);
 
