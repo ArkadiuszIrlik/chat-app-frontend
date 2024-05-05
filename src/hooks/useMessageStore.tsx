@@ -1,4 +1,4 @@
-import { useMessageEvents } from '@hooks/index';
+import { useSocketEvents } from '@hooks/index';
 import {
   ReactNode,
   createContext,
@@ -18,7 +18,7 @@ function orderMessages(messageList: Message[]) {
 
 function useMessageStore() {
   const [messageStore, setMessageStore] = useState<MessageStore>({});
-  const { messageEmitter } = useMessageEvents()!;
+  const { messageEmitter } = useSocketEvents()!;
 
   const addToStore = useCallback((chatId: string, newMessages: Message[]) => {
     setMessageStore((ms) => {

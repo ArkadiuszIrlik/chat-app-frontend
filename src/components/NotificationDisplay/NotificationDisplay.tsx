@@ -10,8 +10,7 @@ function NotificationDisplay() {
   const [currentEvent, setCurrentEvent] = useState<Message | null>(null);
   const { channelId } = useParams();
   const navigate = useNavigate();
-
-  const { messageEmitter } = useMessageEvents()!;
+  const { messageEmitter } = useSocketEvents()!;
   // add new events to queue
   useEffect(() => {
     function addToEventQueue(newEvent: Message) {
