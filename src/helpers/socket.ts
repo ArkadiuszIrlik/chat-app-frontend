@@ -1,4 +1,4 @@
-import { SocketEvents } from '@src/types';
+import { SocketEvents, UserOnlineStatus } from '@src/types';
 import { Socket, io } from 'socket.io-client';
 
 interface ClientToServerEvents {
@@ -6,10 +6,18 @@ interface ClientToServerEvents {
     message: { text: string; clientId: string },
     socketId: string,
   ) => void;
+  [SocketEvents.ChangeOnlineStatus]: (
+    nextStatus: UserOnlineStatus,
+    callback: () => void,
+  ) => void;
 }
 
 interface ServerToClientEvents {
   [SocketEvents.ChatMessage]: (message: NetworkMessage) => void;
+  [SocketEvents.OnlineStatusChanged]: (
+    userId: string,
+    nextStatus: UserOnlineStatus,
+  ) => void;
 }
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(

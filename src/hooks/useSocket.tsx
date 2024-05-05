@@ -8,11 +8,16 @@ import {
 } from 'react';
 import socket from '@helpers/socket';
 import { useAuth } from '@hooks/index';
-import { SocketEvents } from '@src/types';
+import { SocketEvents, UserOnlineStatus } from '@src/types';
+
 function useSocket() {
   const { logout } = useAuth()!;
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [messageEvents, setMessageEvents] = useState<Message[]>([]);
+  const [statusEvents, setStatusEvents] = useState<
+    { userId: string; nextStatus: UserOnlineStatus }[]
+  >([]);
+
   useEffect(() => {
     socket.connect();
 
@@ -46,11 +51,22 @@ function useSocket() {
     function onAuthError() {
       void logout();
     }
+
+    function onStatusEvent(userId: string, nextStatus: UserOnlineStatus) {
+      const nextStatusEvent = {
+        userId,
+        nextStatus,
+      };
+      setStatusEvents((se) => [...se, nextStatusEvent]);
+    }
+
     socket.on(SocketEvents.ChatMessage, onMessageEvent);
     socket.on(SocketEvents.AuthenticationError, onAuthError);
+    socket.on(SocketEvents.OnlineStatusChanged, onStatusEvent);
     return () => {
       socket.off(SocketEvents.ChatMessage, onMessageEvent);
       socket.off(SocketEvents.AuthenticationError, onAuthError);
+      socket.off(SocketEvents.OnlineStatusChanged, onStatusEvent);
     };
   }, [logout]);
 
@@ -64,10 +80,24 @@ function useSocket() {
     },
     [],
   );
+
+  const changeOnlineStatus = useCallback((nextStatus: UserOnlineStatus) => {
+    const timeout = 2000;
+    return new Promise<{ ok: boolean }>((resolve, reject) => {
+      const timeoutId = setTimeout(reject, timeout);
+      socket.emit(SocketEvents.ChangeOnlineStatus, nextStatus, () => {
+        clearTimeout(timeoutId);
+        resolve({ ok: true });
+      });
+    });
+  }, []);
+
   return {
     isConnected,
     messageEvents,
+    statusEvents,
     sendChatMessage,
+    changeOnlineStatus,
   };
 }
 
