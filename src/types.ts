@@ -12,7 +12,9 @@ enum UserOnlineStatus {
 
 enum SocketEvents {
   ChatMessage = 'chat message',
+  AuthenticationError = 'authentication error',
   SendChatMessage = 'send chat message',
+  ChangeOnlineStatus = 'change online status',
   OnlineStatusChanged = 'online status changed',
 }
 
