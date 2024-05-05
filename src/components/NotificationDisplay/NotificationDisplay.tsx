@@ -1,5 +1,5 @@
 import Notification from '@components/NotificationDisplay/Notification';
-import { useMessageEvents } from '@hooks/index';
+import { useSocketEvents } from '@hooks/index';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ClientEvents } from '@src/types';
