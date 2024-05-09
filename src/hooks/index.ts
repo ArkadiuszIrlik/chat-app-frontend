@@ -8,3 +8,4 @@ export { default as useMessageEvents } from './useMessageEvents';
 export * from './useMessageStore';
 export { default as useMessageStore } from './useMessageStore';
 export { default as useChatMessages } from './useChatMessages';
+export { default as useOnClickOutside } from './useOnClickOutside';
