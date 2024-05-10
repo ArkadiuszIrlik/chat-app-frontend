@@ -1,17 +1,17 @@
-/* eslint-disable */
-import { ChannelCategory, ChannelList } from '@components/ChannelList';
-import { ChatDisplay } from '@components/ChatDisplay';
 import { UserList } from '@components/UserList';
-import useSWR from 'swr';
-import { genericFetcherCredentials } from '@helpers/fetch';
-import { useCallback, useEffect, useState } from 'react';
-import ProfileIcon1 from '@assets/profile-icon-1.webp';
-import ProfileIcon2 from '@assets/profile-icon-2.webp';
-import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import {
+  Outlet,
+  useLoaderData,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 import loader from '@components/ServerView/ServerView.loader';
-import UserBar from '@components/ServerView/UserBar';
+import LeftSidebar from '@components/ServerView/LeftSidebar';
+import { useUserList } from '@hooks/index';
+import { ServerContextInterface } from '@components/ServerView/useServerContext';
 
-function getChannelList(channelCategories: ChannelCategory[]) {
+function getChannelList(channelCategories: Server['channelCategories']) {
   const channelList: Channel[] = [];
   channelCategories.forEach((category) => {
     channelList.push(...category.channels);
@@ -19,17 +19,16 @@ function getChannelList(channelCategories: ChannelCategory[]) {
   return channelList;
 }
 
-// function ServerView({ serverId }: { serverId: string }) {
 function ServerView() {
   const { server } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
   const navigate = useNavigate();
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
   const { channelId } = useParams();
+  const { addChannelUsersToStore } = useUserList() ?? {};
 
   useEffect(() => {
     // if channelId missing, redirect to first available text channel
     if (channelId === undefined) {
-      console.log(server);
       const channelList = getChannelList(server.channelCategories);
       const nextChannel = channelList.find(
         (channel) => channel.type === 'text',
@@ -50,52 +49,37 @@ function ServerView() {
         navigate('..', { replace: true });
       }
     }
-  }, []);
+  }, [channelId, navigate, server.channelCategories]);
 
-  // const { serverId } = useParams();
-  // const { data, isLoading } = useSWR<Server>(
-  //   `/servers/${serverId}`,
-  //   genericFetcherCredentials,
-  // );
-  // const [activeChannelId, setActiveChannelId] = useState('');
+  useEffect(() => {
+    if (server && addChannelUsersToStore) {
+      const channelList = getChannelList(server.channelCategories);
+      channelList.forEach((channel) => {
+        void addChannelUsersToStore(
+          channel._id,
+          channel.socketId,
+          server.members,
+        );
+      });
+    }
+  }, [server, addChannelUsersToStore]);
 
-  const handleChangeActiveChannel = useCallback(
-    (channel: Channel) => {
-      setActiveChannel(channel);
-      navigate(`${channel._id}`, { replace: true, relative: 'path' });
-    },
-    [setActiveChannel],
-  );
   return (
     <div className="flex min-h-screen grow">
-      {
-        // isLoading === true ? (
-        //   <div>Loading...</div>
-        // ) :
-        server !== undefined && (
-          <>
-            <div className="flex w-52 flex-col bg-gray-700 px-2 py-2">
-              <ChannelList
-                channelCategories={
-                  server.channelCategories as ChannelCategory[]
-                }
-                serverName={server.name}
-                activeChannel={activeChannel}
-                onChangeActiveChannel={handleChangeActiveChannel}
-              />
-              <UserBar />
-            </div>
-            <ChatDisplay
-              channelName={activeChannel?.name ?? ''}
-              // channelId={activeChannel._id}
-              // messagesId={activeChannel?.messagesId ?? ''}
-              chatId={activeChannel?.messagesId ?? ''}
-              channelSocketId={activeChannel?.socketId ?? ''}
+      {server !== undefined && (
+        <>
+          <LeftSidebar
+            channelCategories={server.channelCategories}
+            serverName={server.name}
+          />
+          <div className="flex grow">
+            <Outlet
+              context={{ activeChannel } satisfies ServerContextInterface}
             />
-            <UserList userList={users} />
-          </>
-        )
-      }
+          </div>
+          <UserList />
+        </>
+      )}
     </div>
   );
 }
