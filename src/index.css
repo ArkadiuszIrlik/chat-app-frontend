@@ -69,6 +69,21 @@
     @apply rounded-full shadow-[inset_0_1px_2px_0_rgba(217,217,217,0.25)];
   }
 
+  .bg-status-online {
+    @apply bg-green-500;
+  }
+
+  .bg-status-away {
+    @apply bg-orange-500;
+  }
+
+  .bg-status-do-not-disturb {
+    @apply bg-red-600;
+  }
+
+  .bg-status-offline {
+    @apply bg-gray-300;
+  }
 }
 
 @layer utilities {
