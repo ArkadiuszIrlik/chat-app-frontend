@@ -1,18 +1,15 @@
 import { useState } from 'react';
-import { Channel } from '@components/ChannelList';
-import ChannelButton from '@components/ChannelList/ChannelButton';
+import ChannelLink from '@components/ChannelList/ChannelLink';
+import { useParams } from 'react-router-dom';
 
 function ChannelCategorySection({
   name,
   channelList,
-  activeChannelId,
-  onChangeActiveChannel,
 }: {
   name: string;
   channelList: Channel[];
-  activeChannelId: string;
-  onChangeActiveChannel: (channelId: string) => void;
 }) {
+  const { channelId: activeChannelId } = useParams();
   const [isExpanded, setIsExpanded] = useState(true);
 
   function handleExpandCategory() {
@@ -32,14 +29,14 @@ function ChannelCategorySection({
       </div>
       {isExpanded &&
         channelList.map((channel) => {
-          const isActive = channel.id === activeChannelId;
+          const isActive = channel._id === activeChannelId;
           return (
-            <ChannelButton
+            <ChannelLink
               name={channel.name}
               isActive={isActive}
-              onClick={() => onChangeActiveChannel(channel.id)}
               type={channel.type}
-              key={channel.id}
+              relUrl={channel._id}
+              key={channel._id}
             />
           );
         })}
