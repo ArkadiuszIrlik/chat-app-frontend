@@ -64,6 +64,11 @@
     mask-size: contain;
     mask-position: center;
   }
+
+  .profile-img-overlay {
+    @apply rounded-full shadow-[inset_0_1px_2px_0_rgba(217,217,217,0.25)];
+  }
+
 }
 
 @layer utilities {
