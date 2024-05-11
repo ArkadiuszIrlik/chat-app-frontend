@@ -6,7 +6,8 @@ import { ClientEvents } from '@src/types';
 const messageEmitter = new EventEmitter();
 
 function useSocketEvents() {
-  const { messageEvents, statusEvents } = useSocket()!;
+  const { messageEvents, statusEvents, serverUpdateEvents } = useSocket()!;
+
   useEffect(() => {
     const latestEvent = messageEvents[messageEvents.length - 1];
     if (latestEvent === undefined) {
@@ -22,6 +23,14 @@ function useSocketEvents() {
     }
     messageEmitter.emit(ClientEvents.OnlineStatusChanged, latestEvent);
   }, [statusEvents]);
+
+  useEffect(() => {
+    const latestEvent = serverUpdateEvents[serverUpdateEvents.length - 1];
+    if (latestEvent === undefined) {
+      return;
+    }
+    messageEmitter.emit(ClientEvents.ServerUpdated, latestEvent);
+  }, [serverUpdateEvents]);
 
   return { messageEmitter };
 }

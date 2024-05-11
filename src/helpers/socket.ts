@@ -19,6 +19,7 @@ interface ServerToClientEvents {
     userId: string,
     nextStatus: UserOnlineStatus,
   ) => void;
+  [SocketEvents.ServerUpdated]: (serverId: string) => void;
 }
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(

@@ -16,11 +16,13 @@ enum SocketEvents {
   SendChatMessage = 'send chat message',
   ChangeOnlineStatus = 'change online status',
   OnlineStatusChanged = 'online status changed',
+  ServerUpdated = 'server updated',
 }
 
 enum ClientEvents {
   ChatMessage = 'CHAT MESSAGE',
   OnlineStatusChanged = 'ONLINE STATUS CHANGED',
+  ServerUpdated = 'SERVER UPDATED',
 }
 
 

@@ -17,6 +17,7 @@ function useSocket() {
   const [statusEvents, setStatusEvents] = useState<
     { userId: string; nextStatus: UserOnlineStatus }[]
   >([]);
+  const [serverUpdateEvents, setServerUpdateEvents] = useState<string[]>([]);
 
   useEffect(() => {
     socket.connect();
@@ -60,13 +61,20 @@ function useSocket() {
       setStatusEvents((se) => [...se, nextStatusEvent]);
     }
 
+    function onServerUpdateEvent(serverId: string) {
+      setServerUpdateEvents((se) => [...se, serverId]);
+    }
+
+
     socket.on(SocketEvents.ChatMessage, onMessageEvent);
     socket.on(SocketEvents.AuthenticationError, onAuthError);
     socket.on(SocketEvents.OnlineStatusChanged, onStatusEvent);
+    socket.on(SocketEvents.ServerUpdated, onServerUpdateEvent);
     return () => {
       socket.off(SocketEvents.ChatMessage, onMessageEvent);
       socket.off(SocketEvents.AuthenticationError, onAuthError);
       socket.off(SocketEvents.OnlineStatusChanged, onStatusEvent);
+      socket.off(SocketEvents.ServerUpdated, onServerUpdateEvent);
     };
   }, [logout]);
 
@@ -96,6 +104,7 @@ function useSocket() {
     isConnected,
     messageEvents,
     statusEvents,
+    serverUpdateEvents,
     sendChatMessage,
     changeOnlineStatus,
   };
