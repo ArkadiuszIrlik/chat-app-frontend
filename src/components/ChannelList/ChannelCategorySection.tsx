@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import ChannelLink from '@components/ChannelList/ChannelLink';
 import { useParams } from 'react-router-dom';
+import DownArrowIcon from '@assets/down-arrow-fill.png';
+import { ExtendedCSSProperties } from '@src/types';
+
+const downArrowStyle: ExtendedCSSProperties = {
+  '--mask-url': `url(${DownArrowIcon})`,
+};
 
 function ChannelCategorySection({
   name,
@@ -18,12 +24,16 @@ function ChannelCategorySection({
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between">
-        <h4 className="text-gray-300">{name}</h4>
+        <h4 className="truncate text-gray-300" title={name}>
+          {name}
+        </h4>
         <button type="button" aria-label={name} onClick={handleExpandCategory}>
           <div
-            className={`down-arrow-mask h-4 w-4 bg-gray-400 ${
-              isExpanded ? 'rotate-0' : 'rotate-180'
-            } transition-all duration-200 ease-in-out`}
+            style={downArrowStyle}
+            className={`alpha-mask aspect-square h-4 w-4 shrink-0 grow-0
+             bg-gray-400 ${
+               isExpanded ? 'rotate-0' : 'rotate-180'
+             } transition-all duration-200 ease-in-out`}
           />
         </button>
       </div>

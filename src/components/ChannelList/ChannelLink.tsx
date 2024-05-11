@@ -1,4 +1,15 @@
 import { Link } from 'react-router-dom';
+import TextChannelIcon from '@assets/text-channel-icon.png';
+import VoiceChannelIcon from '@assets/voice-channel-icon.png';
+import { ExtendedCSSProperties } from '@src/types';
+
+const textChannelStyle: ExtendedCSSProperties = {
+  '--mask-url': `url(${TextChannelIcon})`,
+};
+
+const voiceChannelStyle: ExtendedCSSProperties = {
+  '--mask-url': `url(${VoiceChannelIcon})`,
+};
 
 function ChannelLink({
   type,
@@ -19,13 +30,17 @@ function ChannelLink({
       }`}
     >
       <div
+        style={type === 'text' ? textChannelStyle : voiceChannelStyle}
         className={`${
-          type === 'text' ? 'text-channel-mask' : 'voice-channel-mask'
-        } ${
           isActive ? ' group-hover:bg-gray-300' : 'bg-gray-400'
-        } h-6 w-6 bg-gray-400 `}
+        } alpha-mask aspect-square h-6 w-6 shrink-0 grow-0 bg-gray-400`}
       />
-      <h5 className={`${isActive ? 'text-white' : 'text-gray-300'}`}>{name}</h5>
+      <h5
+        className={`${isActive ? 'text-white' : 'text-gray-300'} truncate`}
+        title={name}
+      >
+        {name}
+      </h5>
     </Link>
   );
 }
