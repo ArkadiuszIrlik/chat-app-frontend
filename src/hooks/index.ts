@@ -9,3 +9,5 @@ export * from './useMessageStore';
 export { default as useMessageStore } from './useMessageStore';
 export { default as useChatMessages } from './useChatMessages';
 export { default as useOnClickOutside } from './useOnClickOutside';
+export * from './useServerStore';
+export { default as useServerStore } from './useServerStore';

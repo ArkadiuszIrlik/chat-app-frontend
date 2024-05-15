@@ -1,6 +1,7 @@
 import { NotificationDisplay } from '@components/NotificationDisplay';
 import {
   useAuth,
+  ServerStoreProvider,
   SocketProvider,
 } from '@hooks/index';
 import ServerSelectBar from '@containers/AppScreen/ServerSelectBar';
@@ -11,20 +12,22 @@ function AppScreen() {
 
   return (
     <SocketProvider>
-              <div className="flex min-h-screen">
-                <NotificationDisplay />
-                <button
-                  type="button"
-                  className="bg-red-500 p-4"
-                  onClick={() => {
-                    void logout();
-                  }}
-                >
-                  Log Out
-                </button>
-                <ServerSelectBar serverList={user?.serversIn ?? []} />
-                <Outlet />
-              </div>
+          <ServerStoreProvider>
+                <div className="flex min-h-screen">
+                  <NotificationDisplay />
+                  <button
+                    type="button"
+                    className="bg-red-500 p-4"
+                    onClick={() => {
+                      void logout();
+                    }}
+                  >
+                    Log Out
+                  </button>
+                  <ServerSelectBar serverList={user?.serversIn ?? []} />
+                  <Outlet />
+                </div>
+          </ServerStoreProvider>
     </SocketProvider>
   );
 }
