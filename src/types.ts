@@ -17,12 +17,14 @@ enum SocketEvents {
   ChangeOnlineStatus = 'change online status',
   OnlineStatusChanged = 'online status changed',
   ServerUpdated = 'server updated',
+  ServerDeleted = 'server deleted',
 }
 
 enum ClientEvents {
   ChatMessage = 'CHAT MESSAGE',
   OnlineStatusChanged = 'ONLINE STATUS CHANGED',
   ServerUpdated = 'SERVER UPDATED',
+  ServerDeleted = 'SERVER DELETED',
 }
 
 

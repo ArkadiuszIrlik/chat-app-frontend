@@ -18,6 +18,7 @@ function useSocket() {
     { userId: string; nextStatus: UserOnlineStatus }[]
   >([]);
   const [serverUpdateEvents, setServerUpdateEvents] = useState<string[]>([]);
+  const [serverDeleteEvents, setServerDeleteEvents] = useState<string[]>([]);
 
   useEffect(() => {
     socket.connect();
@@ -65,16 +66,21 @@ function useSocket() {
       setServerUpdateEvents((se) => [...se, serverId]);
     }
 
+    function onServerDeleteEvent(serverId: string) {
+      setServerDeleteEvents((se) => [...se, serverId]);
+    }
 
     socket.on(SocketEvents.ChatMessage, onMessageEvent);
     socket.on(SocketEvents.AuthenticationError, onAuthError);
     socket.on(SocketEvents.OnlineStatusChanged, onStatusEvent);
     socket.on(SocketEvents.ServerUpdated, onServerUpdateEvent);
+    socket.on(SocketEvents.ServerDeleted, onServerDeleteEvent);
     return () => {
       socket.off(SocketEvents.ChatMessage, onMessageEvent);
       socket.off(SocketEvents.AuthenticationError, onAuthError);
       socket.off(SocketEvents.OnlineStatusChanged, onStatusEvent);
       socket.off(SocketEvents.ServerUpdated, onServerUpdateEvent);
+      socket.off(SocketEvents.ServerDeleted, onServerDeleteEvent);
     };
   }, [logout]);
 
@@ -105,6 +111,7 @@ function useSocket() {
     messageEvents,
     statusEvents,
     serverUpdateEvents,
+    serverDeleteEvents,
     sendChatMessage,
     changeOnlineStatus,
   };

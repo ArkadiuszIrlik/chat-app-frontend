@@ -1,4 +1,5 @@
-import { useAuth } from '@hooks/index';
+import { useAuth, useSocketEvents } from '@hooks/index';
+import { ClientEvents } from '@src/types';
 import {
   ReactNode,
   createContext,
@@ -11,6 +12,7 @@ import {
 function useServerStore() {
   const [serverList, setServerList] = useState<Server[]>([]);
   const { user } = useAuth() ?? {};
+  const { messageEmitter } = useSocketEvents() ?? {};
 
   const addToStore = useCallback((serversToAdd: Server | Server[]) => {
     const nextServersToAdd = Array.isArray(serversToAdd)
@@ -29,6 +31,19 @@ function useServerStore() {
       setServerList(user.serversIn);
     }
   }, [user?.serversIn]);
+
+  useEffect(() => {
+    if (!messageEmitter) {
+      return undefined;
+    }
+    function onServerDeleted(serverId: string) {
+      removeFromStore(serverId);
+    }
+    messageEmitter.on(ClientEvents.ServerDeleted, onServerDeleted);
+    return () => {
+      messageEmitter.off(ClientEvents.ServerDeleted, onServerDeleted);
+    };
+  }, [messageEmitter, removeFromStore]);
 
   return {
     serverList,

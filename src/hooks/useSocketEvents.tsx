@@ -6,7 +6,12 @@ import { ClientEvents } from '@src/types';
 const messageEmitter = new EventEmitter();
 
 function useSocketEvents() {
-  const { messageEvents, statusEvents, serverUpdateEvents } = useSocket()!;
+  const {
+    messageEvents,
+    statusEvents,
+    serverUpdateEvents,
+    serverDeleteEvents,
+  } = useSocket()!;
 
   useEffect(() => {
     const latestEvent = messageEvents[messageEvents.length - 1];
@@ -31,6 +36,14 @@ function useSocketEvents() {
     }
     messageEmitter.emit(ClientEvents.ServerUpdated, latestEvent);
   }, [serverUpdateEvents]);
+
+  useEffect(() => {
+    const latestEvent = serverDeleteEvents[serverDeleteEvents.length - 1];
+    if (latestEvent === undefined) {
+      return;
+    }
+    messageEmitter.emit(ClientEvents.ServerDeleted, latestEvent);
+  }, [serverDeleteEvents]);
 
   return { messageEmitter };
 }
