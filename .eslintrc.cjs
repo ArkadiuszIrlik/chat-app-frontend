@@ -35,6 +35,8 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
     'no-void': 'off',
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
+    'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
+    '@typescript-eslint/prefer-for-of': 'off',
     'import/extensions': [
       'error',
       'ignorePackages',
