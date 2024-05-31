@@ -76,10 +76,23 @@ function useUserList() {
       });
     }
 
+    function onUserLeftServerEvent(user: OtherUserNoStatus, serverId: string) {
+      setUserStore((us) => {
+        if (!(serverId in us)) {
+          return us;
+        }
+        const nextUserList = us[serverId].filter((u) => u._id !== user._id);
+        return { ...us, [serverId]: nextUserList };
+      });
+    }
+
     socket.on(SocketEvents.UserJoinedServer, onUserJoinedServerEvent);
+    socket.on(SocketEvents.UserLeftServer, onUserLeftServerEvent);
     socket.on(SocketEvents.UserConnected, onUserConnectedEvent);
+
     return () => {
       socket.off(SocketEvents.UserJoinedServer, onUserJoinedServerEvent);
+      socket.off(SocketEvents.UserLeftServer, onUserLeftServerEvent);
       socket.off(SocketEvents.UserConnected, onUserConnectedEvent);
     };
   }, [socket]);

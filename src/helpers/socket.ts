@@ -35,6 +35,10 @@ interface ServerToClientEvents {
     user: OtherUserNoStatus,
     serverId: string,
   ) => void;
+  [SocketEvents.UserLeftServer]: (
+    user: OtherUserNoStatus,
+    serverId: string,
+  ) => void;
   [SocketEvents.UserConnected]: (user: {
     _id: string;
     onlineStatus: UserOnlineStatus;

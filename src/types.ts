@@ -18,6 +18,7 @@ enum SocketEvents {
   ChangeOnlineStatus = 'change online status',
   OnlineStatusChanged = 'online status changed',
   UserJoinedServer = 'user joined server',
+  UserLeftServer = 'user left server',
   ServerUpdated = 'server updated',
   ServerDeleted = 'server deleted',
   UserConnected = 'user connected',
