@@ -58,9 +58,29 @@ function useUserList() {
       });
     }
 
+    function onUserConnectedEvent(user: {
+      _id: string;
+      onlineStatus: UserOnlineStatus;
+    }) {
+      setUserStore((us) => {
+        const nextUserStore: UserStore = {};
+        const keys = Object.keys(us);
+        for (let i = 0; i < keys.length; i++) {
+          const serverId = keys[i];
+          const nextUserList = us[serverId].map((u) =>
+            u._id === user._id ? { ...u, onlineStatus: user.onlineStatus } : u,
+          );
+          nextUserStore[serverId] = nextUserList;
+        }
+        return nextUserStore;
+      });
+    }
+
     socket.on(SocketEvents.UserJoinedServer, onUserJoinedServerEvent);
+    socket.on(SocketEvents.UserConnected, onUserConnectedEvent);
     return () => {
       socket.off(SocketEvents.UserJoinedServer, onUserJoinedServerEvent);
+      socket.off(SocketEvents.UserConnected, onUserConnectedEvent);
     };
   }, [socket]);
 

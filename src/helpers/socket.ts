@@ -34,6 +34,10 @@ interface ServerToClientEvents {
     user: OtherUserNoStatus,
     serverId: string,
   ) => void;
+  [SocketEvents.UserConnected]: (user: {
+    _id: string;
+    onlineStatus: UserOnlineStatus;
+  }) => void;
 }
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
