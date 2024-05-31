@@ -1,6 +1,6 @@
 import { useSocketEvents } from '@hooks/index';
 import useSocket from '@hooks/useSocket';
-import { ClientEvents, UserOnlineStatus } from '@src/types';
+import { ClientEvents, SocketEvents, UserOnlineStatus } from '@src/types';
 import { backOff } from 'exponential-backoff';
 import {
   ReactNode,
@@ -36,6 +36,33 @@ function useUserList() {
   >([]);
   const { getUsersStatus, isConnected: isSocketConnected } = useSocket()!;
   const { messageEmitter } = useSocketEvents() ?? {};
+  const { socket } = useSocket() ?? {};
+
+  useEffect(() => {
+    if (!socket) {
+      return undefined;
+    }
+    function onUserJoinedServerEvent(
+      user: OtherUserNoStatus,
+      serverId: string,
+    ) {
+      setUserStore((us) => {
+        if (!(serverId in us)) {
+          return us;
+        }
+        const nextUsersInServer = [
+          ...us[serverId],
+          { ...user, onlineStatus: UserOnlineStatus.Offline },
+        ];
+        return { ...us, [serverId]: nextUsersInServer };
+      });
+    }
+
+    socket.on(SocketEvents.UserJoinedServer, onUserJoinedServerEvent);
+    return () => {
+      socket.off(SocketEvents.UserJoinedServer, onUserJoinedServerEvent);
+    };
+  }, [socket]);
 
   useEffect(() => {
     async function retrySocketMap() {
@@ -48,9 +75,9 @@ function useUserList() {
         setIsRetrying(true);
         const tempStatusLists: Record<string, Promise<StatusList>> = {};
         for (let i = 0; i < socketsToRetry.length; i++) {
-          const socket = socketsToRetry[i];
-          tempStatusLists[socket.serverId] = backOff(() =>
-            getUsersStatus(socket.socketId),
+          const currentSocket = socketsToRetry[i];
+          tempStatusLists[currentSocket.serverId] = backOff(() =>
+            getUsersStatus(currentSocket.socketId),
           );
         }
         try {
@@ -77,10 +104,7 @@ function useUserList() {
         } finally {
           setSocketsToRetry((str) => {
             const nextStr = str.filter(
-              (v) =>
-                !socketsToRetry.find(
-                  (socket) => socket.serverId === v.serverId,
-                ),
+              (v) => !socketsToRetry.find((soc) => soc.serverId === v.serverId),
             );
             return nextStr;
           });

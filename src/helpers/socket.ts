@@ -30,6 +30,10 @@ interface ServerToClientEvents {
   ) => void;
   [SocketEvents.ServerUpdated]: (serverId: string) => void;
   [SocketEvents.ServerDeleted]: (serverId: string) => void;
+  [SocketEvents.UserJoinedServer]: (
+    user: OtherUserNoStatus,
+    serverId: string,
+  ) => void;
 }
 
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(

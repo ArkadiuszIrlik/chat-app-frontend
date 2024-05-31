@@ -17,6 +17,7 @@ enum SocketEvents {
   SendChatMessage = 'send chat message',
   ChangeOnlineStatus = 'change online status',
   OnlineStatusChanged = 'online status changed',
+  UserJoinedServer = 'user joined server',
   ServerUpdated = 'server updated',
   ServerDeleted = 'server deleted',
 }
