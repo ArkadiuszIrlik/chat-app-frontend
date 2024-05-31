@@ -29,26 +29,27 @@ function mapStatusToUsers(
 
 function useUserList() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [userStore, setUserStore] = useState<UserStore>({});
   const [socketsToRetry, setSocketsToRetry] = useState<
-    { socketId: string; channelId: string }[]
+    { socketId: string; serverId: string }[]
   >([]);
   const { getUsersStatus, isConnected: isSocketConnected } = useSocket()!;
   const { messageEmitter } = useSocketEvents() ?? {};
 
   useEffect(() => {
     async function retrySocketMap() {
-      if (socketsToRetry.length > 0 && !isLoading && isSocketConnected) {
-        setIsLoading(true);
-        // const tempStatusLists: Record<
-        //   string,
-        //   StatusList
-        // > = {};
+      if (
+        socketsToRetry.length > 0 &&
+        !isLoading &&
+        !isRetrying &&
+        isSocketConnected
+      ) {
+        setIsRetrying(true);
         const tempStatusLists: Record<string, Promise<StatusList>> = {};
         for (let i = 0; i < socketsToRetry.length; i++) {
           const socket = socketsToRetry[i];
-          // const statusList = await backOff(() => getUsersStatus(socket.socketId));
-          tempStatusLists[socket.channelId] = backOff(() =>
+          tempStatusLists[socket.serverId] = backOff(() =>
             getUsersStatus(socket.socketId),
           );
         }
@@ -65,33 +66,36 @@ function useUserList() {
             const nextUserStore: UserStore = {};
             const keys = Object.keys(statusLists);
             for (let i = 0; i < keys.length; i++) {
-              const channelId = keys[i];
-              nextUserStore[channelId] = mapStatusToUsers(
-                us[channelId],
-                statusLists[channelId],
+              const serverId = keys[i];
+              nextUserStore[serverId] = mapStatusToUsers(
+                us[serverId],
+                statusLists[serverId],
               );
             }
             return { ...us, ...nextUserStore };
           });
-          // Object.entries(tempStatusLists).forEach(([k, v]) => {
-          //   statusLists[k] = await v;
-          // });
         } finally {
           setSocketsToRetry((str) => {
             const nextStr = str.filter(
               (v) =>
                 !socketsToRetry.find(
-                  (socket) => socket.channelId === v.channelId,
+                  (socket) => socket.serverId === v.serverId,
                 ),
             );
             return nextStr;
           });
         }
-        setIsLoading(false);
+        setIsRetrying(false);
       }
     }
     void retrySocketMap();
-  }, [socketsToRetry, isSocketConnected, getUsersStatus, isLoading]);
+  }, [
+    socketsToRetry,
+    isSocketConnected,
+    getUsersStatus,
+    isLoading,
+    isRetrying,
+  ]);
 
   useEffect(() => {
     if (!messageEmitter) {
@@ -123,16 +127,59 @@ function useUserList() {
     };
   }, [messageEmitter]);
 
-  const getChannelUsers = useCallback(
-    (channelId: string) => {
-      if (channelId in userStore) {
-        return userStore[channelId];
+  // const getChannelUsers = useCallback(
+  //   (channelId: string) => {
+  //     if (channelId in userStore) {
+  //       return userStore[channelId];
+  //     }
+  //     return [];
+  //   },
+  //   [userStore],
+  // );
+
+  const getServerUsers = useCallback(
+    (serverId: string) => {
+      if (serverId in userStore) {
+        return userStore[serverId];
       }
       return [];
     },
     [userStore],
   );
 
+  const addServerUsersToStore = useCallback(
+    async (
+      serverId: string,
+      serverSocketId: string,
+      userList: OtherUserNoStatus[],
+    ) => {
+      if (serverId in userStore) {
+        return;
+      }
+      setIsLoading(true);
+      let statusList: Awaited<ReturnType<typeof getUsersStatus>> = [];
+      try {
+        if (!isSocketConnected) {
+          throw new Error();
+        }
+        statusList = await getUsersStatus(serverSocketId);
+      } catch (err) {
+        setSocketsToRetry((sockets) => [
+          ...sockets,
+          { socketId: serverSocketId, serverId },
+        ]);
+      }
+      const nextUserList = mapStatusToUsers(userList, statusList);
+      setUserStore((us) =>
+        // console.log('setting store');
+        ({ ...us, [serverId]: nextUserList }),
+      );
+      setIsLoading(false);
+    },
+    [userStore, getUsersStatus, isSocketConnected],
+  );
+
+  /*
   const addChannelUsersToStore = useCallback(
     async (
       channelId: string,
@@ -168,8 +215,10 @@ function useUserList() {
     },
     [userStore, getUsersStatus, isSocketConnected],
   );
+*/
 
-  return { getChannelUsers, addChannelUsersToStore, isLoading };
+  // return { getChannelUsers, addChannelUsersToStore, isLoading };
+  return { getServerUsers, addServerUsersToStore, isLoading };
 }
 
 const UserListContext = createContext<ReturnType<typeof useUserList> | null>(
