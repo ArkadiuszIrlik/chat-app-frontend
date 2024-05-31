@@ -121,6 +121,7 @@ function useSocket() {
   }, []);
 
   return {
+    socket,
     isConnected,
     messageEvents,
     statusEvents,
