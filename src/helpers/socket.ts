@@ -2,6 +2,15 @@ import { SocketEvents, UserOnlineStatus } from '@src/types';
 import { Socket, io } from 'socket.io-client';
 
 interface ClientToServerEvents {
+  [SocketEvents.GetOnlineStatus]: (
+    roomSocketId: string,
+    callback: (
+      data: {
+        _id: string;
+        onlineStatus: UserOnlineStatus;
+      }[],
+    ) => void,
+  ) => void;
   [SocketEvents.SendChatMessage]: (
     message: { text: string; clientId: string },
     socketId: string,

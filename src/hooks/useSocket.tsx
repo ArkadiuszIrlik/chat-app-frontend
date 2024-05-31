@@ -84,6 +84,20 @@ function useSocket() {
     };
   }, [logout]);
 
+  const getUsersStatus = useCallback(async (roomSocketId: string) => {
+    const timeout = 2000;
+    return new Promise<
+      Parameters<
+        Parameters<typeof socket.emit<SocketEvents.GetOnlineStatus>>[2]
+      >[number]
+    >((resolve, reject) => {
+      const timeoutId = setTimeout(reject, timeout);
+      socket.emit(SocketEvents.GetOnlineStatus, roomSocketId, (data) => {
+        clearTimeout(timeoutId);
+        resolve(data);
+      });
+    });
+  }, []);
 
   const sendChatMessage = useCallback(
     (
@@ -112,6 +126,7 @@ function useSocket() {
     statusEvents,
     serverUpdateEvents,
     serverDeleteEvents,
+    getUsersStatus,
     sendChatMessage,
     changeOnlineStatus,
   };
