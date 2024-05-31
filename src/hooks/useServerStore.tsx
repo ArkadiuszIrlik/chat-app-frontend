@@ -1,5 +1,5 @@
-import { useAuth, useSocketEvents } from '@hooks/index';
-import { ClientEvents } from '@src/types';
+import { useAuth, useSocket, useSocketEvents } from '@hooks/index';
+import { ClientEvents, SocketEvents } from '@src/types';
 import {
   ReactNode,
   createContext,
@@ -13,14 +13,21 @@ function useServerStore() {
   const [serverList, setServerList] = useState<Server[]>([]);
   const { user } = useAuth() ?? {};
   const { messageEmitter } = useSocketEvents() ?? {};
+  const { socket } = useSocket() ?? {};
 
-  const addToStore = useCallback((serversToAdd: Server | Server[]) => {
-    const nextServersToAdd = Array.isArray(serversToAdd)
-      ? serversToAdd
-      : [serversToAdd];
+  const addToStore = useCallback(
+    (serversToAdd: Server | Server[]) => {
+      const nextServersToAdd = Array.isArray(serversToAdd)
+        ? serversToAdd
+        : [serversToAdd];
 
-    setServerList((sl) => [...sl, ...nextServersToAdd]);
-  }, []);
+      setServerList((sl) => [...sl, ...nextServersToAdd]);
+      if (socket) {
+        socket.emit(SocketEvents.UpdateServerList, () => undefined);
+      }
+    },
+    [socket],
+  );
 
   const removeFromStore = useCallback((serverId: string) => {
     setServerList((sl) => sl.filter((server) => server._id !== serverId));

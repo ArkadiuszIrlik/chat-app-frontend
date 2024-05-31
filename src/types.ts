@@ -21,6 +21,7 @@ enum SocketEvents {
   ServerUpdated = 'server updated',
   ServerDeleted = 'server deleted',
   UserConnected = 'user connected',
+  UpdateServerList = 'update server list',
 }
 
 enum ClientEvents {

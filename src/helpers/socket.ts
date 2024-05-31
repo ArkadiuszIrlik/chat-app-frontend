@@ -19,6 +19,7 @@ interface ClientToServerEvents {
     nextStatus: UserOnlineStatus,
     callback: () => void,
   ) => void;
+  [SocketEvents.UpdateServerList]: (callback: () => void) => void;
 }
 
 interface ServerToClientEvents {
