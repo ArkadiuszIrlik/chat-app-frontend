@@ -22,34 +22,29 @@ function getChannelList(channelCategories: Server['channelCategories']) {
 function ServerView() {
   const { server } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
   const navigate = useNavigate();
-  const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
-  const { channelId } = useParams();
-  const { addChannelUsersToStore } = useUserList() ?? {};
+  const activeChannel =
+    getChannelList(server?.channelCategories ?? []).find(
+      (channel) => channel._id === channelId,
+    ) ?? null;
 
   useEffect(() => {
-    // if channelId missing, redirect to first available text channel
-    if (channelId === undefined) {
+    if (server?.channelCategories === undefined) {
+      return;
+    }
+    // if channelId is missing or doesn't point to valid channel
+    // redirect to first available text channel
+    if (!activeChannel) {
       const channelList = getChannelList(server.channelCategories);
       const nextChannel = channelList.find(
         (channel) => channel.type === 'text',
       );
       if (nextChannel !== undefined) {
-        setActiveChannel(nextChannel);
-        navigate(`${nextChannel._id}`, { replace: true });
-      }
-    } else {
-      const channelList = getChannelList(server.channelCategories);
-      const nextChannel = channelList.find(
-        (channel) => channel._id === channelId,
-      );
-      if (nextChannel !== undefined) {
-        setActiveChannel(nextChannel);
-      } else {
-        setActiveChannel(null);
-        navigate('..', { replace: true });
+        navigate(`/app/channels/${server._id}/${nextChannel._id}`, {
+          replace: true,
+        });
       }
     }
-  }, [channelId, navigate, server.channelCategories]);
+  }, [navigate, server?.channelCategories, server?._id, activeChannel]);
 
   useEffect(() => {
     if (server && addChannelUsersToStore) {
