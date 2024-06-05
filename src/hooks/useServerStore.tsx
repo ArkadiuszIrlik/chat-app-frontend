@@ -10,8 +10,8 @@ import {
 } from 'react';
 
 function useServerStore() {
-  const [serverList, setServerList] = useState<Server[]>([]);
   const { user } = useAuth() ?? {};
+  const [serverList, setServerList] = useState<Server[]>(user?.serversIn ?? []);
   const { messageEmitter } = useSocketEvents() ?? {};
   const { socket } = useSocket() ?? {};
 
