@@ -4,10 +4,12 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from '@src/App';
 import { ProtectedRoute } from '@components/ProtectedRoute';
 import { ServerView, ServerViewLoader } from '@components/ServerView';
+import { ChatDisplay } from '@components/ChatDisplay';
 import { AuthScreen } from '@containers/AuthScreen';
 import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
 import { EmailVerification } from '@components/EmailVerification';
+import { ChannelsScreen } from '@containers/ChannelsScreen';
 
 const router = createBrowserRouter([
   {
@@ -34,7 +36,6 @@ const router = createBrowserRouter([
           },
         ],
       },
-
       {
         element: <ProtectedRoute />,
         children: [
@@ -43,10 +44,20 @@ const router = createBrowserRouter([
             element: <AppScreen />,
             children: [
               {
+                path: 'channels',
+                element: <ChannelsScreen />,
+              },
+              {
                 path: 'channels/:serverId',
                 element: <ServerView />,
                 loader: ServerViewLoader,
-                children: [{ path: ':channelId' }],
+                children: [
+                  {
+                    path: ':channelId',
+                    element: <ChatDisplay />,
+                  },
+                ],
+              },
               },
             ],
           },
