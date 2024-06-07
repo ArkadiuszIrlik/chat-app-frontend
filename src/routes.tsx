@@ -9,7 +9,6 @@ import { AuthScreen } from '@containers/AuthScreen';
 import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
 import { EmailVerification } from '@components/EmailVerification';
-import { ChannelsScreen } from '@containers/ChannelsScreen';
 
 const router = createBrowserRouter([
   {
@@ -44,11 +43,7 @@ const router = createBrowserRouter([
             element: <AppScreen />,
             children: [
               {
-                path: 'channels',
-                element: <ChannelsScreen />,
-              },
-              {
-                path: 'channels/:serverId',
+                path: 'channels/:serverId?',
                 element: <ServerView />,
                 loader: ServerViewLoader,
                 children: [
