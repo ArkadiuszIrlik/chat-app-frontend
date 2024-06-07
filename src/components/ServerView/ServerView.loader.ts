@@ -7,9 +7,12 @@ export default async function loader({
 }: {
   params: Params<'serverId'>;
 }) {
-  const server = await preload(
+  if (!params.serverId) {
+    return null;
+  }
+  void preload(
     `/servers/${params.serverId}`,
     genericFetcherCredentials as (key: string) => Promise<Server>,
   );
-  return { server };
+  return null;
 }

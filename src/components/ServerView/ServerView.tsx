@@ -1,15 +1,12 @@
 import { UserList } from '@components/UserList';
-import { useEffect, useState } from 'react';
-import {
-  Outlet,
-  useLoaderData,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
-import loader from '@components/ServerView/ServerView.loader';
+import { useEffect, memo, useState } from 'react';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import LeftSidebar from '@components/ServerView/LeftSidebar';
-import { useUserList } from '@hooks/index';
+import { useServerStore, useUserList } from '@hooks/index';
 import { ServerContextInterface } from '@components/ServerView/useServerContext';
+import useSWR from 'swr';
+import { genericFetcherCredentials } from '@helpers/fetch';
+import { ErrorDisplay } from '@components/form-controls';
 
 function getChannelList(channelCategories: Server['channelCategories']) {
   const channelList: Channel[] = [];
@@ -19,9 +16,50 @@ function getChannelList(channelCategories: Server['channelCategories']) {
   return channelList;
 }
 
+const MemoizedUserList = memo(UserList);
+
 function ServerView() {
-  const { server } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+  const { serverId, channelId } = useParams();
   const navigate = useNavigate();
+
+  // if user not in server, navigate away
+  const { serverList } = useServerStore() ?? { serverList: [] };
+  const isServerListEmpty = serverList.length === 0;
+  const isServerIdInServerList = !!serverList.find(
+    (server) => server._id === serverId,
+  );
+
+  useEffect(() => {
+    if (isServerListEmpty) {
+      navigate('/app/channels');
+    }
+  }, [isServerListEmpty, navigate]);
+
+  // if serverId invalid or undefined navigate to first available server
+  useEffect(() => {
+    if (!isServerIdInServerList && !isServerListEmpty) {
+      navigate(`/app/channels/${serverList[0]._id}`, { replace: true });
+    }
+  }, [isServerIdInServerList, isServerListEmpty, navigate, serverList]);
+
+  const [shouldFetch, setShouldFetch] = useState(!!serverId);
+
+  useEffect(() => {
+    if (!!serverId !== shouldFetch) {
+      setShouldFetch(!!serverId);
+    }
+  }, [serverId, shouldFetch]);
+
+  const {
+    data: server,
+    error,
+    mutate,
+    isLoading,
+  } = useSWR<Server, BackendError>(
+    shouldFetch ? `/servers/${serverId}` : null,
+    genericFetcherCredentials,
+  );
+  const { addServerUsersToStore } = useUserList() ?? {};
   const activeChannel =
     getChannelList(server?.channelCategories ?? []).find(
       (channel) => channel._id === channelId,
@@ -47,34 +85,51 @@ function ServerView() {
   }, [navigate, server?.channelCategories, server?._id, activeChannel]);
 
   useEffect(() => {
-    if (server && addChannelUsersToStore) {
-      const channelList = getChannelList(server.channelCategories);
-      channelList.forEach((channel) => {
-        void addChannelUsersToStore(
-          channel._id,
-          channel.socketId,
-          server.members,
-        );
-      });
+    if (server && addServerUsersToStore) {
+      void addServerUsersToStore(server._id, server.socketId, server.members);
     }
-  }, [server, addChannelUsersToStore]);
+  }, [server, addServerUsersToStore]);
 
-  return (
-    <div className="flex min-h-screen grow">
-      {server !== undefined && (
-        <>
-          <LeftSidebar
-            channelCategories={server.channelCategories}
-            serverName={server.name}
-          />
-          <div className="flex grow">
-            <Outlet
-              context={{ activeChannel } satisfies ServerContextInterface}
+  function renderServerContentSwitch() {
+    switch (true) {
+      case isServerListEmpty:
+        return (
+          <div className="px-2 pt-2 md:px-10 md:pt-12">
+            <div className="max-w-prose text-gray-100">
+              It looks like you haven&apos;t joined any servers yet. Let&apos;s
+              get you set up. Click &quot;Add a server&quot; in the panel to the
+              left to join or create a new server.
+            </div>
+          </div>
+        );
+      case !isLoading && !!error:
+        return (
+          <div className="mx-auto">
+            <ErrorDisplay
+              errorMessage={error.message ?? 'Error loading server'}
             />
           </div>
-          <UserList />
-        </>
-      )}
+        );
+      case !isLoading && !!server:
+        return (
+          <Outlet
+            context={{ activeChannel } satisfies ServerContextInterface}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
+  return (
+    <div className="flex max-h-screen min-h-screen grow">
+      <LeftSidebar
+        isEmptyServerList={isServerListEmpty}
+        isServerLoading={isLoading}
+        server={server}
+      />
+      <div className="flex grow">{renderServerContentSwitch()}</div>
+      {!isServerListEmpty && <MemoizedUserList />}
     </div>
   );
 }

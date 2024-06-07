@@ -6,42 +6,17 @@ import styleConsts from '@constants/styleConsts';
 import { useCallback, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
 
-const defaultChannelCategories: Server['channelCategories'] = [];
-
 LeftSidebar.defaultProps = {
-  isEmptyServerList: false,
+  server: undefined,
 };
 
-interface LoadingProps {
-  isEmptyServerList?: false;
-  isServerLoading: true;
-  channelCategories?: Server['channelCategories'];
-  serverName?: string;
+interface Props {
+  server?: Server;
+  isServerLoading: boolean;
+  isEmptyServerList: boolean;
 }
 
-interface NotLoadingProps {
-  isEmptyServerList?: false;
-  isServerLoading: false;
-  channelCategories: Server['channelCategories'];
-  serverName: string;
-}
-
-interface EmptyServerListProps {
-  isEmptyServerList: true;
-  isServerLoading?: never;
-  channelCategories?: never;
-  serverName?: never;
-}
-
-type Props = LoadingProps | NotLoadingProps | EmptyServerListProps;
-
-function LeftSidebar({
-  channelCategories = defaultChannelCategories,
-  serverName,
-}: {
-  isServerLoading,
-  isEmptyServerList,
-}: Props) {
+function LeftSidebar({ server, isServerLoading, isEmptyServerList }: Props) {
   const [isServersMenuOpen, setIsServersMenuOpen] = useState(false);
 
   const handleOpenServersMenu = useCallback(() => {
@@ -67,13 +42,16 @@ function LeftSidebar({
             />
           </div>
         );
-      case !isServerLoading:
+      case server && !isServerLoading:
         return (
           <ChannelList
-            channelCategories={channelCategories}
-            serverName={serverName}
+            channelCategories={server.channelCategories}
+            serverName={server.name}
+            server={server}
           />
         );
+      case !server && !isServerLoading:
+        return <ServersMenu />;
       default:
         return null;
     }
