@@ -1,4 +1,4 @@
-import { getClientURL } from '@helpers/index';
+import { exampleServerInviteLink, serverInviteRegex } from '@constants/apiData';
 import Yup from '@src/extendedYup';
 
 const channelSchema = {
@@ -36,13 +36,11 @@ const serverSchema = {
     ),
 };
 
-const exampleServerInviteLink = getClientURL('?invite=M0DQ26NLET4');
-
 const serverInviteSchema = {
   invite: Yup.string()
     .trim()
     .matches(
-      /(?:\?invite=)([a-zA-Z0-9]{12})$|^([a-zA-Z0-9]{12})$/g,
+      serverInviteRegex,
       `Please enter a valid invite in the format: ${exampleServerInviteLink}`,
     ),
   // .required('Please enter an invite link or code.'),
