@@ -5,9 +5,15 @@ import useOnClickOutside from '@hooks/useOnClickOutside';
 import { ExtendedCSSProperties, UserOnlineStatus } from '@src/types';
 import { MutableRefObject, useCallback, useRef, useState } from 'react';
 import RightArrowIcon from '@assets/right-arrow-fill-icon.png';
+import LogoutIcon from '@assets/logout-icon.png';
+import { useAuth } from '@hooks/index';
 
 const arrowStyle: ExtendedCSSProperties = {
   '--mask-url': `url(${RightArrowIcon})`,
+};
+
+const logoutStyle: ExtendedCSSProperties = {
+  '--mask-url': `url(${LogoutIcon})`,
 };
 
 function UserDropdown({
@@ -39,6 +45,14 @@ function UserDropdown({
     setIsStatusDropdownOpen(false);
   }, []);
 
+  const { logout } = useAuth() ?? {};
+
+  const handleLogout = useCallback(() => {
+    if (logout) {
+      void logout();
+    }
+  }, [logout]);
+
   return (
     <div
       className="absolute left-0 top-0 z-10 w-56 -translate-y-full rounded-md bg-gray-800"
@@ -55,7 +69,7 @@ function UserDropdown({
           </div>
           <span>{username}</span>
         </div>
-        <div className="relative w-full">
+        <div className="relative flex w-full flex-col gap-1">
           <button
             type="button"
             ref={statusButtonRef}
@@ -79,6 +93,17 @@ function UserDropdown({
               onClose={handleCloseStatusDropdown}
             />
           )}
+          <button
+            type="button"
+            className="group flex w-full items-center justify-between rounded-md px-2 py-1 hover:bg-gray-600"
+            onClick={handleLogout}
+          >
+            Logout
+            <div
+              className="alpha-mask aspect-square h-5 w-5 shrink-0 grow-0 bg-gray-400 group-hover:bg-gray-300"
+              style={logoutStyle}
+            />
+          </button>
         </div>
       </div>
     </div>
