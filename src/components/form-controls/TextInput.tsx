@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useField, FieldHookConfig } from 'formik';
 import { InputHTMLAttributes, ClassAttributes } from 'react';
+import FieldError from '@components/form-controls/FieldError';
 
 interface TextInputInterface {
   label: string;
@@ -33,10 +34,7 @@ function TextInput({
         // id={props.id}
       />
       {meta.touched && meta.error ? (
-        <div className="flex items-center gap-2">
-          <div className="exclamation-mask aspect-square h-5 w-5 bg-red-300" />
-          <p className="text-red-300">{meta.error}</p>
-        </div>
+        <FieldError errorMessage={meta.error} />
       ) : null}
     </>
   );
