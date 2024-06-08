@@ -1,5 +1,5 @@
 import { UserList } from '@components/UserList';
-import { useEffect, memo, useState } from 'react';
+import { useEffect, memo } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import LeftSidebar from '@components/ServerView/LeftSidebar';
 import { useServerStore, useSocket, useUserList } from '@hooks/index';
@@ -43,13 +43,7 @@ function ServerView() {
     }
   }, [isServerIdInServerList, isServerListEmpty, navigate, serverList]);
 
-  const [shouldFetch, setShouldFetch] = useState(!!serverId);
-
-  useEffect(() => {
-    if (!!serverId !== shouldFetch) {
-      setShouldFetch(!!serverId);
-    }
-  }, [serverId, shouldFetch]);
+  const shouldFetch = !!serverId;
 
   const {
     data: server,
