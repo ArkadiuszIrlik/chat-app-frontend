@@ -1,4 +1,4 @@
-import { AppScreen } from '@containers/AppScreen';
+import { AppScreen, NavigateAwayFromAppScreen } from '@containers/AppScreen';
 import { HomeScreen } from '@containers/HomeScreen';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@src/App';
@@ -42,6 +42,7 @@ const router = createBrowserRouter([
             path: '/app',
             element: <AppScreen />,
             children: [
+              { path: '', element: <NavigateAwayFromAppScreen /> },
               {
                 path: 'channels/:serverId?',
                 element: <ServerView />,
