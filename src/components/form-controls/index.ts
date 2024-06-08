@@ -2,6 +2,8 @@ export * from './TextInput';
 export { default as TextInput } from './TextInput';
 export * from './SubmitButtonPrimary';
 export { default as SubmitButtonPrimary } from './SubmitButtonPrimary';
+export * from './ImageFileInput';
+export { default as ImageFileInput } from './ImageFileInput';
 export * from './SubmittingUpdater';
 export { default as SubmittingUpdater } from './SubmittingUpdater';
 export * from './ErrorDisplay';
