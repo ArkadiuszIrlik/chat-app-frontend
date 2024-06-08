@@ -1,23 +1,21 @@
-import {
-  statusAwayBg,
-  statusDoNotDisturbBg,
-  statusOfflineBg,
-  statusOnlineBg,
-} from '@constants/classes';
 import { UserOnlineStatus } from '@src/types';
 
 const statusOptionList = [
-  { label: 'Online', value: UserOnlineStatus.Online, bgClass: statusOnlineBg },
-  { label: 'Away', value: UserOnlineStatus.Away, bgClass: statusAwayBg },
+  {
+    label: 'Online',
+    value: UserOnlineStatus.Online,
+    bgClass: 'bg-status-online',
+  },
+  { label: 'Away', value: UserOnlineStatus.Away, bgClass: 'bg-status-away' },
   {
     label: 'Do Not Disturb',
     value: UserOnlineStatus.DoNotDisturb,
-    bgClass: statusDoNotDisturbBg,
+    bgClass: 'bg-status-do-not-disturb',
   },
   {
     label: 'Invisible',
     value: UserOnlineStatus.Offline,
-    bgClass: statusOfflineBg,
+    bgClass: 'bg-status-offline',
   },
 ];
 
