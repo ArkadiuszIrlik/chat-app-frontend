@@ -102,6 +102,8 @@ function ServerView() {
         navigate(`/app/channels/${server._id}/${nextChannel._id}`, {
           replace: true,
         });
+      } else {
+        navigate(`/app/channels/${server._id}`);
       }
     }
   }, [navigate, server?.channelCategories, server?._id, activeChannel]);
