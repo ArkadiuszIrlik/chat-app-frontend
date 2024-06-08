@@ -2,10 +2,11 @@ import { UserList } from '@components/UserList';
 import { useEffect, memo, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import LeftSidebar from '@components/ServerView/LeftSidebar';
-import { useServerStore, useUserList } from '@hooks/index';
+import { useServerStore, useSocket, useUserList } from '@hooks/index';
 import { ServerContextInterface } from '@components/ServerView/useServerContext';
 import useSWR from 'swr';
 import { genericFetcherCredentials } from '@helpers/fetch';
+import { SocketEvents } from '@src/types';
 import { ErrorDisplay } from '@components/form-controls';
 
 function getChannelList(channelCategories: Server['channelCategories']) {
@@ -59,6 +60,33 @@ function ServerView() {
     shouldFetch ? `/servers/${serverId}` : null,
     genericFetcherCredentials,
   );
+
+  const { socket } = useSocket() ?? {};
+  useEffect(() => {
+    if (!socket) {
+      return undefined;
+    }
+    function onServerUpdated(updatedId: string) {
+      if (updatedId === serverId) {
+        void mutate();
+      }
+    }
+
+    function onServerDeleted(deletedId: string) {
+      if (deletedId === serverId) {
+        navigate('/app/channels', { replace: true });
+      }
+    }
+
+    socket.on(SocketEvents.ServerUpdated, onServerUpdated);
+    socket.on(SocketEvents.ServerDeleted, onServerDeleted);
+
+    return () => {
+      socket.off(SocketEvents.ServerUpdated, onServerUpdated);
+      socket.off(SocketEvents.ServerDeleted, onServerDeleted);
+    };
+  }, [socket, serverId, mutate, navigate]);
+
   const { addServerUsersToStore } = useUserList() ?? {};
   const activeChannel =
     getChannelList(server?.channelCategories ?? []).find(
