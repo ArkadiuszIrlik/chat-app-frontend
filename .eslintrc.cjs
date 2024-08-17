@@ -37,6 +37,7 @@ module.exports = {
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
     'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
     '@typescript-eslint/prefer-for-of': 'off',
+    'import/prefer-default-export': 'off',
     'import/extensions': [
       'error',
       'ignorePackages',
