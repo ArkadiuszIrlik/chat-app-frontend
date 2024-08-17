@@ -1,11 +1,8 @@
-import { useSocketEvents } from '@hooks/index';
-import { ClientEvents } from '@src/types';
 import {
   ReactNode,
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from 'react';
 
@@ -19,7 +16,6 @@ function orderMessages(messageList: Message[]) {
 
 function useMessageStore() {
   const [messageStore, setMessageStore] = useState<MessageStore>({});
-  const { messageEmitter } = useSocketEvents()!;
 
   const addToStore = useCallback((chatId: string, newMessages: Message[]) => {
     setMessageStore((ms) => {
@@ -32,26 +28,6 @@ function useMessageStore() {
       };
     });
   }, []);
-
-  useEffect(() => {
-    function addToMessages(newEvent: Message) {
-      setMessageStore((ms) => {
-        const currentMessageList = ms[newEvent.chatId];
-        return {
-          ...ms,
-          [newEvent.chatId]: currentMessageList
-            ? [...currentMessageList, newEvent]
-            : [newEvent],
-        };
-      });
-    }
-
-    messageEmitter.on(ClientEvents.ChatMessage, addToMessages);
-
-    return () => {
-      messageEmitter.off(ClientEvents.ChatMessage, addToMessages);
-    };
-  }, [messageEmitter]);
 
   return {
     messageStore,
