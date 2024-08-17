@@ -1,4 +1,4 @@
-import parseMessageDates from '@helpers/data';
+import { parseNetworkMessages } from '@helpers/data';
 import { genericFetcherCredentials } from '@helpers/fetch';
 import { useMessageStore, useSocket } from '@hooks/index';
 import { SocketEvents } from '@src/types';
@@ -25,10 +25,7 @@ function useChatMessages(chatId: string | undefined) {
   useEffect(() => {
     if (socket && addToStore) {
       const addToMessages = (networkMessage: NetworkMessage) => {
-        const nextMessage: Message = {
-          ...networkMessage,
-          postedAt: new Date(networkMessage.postedAt),
-        };
+        const nextMessage = parseNetworkMessages(networkMessage)[0];
         addToStore(nextMessage.chatId, [nextMessage]);
       };
       socket.on(SocketEvents.ChatMessage, addToMessages);
@@ -42,15 +39,15 @@ function useChatMessages(chatId: string | undefined) {
 
   // fetch chat messages from API
   const { data, error, isLoading } = useSWR<
-    { message: string; data: { messages: Message[] } },
+    { message: string; data: { messages: NetworkMessage[] } },
     BackendError
   >(() => (shouldFetch ? `/chat/${chatId}` : null), genericFetcherCredentials);
 
   useEffect(() => {
     if (shouldFetch && !isLoading && (data ?? error) && chatId && addToStore) {
-      const messageList = data?.data?.messages ?? [];
-      parseMessageDates(messageList);
-      addToStore(chatId, messageList);
+      const networkMessages = data?.data?.messages ?? [];
+      const parsedMessages = parseNetworkMessages(networkMessages);
+      addToStore(chatId, parsedMessages);
     }
   }, [data, isLoading, error, shouldFetch, addToStore, chatId]);
 
