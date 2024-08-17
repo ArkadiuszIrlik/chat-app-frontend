@@ -1,5 +1,5 @@
-import { useAuth, useSocket, useSocketEvents } from '@hooks/index';
-import { ClientEvents, SocketEvents } from '@src/types';
+import { useAuth, useSocket } from '@hooks/index';
+import { SocketEvents } from '@src/types';
 import {
   ReactNode,
   createContext,
@@ -12,7 +12,6 @@ import {
 function useServerStore() {
   const { user } = useAuth() ?? {};
   const [serverList, setServerList] = useState<Server[]>(user?.serversIn ?? []);
-  const { messageEmitter } = useSocketEvents() ?? {};
   const { socket } = useSocket() ?? {};
 
   const addToStore = useCallback(
@@ -40,17 +39,30 @@ function useServerStore() {
   }, [user?.serversIn]);
 
   useEffect(() => {
-    if (!messageEmitter) {
+    if (!socket) {
       return undefined;
+    }
+
+    function onUserLeftServer(
+      removedUser: OtherUserNoStatus,
+      serverId: string,
+    ) {
+      if (removedUser._id === user?._id) {
+        removeFromStore(serverId);
+      }
     }
     function onServerDeleted(serverId: string) {
       removeFromStore(serverId);
     }
-    messageEmitter.on(ClientEvents.ServerDeleted, onServerDeleted);
+
+    socket.on(SocketEvents.UserLeftServer, onUserLeftServer);
+    socket.on(SocketEvents.ServerDeleted, onServerDeleted);
+
     return () => {
-      messageEmitter.off(ClientEvents.ServerDeleted, onServerDeleted);
+      socket.off(SocketEvents.UserLeftServer, onUserLeftServer);
+      socket.off(SocketEvents.ServerDeleted, onServerDeleted);
     };
-  }, [messageEmitter, removeFromStore]);
+  }, [removeFromStore, socket, user?._id]);
 
   return {
     serverList,
