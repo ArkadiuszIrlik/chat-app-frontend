@@ -17,8 +17,11 @@ interface UserAuth {
 function useAuth() {
   const [user, setUser] = useState<UserAuth | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isFirstLogin, setIsFirstLogin] = useState(true);
 
   const login = useCallback(async () => {
+    setIsLoggingIn(true);
     try {
       const res = await fetch(getURL('/users/self'), {
         credentials: 'include',
@@ -30,11 +33,13 @@ function useAuth() {
         throw error;
       }
       const nextUser = (await res.json()) as UserAuth;
-      setUser(nextUser);
+      setIsAuthenticated(true);
     } catch {
       setUser(null);
+      setIsAuthenticated(false);
     }
-  }, [setUser]);
+    setIsLoggingIn(false);
+  }, []);
 
   const logout = useCallback(async () => {
     const res = await fetch(getURL('/auth/logout'), {
@@ -46,7 +51,10 @@ function useAuth() {
   }, [setUser]);
 
   useEffect(() => {
-    void login();
+    void (async () => {
+      await login();
+      setIsFirstLogin(false);
+    })();
   }, [login]);
 
   useEffect(() => {
@@ -63,8 +71,17 @@ function useAuth() {
       isAuthenticated,
       logout,
       login,
+      isLoggingIn,
+      isFirstLogin,
     }),
-    [user, isAuthenticated, logout, login],
+    [
+      user,
+      isAuthenticated,
+      logout,
+      login,
+      isLoggingIn,
+      isFirstLogin,
+    ],
   );
 
   return authObj;
