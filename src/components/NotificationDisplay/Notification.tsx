@@ -1,16 +1,23 @@
+import { useEffect } from 'react';
+
 function Notification({
   authorName,
   authorImg,
   channelName,
   text,
   onClick,
+  onDisplayNotification,
 }: {
   authorName: string;
   authorImg: string;
   channelName?: string;
   text: string;
   onClick: () => void;
+  onDisplayNotification: () => void;
 }) {
+  useEffect(() => {
+    onDisplayNotification();
+  }, [onDisplayNotification]);
   return (
     <div className="fixed bottom-10 right-10 z-30">
       <button

@@ -1,33 +1,40 @@
 import Notification from '@components/NotificationDisplay/Notification';
-import { useSocketEvents } from '@hooks/index';
+import { useSocket } from '@hooks/index';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ClientEvents } from '@src/types';
+import { SocketEvents } from '@src/types';
+import { parseNetworkMessages } from '@helpers/data';
+import useNotificationSound from '@components/NotificationDisplay/useNotificationSound';
 
 const NOTIFICATION_DISPLAY_TIME = 5000;
 
 function NotificationDisplay() {
+  const { socket } = useSocket() ?? {};
   const [eventQueue, setEventQueue] = useState<Message[]>([]);
   const [currentEvent, setCurrentEvent] = useState<Message | null>(null);
   const { channelId } = useParams();
   const navigate = useNavigate();
-  const { messageEmitter } = useSocketEvents()!;
+  const { handlePlayNotificationSound } = useNotificationSound(eventQueue);
+
   // add new events to queue
   useEffect(() => {
-    function addToEventQueue(newEvent: Message) {
+    if (!socket) {
+      return undefined;
+    }
+    function addToEventQueue(message: NetworkMessage) {
       // don't display notifications for chat that's already on screen
-      if (newEvent.chatId === channelId) {
+      if (message.chatId === channelId) {
         return;
       }
-      setEventQueue((eq) => [...eq, newEvent]);
+      const parsedMessage = parseNetworkMessages(message)[0];
+      setEventQueue((eq) => [...eq, parsedMessage]);
     }
 
-    messageEmitter.on(ClientEvents.ChatMessage, addToEventQueue);
-
+    socket.on(SocketEvents.ChatMessage, addToEventQueue);
     return () => {
-      messageEmitter.off(ClientEvents.ChatMessage, addToEventQueue);
+      socket.off(SocketEvents.ChatMessage, addToEventQueue);
     };
-  }, [messageEmitter, channelId]);
+  }, [socket, channelId]);
 
   // display queued events
   useEffect(() => {
@@ -52,11 +59,11 @@ function NotificationDisplay() {
 
   return currentEvent ? (
     <Notification
-      authorName={currentEvent.authorName}
-      authorImg={currentEvent.authorImg}
-      // channelName={currentEvent.channelName}
+      authorName={currentEvent.author.username}
+      authorImg={currentEvent.author.profileImg}
       text={currentEvent.text}
       onClick={handleClickNotification}
+      onDisplayNotification={handlePlayNotificationSound}
     />
   ) : null;
 }
