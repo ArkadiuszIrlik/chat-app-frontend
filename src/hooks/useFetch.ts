@@ -11,16 +11,49 @@ interface BaseProps {
 interface GetProps {
   method: 'GET' | 'HEAD';
   postData?: never;
+  isFileUpload?: never;
 }
-interface PostProps {
-  method: 'POST' | 'DELETE' | 'PUT';
-  postData: object;
+type ConditionalPostData =
+  | {
+      postData: FormData;
+      isFileUpload: true;
+    }
+  | { postData: object; isFileUpload?: false };
+type PostProps = ConditionalPostData & {
+  method: 'POST' | 'PUT' | 'PATCH';
+};
+
+interface DeleteProps {
+  method: 'DELETE';
+  postData?: object;
+  isFileUpload?: never;
 }
-type ConditionalProps = GetProps | PostProps;
+type ConditionalProps = GetProps | PostProps | DeleteProps;
 type Props = BaseProps & ConditionalProps;
 
 const defaultInitialParams = {};
 const defaultHeaders = {};
+
+function formatHeaders(headers: Record<string, string>, isFileUpload: boolean) {
+  const nextHeaders = { ...headers };
+  if (nextHeaders['Content-Type'] === undefined && !isFileUpload) {
+    nextHeaders['Content-Type'] = 'application/json;charset=utf-8';
+  }
+  return nextHeaders;
+}
+
+function formatRequestBody(
+  postData: object | FormData | undefined,
+  isFileUpload: boolean,
+) {
+  if (postData && isFileUpload) {
+    return postData as FormData;
+  }
+  if (postData && !isFileUpload) {
+    return JSON.stringify(postData);
+  }
+  return undefined;
+}
 
 function useFetch({
   initialUrl,
@@ -30,10 +63,12 @@ function useFetch({
   method = 'GET',
   headers = defaultHeaders,
   credentials = 'include',
+  isFileUpload = false,
 }: Props) {
   const [url, updateUrl] = useState(initialUrl);
   const [params, updateParams] = useState(initialParams);
-  const [data, setData] = useState<object | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [data, setData] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -49,20 +84,17 @@ function useFetch({
     [params],
   );
   const refetch = () => setRefetchIndex(refetchIndex + 1);
+
   useEffect(() => {
     async function fetchData() {
       if (onMount === false && refetchIndex === 0) return;
       setIsLoading(true);
       setHasError(false);
       setErrorMessage('');
-      const nextHeaders = { ...headers };
-      if (nextHeaders['Content-Type'] === undefined) {
-        nextHeaders['Content-Type'] = 'application/json;charset=utf-8';
-      }
       try {
-        const response = await fetch(`${getURL(url)}${queryString}`, {
-          headers: nextHeaders,
-          body: postData ? JSON.stringify(postData) : undefined,
+        const response = await fetch(`${getURL(url)}?${queryString}`, {
+          headers: formatHeaders(headers, isFileUpload),
+          body: formatRequestBody(postData, isFileUpload),
           method,
           credentials,
         });
@@ -102,6 +134,7 @@ function useFetch({
     postData,
     headers,
     credentials,
+    isFileUpload,
   ]);
   return {
     data,
