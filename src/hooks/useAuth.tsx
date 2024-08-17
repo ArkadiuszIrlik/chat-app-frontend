@@ -1,4 +1,5 @@
 import { getURL } from '@helpers/fetch';
+import { UserOnlineStatus } from '@src/types';
 import {
   createContext,
   ReactNode,
@@ -12,6 +13,8 @@ import {
 interface UserAuth {
   _id: string;
   name: string;
+  onlineStatus: UserOnlineStatus;
+  prefersOnlineStatus: UserOnlineStatus;
 }
 
 function useAuth() {
@@ -33,6 +36,7 @@ function useAuth() {
         throw error;
       }
       const nextUser = (await res.json()) as UserAuth;
+      setUser({ ...nextUser, onlineStatus: nextUser.prefersOnlineStatus });
       setIsAuthenticated(true);
     } catch {
       setUser(null);
@@ -65,6 +69,15 @@ function useAuth() {
     }
   }, [user]);
 
+  const changeOnlineStatus = useCallback((nextStatus: UserOnlineStatus) => {
+    setUser((u) => {
+      if (u === null) {
+        return u;
+      }
+      return { ...u, onlineStatus: nextStatus };
+    });
+  }, []);
+
   const authObj = useMemo(
     () => ({
       user,
@@ -73,6 +86,7 @@ function useAuth() {
       login,
       isLoggingIn,
       isFirstLogin,
+      changeOnlineStatus,
     }),
     [
       user,
@@ -81,6 +95,7 @@ function useAuth() {
       login,
       isLoggingIn,
       isFirstLogin,
+      changeOnlineStatus,
     ],
   );
 
