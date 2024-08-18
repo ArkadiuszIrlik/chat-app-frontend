@@ -1,62 +1,13 @@
-import {
-  EditorProvider,
-  FloatingMenu,
-  BubbleMenu,
-  Extension,
-  useCurrentEditor,
-} from '@tiptap/react';
+import { EditorProvider, Extension, useCurrentEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import socket from '@helpers/socket';
 import Placeholder from '@tiptap/extension-placeholder';
-
-// const ShortcutExtension = Extension.create({
-//   addKeyboardShortcuts() {
-//     return {
-//       Enter: () => {
-//         const messageText = this.editor.getHTML();
-//         handleSendMessage(messageText);
-//         return this.editor.commands.clearContent();
-//       },
-//     };
-//   },
-// });
-// const extensions = [StarterKit, ShortcutExtension];
-
-// function submitMessage() {}
-// function handleSendMessage(msgText: string, socketId: string) {
-//   socket.emit(
-//     'chat message',
-//     {
-//       text: msgText,
-//     },
-//     socketId,
-//   );
-// }
+import { useParams } from 'react-router-dom';
+import { useAuth, useChatMessages } from '@hooks/index';
 
 function MessageInput({ channelSocketId }: { channelSocketId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // function handleSendMessage(msgText: string) {
-  //   socket.emit(
-  //     'chat message',
-  //     {
-  //       text: msgText,
-  //     },
-  //     channelSocketId,
-  //   );
-  // }
-  const handleSendMessage = useCallback(
-    (msgText: string) => {
-      socket.emit(
-        'chat message',
-        {
-          text: msgText,
-        },
-        channelSocketId,
-      );
-    },
-    [channelSocketId],
-  );
+
   const ShortcutExtension = useMemo(
     () =>
       Extension.create({
@@ -64,28 +15,23 @@ function MessageInput({ channelSocketId }: { channelSocketId: string }) {
           return {
             Enter: () => {
               // eslint-disable-next-line react/no-this-in-sfc
-              const messageText = this.editor.getText();
-              if (messageText !== '') {
+              const isEmpty = !this.editor.getText().trim().length;
+              if (!isEmpty) {
                 setIsSubmitting(true);
               }
-              // handleSendMessage(messageText, channelSocketId);
-              // handleSendMessage(messageText);
               return true;
-
-              // eslint-disable-next-line react/no-this-in-sfc
-              return this.editor.commands.clearContent();
             },
           };
         },
       }),
-    [handleSendMessage],
+    [],
   );
 
   const handleStopSubmitting = useCallback(() => {
     setIsSubmitting(false);
   }, [setIsSubmitting]);
   return (
-    <div className="p-4">
+    <div className="px-4 py-2">
       <EditorProvider
         extensions={[
           StarterKit,
@@ -106,8 +52,6 @@ function MessageInput({ channelSocketId }: { channelSocketId: string }) {
           isSubmitting={isSubmitting}
           onStopSubmitting={handleStopSubmitting}
         />
-        <FloatingMenu>This is the floating menu</FloatingMenu>
-        <BubbleMenu>This is the bubble menu</BubbleMenu>
       </EditorProvider>
     </div>
   );
@@ -124,19 +68,45 @@ function MessageSender({
   channelSocketId: string;
 }) {
   const { editor } = useCurrentEditor();
-  useEffect(() => {
-    if (isSubmitting) {
-      const messageContent = editor?.getHTML();
-      socket.emit(
-        'chat message',
-        {
-          text: messageContent,
+  const { channelId } = useParams();
+  const { user } = useAuth() ?? {};
+  const { sendMessage } = useChatMessages(channelId);
+
+  const handleSendMessage = useCallback(
+    (message: { text: string }, chatId: string, socketId: string) => {
+      if (chatId === undefined || !user) {
+        return;
+      }
+      const clientMessage = {
+        postedAt: new Date(),
+        author: {
+          _id: user._id,
+          username: user.name,
+          profileImg: user.profileImg,
         },
-        channelSocketId,
-      );
-      editor?.commands.clearContent();
+        text: message.text,
+        chatId,
+        clientId: crypto.randomUUID(),
+      };
+      sendMessage(clientMessage, socketId);
+    },
+    [user, sendMessage],
+  );
+
+  useEffect(() => {
+    if (editor && isSubmitting && channelId) {
+      const messageContent = editor.getHTML();
+      handleSendMessage({ text: messageContent }, channelId, channelSocketId);
+      editor.commands.clearContent();
       onStopSubmitting();
     }
-  }, [isSubmitting, onStopSubmitting, channelSocketId, editor]);
+  }, [
+    isSubmitting,
+    onStopSubmitting,
+    channelSocketId,
+    editor,
+    channelId,
+    handleSendMessage,
+  ]);
   return null;
 }
