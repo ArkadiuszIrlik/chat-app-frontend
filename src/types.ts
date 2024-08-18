@@ -25,17 +25,4 @@ enum SocketEvents {
   UpdateServerList = 'update server list',
 }
 
-enum ClientEvents {
-  ChatMessage = 'CHAT MESSAGE',
-  OnlineStatusChanged = 'ONLINE STATUS CHANGED',
-  ServerUpdated = 'SERVER UPDATED',
-  ServerDeleted = 'SERVER DELETED',
-}
-
-
-export {
-  UserOnlineStatus,
-  type ExtendedCSSProperties,
-  SocketEvents,
-  ClientEvents,
-};
+export { UserOnlineStatus, type ExtendedCSSProperties, SocketEvents };
