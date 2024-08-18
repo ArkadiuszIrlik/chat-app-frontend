@@ -120,6 +120,7 @@ function useFetch({
         }
         setHasError(true);
       } finally {
+        setRefetchIndex(0);
         setIsLoading(false);
       }
     }
