@@ -1,6 +1,6 @@
-import { useSocketEvents } from '@hooks/index';
+import { useAuth } from '@hooks/index';
 import useSocket from '@hooks/useSocket';
-import { ClientEvents, SocketEvents, UserOnlineStatus } from '@src/types';
+import { SocketEvents, UserOnlineStatus } from '@src/types';
 import { backOff } from 'exponential-backoff';
 import {
   ReactNode,
@@ -34,9 +34,21 @@ function useUserList() {
   const [socketsToRetry, setSocketsToRetry] = useState<
     { socketId: string; serverId: string }[]
   >([]);
-  const { getUsersStatus, isConnected: isSocketConnected } = useSocket()!;
-  const { messageEmitter } = useSocketEvents() ?? {};
+  const { getUsersStatus, isConnected: isSocketConnected } = useSocket() ?? {};
   const { socket } = useSocket() ?? {};
+  const { user: authUser } = useAuth() ?? {};
+
+  const removeServerFromStore = useCallback((serverId: string) => {
+    setUserStore((us) => {
+      const nextUserStore: typeof us = {};
+      Object.keys(us).forEach((key) => {
+        if (key !== serverId) {
+          nextUserStore[key] = us[key];
+        }
+      });
+      return nextUserStore;
+    });
+  }, []);
 
   useEffect(() => {
     if (!socket) {
@@ -81,21 +93,39 @@ function useUserList() {
         if (!(serverId in us)) {
           return us;
         }
+        if (user._id === authUser?._id) {
+          removeServerFromStore(serverId);
+        }
         const nextUserList = us[serverId].filter((u) => u._id !== user._id);
         return { ...us, [serverId]: nextUserList };
+      });
+    }
+
+    function updateUserStatus(userId: string, nextStatus: UserOnlineStatus) {
+      setUserStore((us) => {
+        const nextStore: UserStore = {};
+        Object.entries(us).forEach(([k, v]) => {
+          const nextV = v.map((user) =>
+            user._id === userId ? { ...user, onlineStatus: nextStatus } : user,
+          );
+          nextStore[k] = nextV;
+        });
+        return nextStore;
       });
     }
 
     socket.on(SocketEvents.UserJoinedServer, onUserJoinedServerEvent);
     socket.on(SocketEvents.UserLeftServer, onUserLeftServerEvent);
     socket.on(SocketEvents.UserConnected, onUserConnectedEvent);
+    socket.on(SocketEvents.OnlineStatusChanged, updateUserStatus);
 
     return () => {
       socket.off(SocketEvents.UserJoinedServer, onUserJoinedServerEvent);
       socket.off(SocketEvents.UserLeftServer, onUserLeftServerEvent);
       socket.off(SocketEvents.UserConnected, onUserConnectedEvent);
+      socket.off(SocketEvents.OnlineStatusChanged, updateUserStatus);
     };
-  }, [socket]);
+  }, [socket, removeServerFromStore, authUser?._id]);
 
   useEffect(() => {
     async function retrySocketMap() {
@@ -103,7 +133,8 @@ function useUserList() {
         socketsToRetry.length > 0 &&
         !isLoading &&
         !isRetrying &&
-        isSocketConnected
+        isSocketConnected &&
+        getUsersStatus
       ) {
         setIsRetrying(true);
         const tempStatusLists: Record<string, Promise<StatusList>> = {};
@@ -154,36 +185,6 @@ function useUserList() {
     isRetrying,
   ]);
 
-  useEffect(() => {
-    if (!messageEmitter) {
-      return undefined;
-    }
-    function updateUserStatus({
-      userId,
-      nextStatus,
-    }: {
-      userId: string;
-      nextStatus: UserOnlineStatus;
-    }) {
-      setUserStore((us) => {
-        const nextStore: UserStore = {};
-        Object.entries(us).forEach(([k, v]) => {
-          const nextV = v.map((user) =>
-            user._id === userId ? { ...user, onlineStatus: nextStatus } : user,
-          );
-          nextStore[k] = nextV;
-        });
-        return nextStore;
-      });
-    }
-
-    messageEmitter.on(ClientEvents.OnlineStatusChanged, updateUserStatus);
-
-    return () => {
-      messageEmitter.off(ClientEvents.OnlineStatusChanged, updateUserStatus);
-    };
-  }, [messageEmitter]);
-
   // const getChannelUsers = useCallback(
   //   (channelId: string) => {
   //     if (channelId in userStore) {
@@ -210,7 +211,7 @@ function useUserList() {
       serverSocketId: string,
       userList: OtherUserNoStatus[],
     ) => {
-      if (serverId in userStore) {
+      if (serverId in userStore || !getUsersStatus) {
         return;
       }
       setIsLoading(true);
@@ -275,7 +276,12 @@ function useUserList() {
 */
 
   // return { getChannelUsers, addChannelUsersToStore, isLoading };
-  return { getServerUsers, addServerUsersToStore, isLoading };
+  return {
+    getServerUsers,
+    addServerUsersToStore,
+    removeServerFromStore,
+    isLoading,
+  };
 }
 
 const UserListContext = createContext<ReturnType<typeof useUserList> | null>(
