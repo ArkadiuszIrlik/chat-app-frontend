@@ -1,5 +1,6 @@
 import formatDate from '@components/ChatMessage/ChatMessage.helpers';
 import MessageBody from '@components/ChatMessage/MessageBody';
+import { UserProfileImage } from '@components/UserProfileImage';
 
 function ChatMessage({
   authorName,
@@ -14,11 +15,9 @@ function ChatMessage({
 }) {
   return (
     <div className="flex items-start gap-4 rounded-md bg-gray-700 px-3 py-2">
-      <img
-        src={authorImg}
-        alt=""
-        className="aspect-square h-10 w-10 rounded-full"
-      />
+      <div className="aspect-square h-10 w-10 shrink-0 grow-0">
+        <UserProfileImage image={authorImg} />
+      </div>
       <div className="flex flex-col">
         <div>
           <span className="mr-2 text-blue-400">{authorName}</span>
