@@ -1,6 +1,5 @@
 import { NotificationDisplay } from '@components/NotificationDisplay';
 import {
-  SocketEventsProvider,
   ServerStoreProvider,
   MessageStoreProvider,
   SettingsProvider,
@@ -13,18 +12,18 @@ function AppScreen() {
   return (
     <SocketProvider>
       <SettingsProvider>
-        <SocketEventsProvider>
-          <ServerStoreProvider>
-            <MessageStoreProvider>
+        <ServerStoreProvider>
+          <MessageStoreProvider>
+            <UserListProvider>
               <UserListProvider>
                 <div className="flex min-h-screen">
                   <NotificationDisplay />
                   <Outlet />
                 </div>
               </UserListProvider>
-            </MessageStoreProvider>
-          </ServerStoreProvider>
-        </SocketEventsProvider>
+            </UserListProvider>
+          </MessageStoreProvider>
+        </ServerStoreProvider>
       </SettingsProvider>
     </SocketProvider>
   );
