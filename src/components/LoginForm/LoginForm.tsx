@@ -3,7 +3,7 @@ import useFetch from '@hooks/useFetch';
 import { Formik, Form } from 'formik';
 import { useEffect, useState } from 'react';
 import Yup from '@src/extendedYup';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/index';
 import {
   ErrorDisplay,
@@ -13,8 +13,15 @@ import {
 import { userSchema } from '@constants/validationSchema';
 
 function LoginForm() {
-  const { login } = useAuth() ?? {};
+  const { login, isAuthenticated } = useAuth() ?? {};
   const [postData, setPostData] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/app');
+    }
+  }, [isAuthenticated, navigate]);
 
   const { refetch, hasError, errorMessage, data, isLoading } = useFetch({
     initialUrl: 'auth/login',
