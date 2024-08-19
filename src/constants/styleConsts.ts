@@ -19,6 +19,9 @@ export default {
     blue: {
       400: '#5DC6FF',
     },
+    green: {
+      500: '#09f75a',
+    },
     red: {
       100: '#FFF5F5',
       200: '#FCCFCF',
@@ -29,6 +32,9 @@ export default {
       700: '#760A0A',
       800: '#420000',
       900: '#240000',
+    },
+    orange: {
+      500: '#F2B261',
     },
     cerise: {
       600: '#f80099',
