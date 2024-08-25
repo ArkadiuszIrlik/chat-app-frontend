@@ -1,3 +1,4 @@
+import { getUniqueObjectArray } from '@src/utils/array';
 import {
   ReactNode,
   createContext,
@@ -20,11 +21,17 @@ function useMessageStore() {
   const addToStore = useCallback((chatId: string, newMessages: Message[]) => {
     setMessageStore((ms) => {
       const currentMessageList = ms[chatId];
+      let nextMessageList;
+      if (currentMessageList) {
+        nextMessageList = [...currentMessageList, ...newMessages];
+      } else {
+        nextMessageList = newMessages;
+      }
       return {
         ...ms,
-        [chatId]: currentMessageList
-          ? orderMessages([...currentMessageList, ...newMessages])
-          : orderMessages(newMessages),
+        [chatId]: orderMessages(
+          getUniqueObjectArray(nextMessageList, ['_id']) as Message[],
+        ),
       };
     });
   }, []);
