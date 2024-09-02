@@ -5,7 +5,7 @@ import { SyncLoader } from 'react-spinners';
 import ExclamationIcon from '@assets/exclamation-point-128.png';
 import CheckmarkIcon from '@assets/checkmark.png';
 import useSWR from 'swr';
-import ExtendedCSSProperties from '@src/types';
+import { ExtendedCSSProperties } from '@src/types';
 import { PrimaryLink } from '@components/Link';
 
 const errorStyles: ExtendedCSSProperties = {
