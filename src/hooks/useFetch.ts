@@ -54,8 +54,8 @@ function formatRequestBody(
   }
   return undefined;
 }
-
-function useFetch({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function useFetch<DT = Record<string, any>>({
   initialUrl,
   initialParams = defaultInitialParams,
   onMount = true,
@@ -67,8 +67,7 @@ function useFetch({
 }: Props) {
   const [url, updateUrl] = useState(initialUrl);
   const [params, updateParams] = useState(initialParams);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [data, setData] = useState<Record<string, any> | null>(null);
+  const [data, setData] = useState<DT | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -98,19 +97,13 @@ function useFetch({
           method,
           credentials,
         });
-        const result = (await response.json()) as Record<
-          string,
-          string | boolean | number
-        >;
         if (response.ok) {
+          const result = (await response.json()) as DT;
           setData(result);
         } else {
+          const result = (await response.json()) as BackendError;
           setHasError(true);
-          if (typeof result.message === 'string') {
-            setErrorMessage(result.message);
-          } else if (typeof result.error === 'string') {
-            setErrorMessage(result.error);
-          }
+          setErrorMessage(result.message);
         }
       } catch (err) {
         if (typeof err === 'string') {
