@@ -13,8 +13,10 @@ import {
 interface UserAuth {
   _id: string;
   name: string;
+  profileImg: string;
   onlineStatus: UserOnlineStatus;
   prefersOnlineStatus: UserOnlineStatus;
+  serversIn: Server[];
 }
 
 function useAuth() {
