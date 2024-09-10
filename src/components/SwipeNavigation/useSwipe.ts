@@ -23,6 +23,7 @@ function useSwipe(
 ) {
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
 
   const handleSwipeStart = useCallback(
     (e: TouchEvent | MouseEvent) => {
@@ -37,6 +38,7 @@ function useSwipe(
         }
       }
 
+      setIsSwiping(true);
       e.preventDefault();
       setStartX(uE.clientX);
       setStartY(uE.clientY);
@@ -46,6 +48,9 @@ function useSwipe(
 
   const handleSwipeEnd = useCallback(
     (e: TouchEvent | MouseEvent) => {
+      if (!isSwiping) {
+        return;
+      }
       const uE = unifyEvent(e);
       if (constrainToContainer) {
         if (
@@ -63,10 +68,10 @@ function useSwipe(
       const endY = uE.clientY;
       const deltaX = endX - startX;
       const deltaY = endY - startY;
-
+      setIsSwiping(false);
       onSwipe({ deltaX, deltaY });
     },
-    [constrainToContainer, containerRef, startX, startY, onSwipe],
+    [constrainToContainer, containerRef, startX, startY, onSwipe, isSwiping],
   );
 
   //   some browsers navigate back/forward on swipe gestures, this bit of
