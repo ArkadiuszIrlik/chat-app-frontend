@@ -39,7 +39,6 @@ function useSwipe(
       }
 
       setIsSwiping(true);
-      e.preventDefault();
       setStartX(uE.clientX);
       setStartY(uE.clientY);
     },
@@ -61,8 +60,6 @@ function useSwipe(
           return;
         }
       }
-
-      e.preventDefault();
 
       const endX = uE.clientX;
       const endY = uE.clientY;
