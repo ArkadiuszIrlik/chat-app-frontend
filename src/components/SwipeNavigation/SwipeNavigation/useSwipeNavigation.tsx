@@ -8,9 +8,16 @@ import {
   useState,
 } from 'react';
 
+interface IOptions {
+  /** Specifies minimum distance (in pixels) for a swipe to be
+   *  registered */
+  minimumDistance?: number;
+}
+
 function useSwipeNavigation(
   columns: ISwipeColumn[],
   swipeContainerRef: MutableRefObject<HTMLElement | null>,
+  { minimumDistance = 0 }: IOptions = {},
 ) {
   const lowestIndex = 0;
   const highestIndex = columns.length - 1;
@@ -46,11 +53,11 @@ function useSwipeNavigation(
   }, [highestIndex]);
 
   function processSwipe({ deltaX }: { deltaX: number; deltaY: number }) {
-    if (deltaX > 0) {
+    if (deltaX > 0 && deltaX >= minimumDistance) {
       handleSwipeRight();
       return;
     }
-    if (deltaX < 0) {
+    if (deltaX < 0 && deltaX <= -Math.abs(minimumDistance)) {
       handleSwipeLeft();
     }
   }
