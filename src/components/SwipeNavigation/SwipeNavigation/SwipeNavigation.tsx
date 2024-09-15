@@ -18,9 +18,13 @@ function SwipeNavigation({
   columns: ISwipeColumn[];
 }) {
   const swipeContainerRef = useRef<HTMLDivElement | null>(null);
-  const { swipeIndex } = useSwipeNavigation(columns, swipeContainerRef, {
-    minimumDistance: Math.min(window.innerWidth * 0.2, 300),
-  });
+  const { swipeIndex, dragIndex, dragOffset } = useSwipeNavigation(
+    columns,
+    swipeContainerRef,
+    {
+      minimumDistance: Math.min(window.innerWidth * 0.2, 300),
+    },
+  );
   const mainIndex = columns.findIndex((col) => col.main === true);
   return (
     <div
@@ -41,6 +45,8 @@ function SwipeNavigation({
           <SwipeColumn
             index={i}
             swipeIndex={swipeIndex}
+            dragIndex={dragIndex}
+            dragOffset={dragOffset}
             isMain={isMain}
             swipeDirection={swipeDirection}
           >

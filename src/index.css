@@ -84,6 +84,17 @@
   .bg-status-offline {
     @apply bg-gray-300;
   }
+
+  .swipe-slide {
+    transform: translateX(
+      clamp(
+        -100%,
+        calc(var(--slide-offset, 0px) + var(--drag-offset, 0px)),
+        100%
+      )
+    );
+    z-index: var(--slide-z-index, 10);
+  }
 }
 
 @layer utilities {

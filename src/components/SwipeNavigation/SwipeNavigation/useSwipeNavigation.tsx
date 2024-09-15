@@ -24,6 +24,8 @@ function useSwipeNavigation(
   const mainColIndex = columns.findIndex((col) => col.main === true);
 
   const [swipeIndex, setSwipeIndex] = useState(mainColIndex);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOffset, setDragOffset] = useState(0);
 
   // whenever columns.length changes, reset swipeIndex
   useEffect(() => {
@@ -52,25 +54,65 @@ function useSwipeNavigation(
     });
   }, [highestIndex]);
 
-  function processSwipe({ deltaX }: { deltaX: number; deltaY: number }) {
-    if (deltaX > 0 && deltaX >= minimumDistance) {
-      handleSwipeRight();
-      return;
-    }
-    if (deltaX < 0 && deltaX <= -Math.abs(minimumDistance)) {
-      handleSwipeLeft();
-    }
-  }
+  const processSwipe = useCallback(
+    ({ deltaX }: { deltaX: number; deltaY: number }) => {
+      setDragIndex(null);
+      setDragOffset(0);
+      if (deltaX > 0 && deltaX >= minimumDistance) {
+        handleSwipeRight();
+        return;
+      }
+      if (deltaX < 0 && deltaX <= -Math.abs(minimumDistance)) {
+        handleSwipeLeft();
+      }
+    },
+    [handleSwipeLeft, handleSwipeRight, minimumDistance],
+  );
 
-  useSwipe(processSwipe, {
+  const processSwipeUpdate = useCallback(
+    ({ deltaX }: { deltaX: number; deltaY: number }) => {
+      setDragOffset(Math.round(deltaX));
+      if (swipeIndex === mainColIndex) {
+        if (deltaX > 0) {
+          setDragIndex(swipeIndex - 1);
+        }
+        if (deltaX < 0) {
+          setDragIndex(swipeIndex + 1);
+        }
+        return;
+      }
+      if (swipeIndex < mainColIndex) {
+        if (deltaX > 0) {
+          setDragIndex(swipeIndex - 1);
+        }
+        if (deltaX < 0) {
+          setDragIndex(swipeIndex);
+        }
+        return;
+      }
+      if (swipeIndex > mainColIndex) {
+        if (deltaX > 0) {
+          setDragIndex(swipeIndex);
+        }
+        if (deltaX < 0) {
+          setDragIndex(swipeIndex + 1);
+        }
+      }
+    },
+    [swipeIndex, mainColIndex],
+  );
+
+  useSwipe(processSwipe, processSwipeUpdate, {
     containerRef: swipeContainerRef,
   });
 
   return useMemo(
     () => ({
       swipeIndex,
+      dragIndex,
+      dragOffset,
     }),
-    [swipeIndex],
+    [swipeIndex, dragIndex, dragOffset],
   );
 }
 
