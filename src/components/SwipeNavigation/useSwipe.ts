@@ -57,6 +57,7 @@ function useSwipe(
           (uE.target instanceof Node &&
             !containerRef.current.contains(uE.target))
         ) {
+          setIsSwiping(false);
           return;
         }
       }
