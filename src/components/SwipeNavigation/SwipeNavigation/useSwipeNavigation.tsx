@@ -12,12 +12,15 @@ interface IOptions {
   /** Specifies minimum distance (in pixels) for a swipe to be
    *  registered */
   minimumDistance?: number;
+  /** Specifies minimum distance (in pixels) for a drag be
+   *  registered */
+  minimumDragDistance?: number;
 }
 
 function useSwipeNavigation(
   columns: ISwipeColumn[],
   swipeContainerRef: MutableRefObject<HTMLElement | null>,
-  { minimumDistance = 0 }: IOptions = {},
+  { minimumDistance = 0, minimumDragDistance = 0 }: IOptions = {},
 ) {
   const lowestIndex = 0;
   const highestIndex = columns.length - 1;
@@ -72,6 +75,10 @@ function useSwipeNavigation(
   const processSwipeUpdate = useCallback(
     ({ deltaX }: { deltaX: number; deltaY: number }) => {
       setDragOffset(Math.round(deltaX));
+      if (Math.abs(deltaX) < minimumDragDistance) {
+        setDragIndex(null);
+        return;
+      }
       if (swipeIndex === mainColIndex) {
         if (deltaX > 0) {
           setDragIndex(swipeIndex - 1);
@@ -99,7 +106,7 @@ function useSwipeNavigation(
         }
       }
     },
-    [swipeIndex, mainColIndex],
+    [swipeIndex, mainColIndex, minimumDragDistance],
   );
 
   useSwipe(processSwipe, processSwipeUpdate, {
