@@ -30,3 +30,5 @@ prototype
 # dev https certificates
 localhost-key.pem
 localhost.pem
+remote-key.pem
+remote-cert.pem
