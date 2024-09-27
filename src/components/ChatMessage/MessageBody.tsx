@@ -1,7 +1,7 @@
 function MessageBody({ text }: { text: string }) {
   return (
     <div
-      className="prose max-w-prose break-words dark:prose-invert"
+      className="prose prose-invert max-w-prose break-words"
       dangerouslySetInnerHTML={{ __html: text }}
     />
   );

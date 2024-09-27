@@ -43,7 +43,7 @@ function MessageInput({ channelSocketId }: { channelSocketId: string }) {
         editorProps={{
           attributes: {
             class:
-              'prose dark:prose-invert bg-gray-600 mx-auto px-5 py-2 rounded-lg',
+              'prose prose-invert bg-gray-600 mx-auto px-5 py-2 rounded-lg',
           },
         }}
       >
