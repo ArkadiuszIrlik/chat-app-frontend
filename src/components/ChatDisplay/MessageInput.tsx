@@ -81,7 +81,7 @@ function MessageSender({
         postedAt: new Date(),
         author: {
           _id: user._id,
-          username: user.name,
+          username: user.username,
           profileImg: user.profileImg,
         },
         text: message.text,

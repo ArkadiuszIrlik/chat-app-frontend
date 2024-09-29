@@ -8,7 +8,7 @@ import useOnlineStatus from '@components/UserBar/useOnlineStatus';
 import UserDropdown from '@components/UserBar/UserDropdown';
 
 function UserBar() {
-  const { user } = useAuth()!;
+  const { user } = useAuth() ?? {};
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const userButtonRef = useRef<HTMLButtonElement | null>(null);
   const { changeOnlineStatus: changeStatus } = useOnlineStatus();
@@ -42,11 +42,11 @@ function UserBar() {
             onlineStatus={user?.onlineStatus ?? UserOnlineStatus.Offline}
           />
         </div>
-        <span className="truncate">{user?.name}</span>
+        <span className="truncate">{user?.username}</span>
       </button>
       {isUserDropdownOpen && (
         <UserDropdown
-          username={user?.name ?? ''}
+          username={user?.username ?? ''}
           userImg={user?.profileImg ?? ''}
           userOnlineStatus={user?.onlineStatus ?? UserOnlineStatus.Offline}
           userButtonRef={userButtonRef}

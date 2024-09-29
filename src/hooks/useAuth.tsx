@@ -12,7 +12,7 @@ import {
 
 interface UserAuth {
   _id: string;
-  name: string;
+  username: string;
   profileImg: string;
   onlineStatus: UserOnlineStatus;
   prefersOnlineStatus: UserOnlineStatus;
