@@ -26,15 +26,15 @@ function SwipeNavigation({
   options?: Options;
 }) {
   const swipeContainerRef = useRef<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
   const { swipeIndex, dragIndex, dragOffset } = useSwipeNavigation(
     columns,
     swipeContainerRef,
     {
-      minimumDistance: Math.min(window.innerWidth * 0.2, 300),
+      minimumDistance: Math.min(containerWidth * 0.2, 300),
     },
   );
   const mainIndex = columns.findIndex((col) => col.main === true);
-  const [containerWidth, setContainerWidth] = useState(0);
 
   useEffect(() => {
     function updateContainerWidth(entries: ResizeObserverEntry[]) {
