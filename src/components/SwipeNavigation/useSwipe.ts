@@ -18,8 +18,20 @@ function unifyEvent(e: TouchEvent | MouseEvent) {
 }
 
 function useSwipe(
-  onSwipe: ((params: { deltaX: number; deltaY: number }) => void) | null,
-  onSwipeUpdate: ((params: { deltaX: number; deltaY: number }) => void) | null,
+  onSwipe:
+    | ((params: {
+        deltaX: number;
+        deltaY: number;
+        e: MouseEvent | TouchEvent;
+      }) => void)
+    | null,
+  onSwipeUpdate:
+    | ((params: {
+        deltaX: number;
+        deltaY: number;
+        e: MouseEvent | TouchEvent;
+      }) => void)
+    | null,
   { containerRef, constrainToContainer = false }: Options,
 ) {
   const [startX, setStartX] = useState(0);
@@ -69,7 +81,7 @@ function useSwipe(
       const deltaY = endY - startY;
       setIsSwiping(false);
       if (onSwipe) {
-        onSwipe({ deltaX, deltaY });
+        onSwipe({ deltaX, deltaY, e });
       }
     },
     [constrainToContainer, containerRef, startX, startY, onSwipe, isSwiping],
@@ -96,7 +108,7 @@ function useSwipe(
       const deltaX = endX - startX;
       const deltaY = endY - startY;
       if (onSwipeUpdate) {
-        onSwipeUpdate({ deltaX, deltaY });
+        onSwipeUpdate({ deltaX, deltaY, e });
       }
     },
     [
@@ -121,11 +133,15 @@ function useSwipe(
     window.addEventListener('touchend', handleSwipeEnd);
     window.addEventListener('mouseup', handleSwipeEnd);
     if (onSwipeUpdate) {
-      window.addEventListener('touchmove', handleSwipeUpdate);
-      window.addEventListener('mousemove', handleSwipeUpdate);
+      window.addEventListener('touchmove', handleSwipeUpdate, {
+        passive: false,
+      });
+      window.addEventListener('mousemove', handleSwipeUpdate, {
+        passive: false,
+      });
     }
 
-    window.addEventListener('touchmove', preventNavigation);
+    window.addEventListener('touchmove', preventNavigation, { passive: false });
 
     return () => {
       window.removeEventListener('touchstart', handleSwipeStart);
