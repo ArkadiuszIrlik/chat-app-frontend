@@ -1,21 +1,29 @@
 import SwipeColumn from '@components/SwipeNavigation/SwipeColumn/SwipeColumn';
 import { ISwipeColumn } from '@components/SwipeNavigation/SwipeNavigation/SwipeNavigation.types';
 import useSwipeNavigation from '@components/SwipeNavigation/SwipeNavigation/useSwipeNavigation';
-import { ReactNode, useRef } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 
 SwipeNavigation.defaultProps = {
   children: null,
   containerClass: '',
+  options: {},
 };
+
+interface Options {
+  darkenLowerColumns?: boolean;
+  maxDarkenPercentage?: number;
+}
 
 function SwipeNavigation({
   children,
   containerClass,
   columns,
+  options: { darkenLowerColumns = true, maxDarkenPercentage = 80 } = {},
 }: {
   children?: ReactNode;
   containerClass?: string;
   columns: ISwipeColumn[];
+  options?: Options;
 }) {
   const swipeContainerRef = useRef<HTMLDivElement | null>(null);
   const { swipeIndex, dragIndex, dragOffset } = useSwipeNavigation(
@@ -26,6 +34,28 @@ function SwipeNavigation({
     },
   );
   const mainIndex = columns.findIndex((col) => col.main === true);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    function updateContainerWidth(entries: ResizeObserverEntry[]) {
+      entries.forEach((entry) => {
+        setContainerWidth(entry.contentRect.width);
+      });
+    }
+
+    const containerObserver = new ResizeObserver(updateContainerWidth);
+
+    containerObserver.disconnect();
+    if (swipeContainerRef.current) {
+      containerObserver.observe(swipeContainerRef.current);
+    }
+
+    return () => {
+      containerObserver.disconnect();
+    };
+  }, [swipeContainerRef, setContainerWidth]);
+
+  const lastIndex = columns.length - 1;
   return (
     <div
       className={`relative z-0 overflow-x-hidden ${containerClass}`}
@@ -41,18 +71,40 @@ function SwipeNavigation({
           swipeDirection = 'left';
         }
 
-        return (
-          <SwipeColumn
-            index={i}
-            swipeIndex={swipeIndex}
-            dragIndex={dragIndex}
-            dragOffset={dragOffset}
-            isMain={isMain}
-            swipeDirection={swipeDirection}
-          >
-            {col.content}
-          </SwipeColumn>
-        );
+        let returnComp: ReactNode;
+        if (darkenLowerColumns) {
+          returnComp = (
+            <SwipeColumn
+              index={i}
+              swipeIndex={swipeIndex}
+              dragIndex={dragIndex}
+              dragOffset={dragOffset}
+              isMain={isMain}
+              swipeDirection={swipeDirection}
+              darkenLowerColumn={darkenLowerColumns}
+              firstIndex={0}
+              lastIndex={lastIndex}
+              maxDarkenPercentage={maxDarkenPercentage}
+              containerWidth={containerWidth}
+            >
+              {col.content}
+            </SwipeColumn>
+          );
+        } else {
+          returnComp = (
+            <SwipeColumn
+              index={i}
+              swipeIndex={swipeIndex}
+              dragIndex={dragIndex}
+              dragOffset={dragOffset}
+              isMain={isMain}
+              swipeDirection={swipeDirection}
+            >
+              {col.content}
+            </SwipeColumn>
+          );
+        }
+        return returnComp;
       })}
       {children}
     </div>

@@ -95,6 +95,10 @@
     );
     z-index: var(--slide-z-index, 10);
   }
+
+  .swipe-slide-darken {
+    opacity: var(--darken-percentage, 0%);
+  }
 }
 
 @layer utilities {

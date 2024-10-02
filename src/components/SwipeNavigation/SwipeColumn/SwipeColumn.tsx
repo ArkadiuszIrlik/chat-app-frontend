@@ -1,4 +1,33 @@
 import { CSSProperties, ReactNode } from 'react';
+import DarkenOverlay from '@components/SwipeNavigation/SwipeColumn/DarkenOverlay';
+
+interface BaseProps {
+  children: ReactNode;
+  index: number;
+  swipeIndex: number;
+  dragIndex: number | null;
+  dragOffset: number;
+  isMain: boolean;
+  swipeDirection: 'right' | 'left' | null;
+}
+
+type DarkenProps =
+  | {
+      darkenLowerColumn: true;
+      firstIndex: number;
+      lastIndex: number;
+      maxDarkenPercentage: number;
+      containerWidth: number;
+    }
+  | {
+      darkenLowerColumn?: false;
+      firstIndex?: never;
+      lastIndex?: never;
+      maxDarkenPercentage?: never;
+      containerWidth?: never;
+    };
+
+type Props = BaseProps & DarkenProps;
 
 function SwipeColumn({
   children,
@@ -8,19 +37,34 @@ function SwipeColumn({
   dragOffset,
   isMain,
   swipeDirection,
-}: {
-  children: ReactNode;
-  index: number;
-  swipeIndex: number;
-  dragIndex: number | null;
-  dragOffset: number;
-  isMain: boolean;
-  swipeDirection: 'right' | 'left' | null;
-}) {
+  firstIndex,
+  lastIndex,
+  darkenLowerColumn = false,
+  maxDarkenPercentage,
+  containerWidth,
+}: Props) {
   let returnComp: ReactNode;
   switch (true) {
     case isMain: {
-      returnComp = <div>{children}</div>;
+      returnComp = (
+        <div className="relative">
+          {children}
+          {darkenLowerColumn && (
+            <DarkenOverlay
+              containerWidth={containerWidth!}
+              dragIndex={dragIndex}
+              dragOffset={dragOffset}
+              firstIndex={firstIndex!}
+              index={index}
+              isMain={isMain}
+              lastIndex={lastIndex!}
+              maxDarkenPercentage={maxDarkenPercentage!}
+              swipeDirection={swipeDirection}
+              swipeIndex={swipeIndex}
+            />
+          )}
+        </div>
+      );
       break;
     }
     case swipeDirection === 'right': {
@@ -38,6 +82,20 @@ function SwipeColumn({
           }
         >
           {children}
+          {darkenLowerColumn && (
+            <DarkenOverlay
+              containerWidth={containerWidth!}
+              dragIndex={dragIndex}
+              dragOffset={dragOffset}
+              firstIndex={firstIndex!}
+              index={index}
+              isMain={isMain}
+              lastIndex={lastIndex!}
+              maxDarkenPercentage={maxDarkenPercentage!}
+              swipeDirection={swipeDirection}
+              swipeIndex={swipeIndex}
+            />
+          )}
         </div>
       );
       break;
@@ -56,6 +114,20 @@ function SwipeColumn({
           }
         >
           {children}
+          {darkenLowerColumn && (
+            <DarkenOverlay
+              containerWidth={containerWidth!}
+              dragIndex={dragIndex}
+              dragOffset={dragOffset}
+              firstIndex={firstIndex!}
+              index={index}
+              isMain={isMain}
+              lastIndex={lastIndex!}
+              maxDarkenPercentage={maxDarkenPercentage!}
+              swipeDirection={swipeDirection}
+              swipeIndex={swipeIndex}
+            />
+          )}
         </div>
       );
       break;
