@@ -123,9 +123,9 @@ function useSwipe(
 
   //   some browsers navigate back/forward on swipe gestures, this bit of
   // code prevents that behavior
-  const preventNavigation = useCallback((e: MouseEvent | TouchEvent) => {
-    e.preventDefault();
-  }, []);
+  // const preventNavigation = useCallback((e: MouseEvent | TouchEvent) => {
+  //   e.preventDefault();
+  // }, []);
 
   useEffect(() => {
     window.addEventListener('touchstart', handleSwipeStart);
@@ -141,7 +141,7 @@ function useSwipe(
       });
     }
 
-    window.addEventListener('touchmove', preventNavigation, { passive: false });
+    // window.addEventListener('touchmove', preventNavigation, { passive: false });
 
     return () => {
       window.removeEventListener('touchstart', handleSwipeStart);
@@ -151,13 +151,13 @@ function useSwipe(
       window.removeEventListener('touchmove', handleSwipeUpdate);
       window.removeEventListener('mousemove', handleSwipeUpdate);
 
-      window.removeEventListener('touchmove', preventNavigation);
+      // window.removeEventListener('touchmove', preventNavigation);
     };
   }, [
     handleSwipeStart,
     handleSwipeEnd,
     handleSwipeUpdate,
-    preventNavigation,
+    // preventNavigation,
     onSwipeUpdate,
   ]);
 }
