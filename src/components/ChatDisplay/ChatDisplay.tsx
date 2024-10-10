@@ -35,6 +35,11 @@ function ChatDisplay() {
           className="flex grow flex-col gap-2 overflow-y-auto px-3"
           ref={chatContainer}
         >
+          {!isLoading && messages.length === 0 && (
+            <p className="text-center italic text-gray-300">
+              It&apos;s empty here, how about you say hi?
+            </p>
+          )}
           {!isLoading &&
             messages.map((message) => (
               <ChatMessage
