@@ -9,6 +9,7 @@ interface BaseProps {
   dragOffset: number;
   isMain: boolean;
   swipeDirection: 'right' | 'left' | null;
+  className?: string;
 }
 
 type DarkenProps =
@@ -37,6 +38,7 @@ function SwipeColumn({
   dragOffset,
   isMain,
   swipeDirection,
+  className,
   firstIndex,
   lastIndex,
   darkenLowerColumn = false,
@@ -47,7 +49,7 @@ function SwipeColumn({
   switch (true) {
     case isMain: {
       returnComp = (
-        <div className="relative">
+        <div className={`relative ${className}`}>
           {children}
           {darkenLowerColumn && (
             <DarkenOverlay
@@ -72,7 +74,7 @@ function SwipeColumn({
         <div
           className={`swipe-slide absolute bottom-0 right-full top-0 ${
             dragIndex === index ? '' : 'transition-transform'
-          }`}
+          } ${className}`}
           style={
             {
               '--slide-z-index': 9999 - index,
@@ -103,8 +105,8 @@ function SwipeColumn({
     case swipeDirection === 'left': {
       returnComp = (
         <div
-          className={`swipe-slide absolute bottom-0 left-full top-0 
-            ${dragIndex === index ? '' : 'transition-transform'}`}
+          className={`swipe-slide absolute bottom-0 left-full top-0 justify-end 
+          ${dragIndex === index ? '' : 'transition-transform'} ${className}`}
           style={
             {
               '--slide-z-index': 0 + index,

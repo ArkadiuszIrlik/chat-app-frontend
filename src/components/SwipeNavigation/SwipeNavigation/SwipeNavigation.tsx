@@ -81,6 +81,7 @@ function SwipeNavigation({
               dragOffset={dragOffset}
               isMain={isMain}
               swipeDirection={swipeDirection}
+              className={col.className}
               darkenLowerColumn={darkenLowerColumns}
               firstIndex={0}
               lastIndex={lastIndex}
@@ -99,6 +100,7 @@ function SwipeNavigation({
               dragOffset={dragOffset}
               isMain={isMain}
               swipeDirection={swipeDirection}
+              className={col.className}
             >
               {col.content}
             </SwipeColumn>
