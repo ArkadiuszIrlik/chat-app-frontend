@@ -32,7 +32,7 @@ function useSwipe(
         e: MouseEvent | TouchEvent;
       }) => void)
     | null,
-  { containerRef, constrainToContainer = false }: Options,
+  { containerRef, constrainToContainer = false }: Options = {},
 ) {
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
