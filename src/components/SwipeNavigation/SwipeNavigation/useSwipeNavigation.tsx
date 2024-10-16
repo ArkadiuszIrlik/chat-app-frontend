@@ -1,5 +1,5 @@
 import { ISwipeColumn } from '@components/SwipeNavigation/SwipeNavigation/SwipeNavigation.types';
-import useSwipe from '@components/SwipeNavigation/useSwipe';
+import useSwipe from '@hooks/useSwipe';
 import {
   MutableRefObject,
   useCallback,
