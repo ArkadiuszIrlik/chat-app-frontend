@@ -99,6 +99,16 @@
   .swipe-slide-darken {
     opacity: var(--darken-percentage, 0%);
   }
+
+  .ripple {
+    animation: ripple var(--duration, 500ms) var(--delay, 0ms) linear forwards;
+  }
+
+  @keyframes ripple {
+    to {
+      transform: scale(var(--scale-x, 4), var(--scale-y, 4));
+    }
+  }
 }
 
 @layer utilities {
