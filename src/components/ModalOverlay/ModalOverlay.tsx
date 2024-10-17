@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { ReactNode } from 'react';
 
 ModalOverlay.defaultProps = {
@@ -8,20 +7,26 @@ ModalOverlay.defaultProps = {
   onMouseDown() {
     return undefined;
   },
+  darken: false,
 };
 
 function ModalOverlay({
   children,
   onClick,
   onMouseDown,
+  darken = false,
 }: {
   children: ReactNode;
   onClick?: () => void;
   onMouseDown?: () => void;
+  darken?: boolean;
 }) {
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
-      className="fixed inset-0 z-40 bg-gray-500/30"
+      className={`fixed inset-0 z-40 ${
+        darken ? 'bg-gray-900/70' : 'bg-gray-500/30'
+      }`}
       onClick={onClick}
       onMouseDown={onMouseDown}
     >
