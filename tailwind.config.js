@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import { styleConsts } from './src/constants';
+import plugin from 'tailwindcss/plugin';
 
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -10,5 +11,11 @@ export default {
       fontFamily: styleConsts.fontFamily,
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/typography'),
+    plugin(function ({ addVariant }) {
+      addVariant('using-touch', '.is-using-touch &');
+      addVariant('using-mouse', '.is-using-mouse &');
+    }),
+  ],
 };

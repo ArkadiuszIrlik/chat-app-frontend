@@ -2,21 +2,24 @@
 import { Outlet } from 'react-router-dom';
 import { AuthProvider } from '@hooks/useAuth';
 import { SWRConfigProvider } from '@components/SWRConfigProvider';
+import { IsTouchInputProvider } from '@hooks/useIsTouchInput';
 
 function App() {
   // const isSocketConnected = useSocketStatus();
   return (
     <AuthProvider>
-      <SWRConfigProvider>
-        <div className="bg-gray-800">
-          <div
-            className="mx-auto flex min-h-screen flex-col overflow-clip font-ui
+      <IsTouchInputProvider>
+        <SWRConfigProvider>
+          <div className="bg-gray-800">
+            <div
+              className="mx-auto flex min-h-screen flex-col overflow-clip font-ui
           text-white lg:mx-[8%] xl:mx-[14%] 2xl:mx-auto 2xl:max-w-[1800px]"
-          >
-            <Outlet />
+            >
+              <Outlet />
+            </div>
           </div>
-        </div>
-      </SWRConfigProvider>
+        </SWRConfigProvider>
+      </IsTouchInputProvider>
     </AuthProvider>
   );
 }
