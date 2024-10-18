@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import ChannelLink from '@components/ChannelList/ChannelLink';
 import { useParams } from 'react-router-dom';
 import DownArrowIcon from '@assets/down-arrow-fill.png';
 import { ExtendedCSSProperties } from '@src/types';
+import { ChannelButton } from '@components/ChannelButton';
 
 const downArrowStyle: ExtendedCSSProperties = {
   '--mask-url': `url(${DownArrowIcon})`,
@@ -10,9 +10,11 @@ const downArrowStyle: ExtendedCSSProperties = {
 
 function ChannelCategorySection({
   name,
+  server,
   channelList,
 }: {
   name: string;
+  server: Server;
   channelList: Channel[];
 }) {
   const { channelId: activeChannelId } = useParams();
@@ -41,11 +43,13 @@ function ChannelCategorySection({
         channelList.map((channel) => {
           const isActive = channel._id === activeChannelId;
           return (
-            <ChannelLink
+            <ChannelButton
               name={channel.name}
               isActive={isActive}
               type={channel.type}
               relUrl={channel._id}
+              server={server}
+              channel={channel}
               key={channel._id}
             />
           );
