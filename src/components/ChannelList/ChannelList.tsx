@@ -1,4 +1,4 @@
-import ChannelCategorySection from '@components/ChannelList/ChannelCategorySection';
+import ChannelGroupSection from '@components/ChannelList/ChannelGroupSection';
 import SettingsIcon from '@assets/settings-icon.png';
 import { ExtendedCSSProperties } from '@src/types';
 import { useCallback, useRef, useState } from 'react';
@@ -60,6 +60,17 @@ function ChannelList({
             onClose={handleCloseServerDropdown}
           />
         )}
+      </div>
+      <div className="overflow-y-auto overflow-x-hidden overscroll-y-contain">
+        {channelCategories.map((category) => (
+          <ChannelGroupSection
+            name={category.name}
+            server={server}
+            category={category}
+            channelList={category.channels}
+            key={category._id}
+          />
+        ))}
       </div>
     </div>
   );
