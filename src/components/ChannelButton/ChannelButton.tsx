@@ -78,11 +78,15 @@ function ChannelButton({
   const [hasFinishedLongPress, setHasFinishedLongPress] = useState(false);
 
   const handleShortPressClick = useCallback(() => {
+    navigate(relUrl);
+  }, [navigate, relUrl]);
+
+  const handleShortPressClickPointer = useCallback(() => {
     // prevents scrolling over buttons from counting as clicks
     if (isPressing) {
-      navigate(relUrl);
+      handleShortPressClick();
     }
-  }, [navigate, relUrl, isPressing]);
+  }, [isPressing, handleShortPressClick]);
 
   function handleCancelLongPress() {
     handleTouchEnd();
@@ -131,13 +135,17 @@ function ChannelButton({
       },
       onCancel(e) {
         handleCancelLongPress();
-        handleShortPressClick();
         // prevents some OS's opening right-click menu after long press
-        e.preventDefault();
+        if (e.type === 'touchend') {
+          handleShortPressClickPointer();
+          e.preventDefault();
+        }
       },
       onFinish(e) {
         // prevents some OS's opening right-click menu after long press
-        e.preventDefault();
+        if (e.type === 'touchend') {
+          e.preventDefault();
+        }
       },
     },
   );
