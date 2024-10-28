@@ -1,25 +1,97 @@
-import { DestructiveSecondaryButton } from '@components/DestructiveSecondaryButton';
-import DeleteServerModal from '@components/ServerSettings/DeleteServerModal';
-import { SettingsOverlay } from '@components/SettingsOverlay';
-import {
-  ErrorDisplay,
-  ImageFileInput,
-  SubmittingUpdater,
-  TextInput,
-} from '@components/form-controls';
-import { serverSchema } from '@constants/validationSchema';
+import { ErrorDisplay } from '@components/form-controls';
 import useFetch from '@hooks/useFetch';
-import { Form, Formik } from 'formik';
+import { useFormikContext } from 'formik';
 import { useCallback, useMemo, useState } from 'react';
-import Yup from '@src/extendedYup';
-import { getPropertiesChanged } from '@helpers/forms';
+import { SettingsContainer } from '@components/SettingsContainer';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import useSWR from 'swr';
+import { genericFetcherCredentials } from '@helpers/fetch';
+import { SyncLoader } from 'react-spinners';
+import styleConsts from '@constants/styleConsts';
+import SettingsContainerBlockUnsaved from '@components/SettingsContainer/SettingsContainerBlockUnsaved';
+import { BlockUnsavedProvider, useBlockUnsaved } from '@hooks/index';
+import { ServerSettingsValues } from '@components/ServerSettings/types';
+import SettingsForm from '@components/ServerSettings/SettingsForm';
+import SettingsFormikProvider from '@components/ServerSettings/SettingsFormikProvider';
 
-function ServerSettings({
+function ServerSettings() {
+  const { state } = useLocation() as { state: { server?: Server } | null };
+  const { serverId } = useParams();
+  const shouldFetch = !state?.server;
+
+  const { data, error, isLoading } = useSWR<Server, BackendError>(
+    shouldFetch ? `/servers/${serverId}` : null,
+    genericFetcherCredentials,
+  );
+
+  const server = state?.server ?? data;
+
+  const navigate = useNavigate();
+  const handleCloseSettings = useCallback(() => {
+    if (window.history?.length && window.history.length > 1) {
+      navigate(-1);
+    } else if (serverId) {
+      navigate(`/app/channels/${serverId}`);
+    } else {
+      navigate('/app/');
+    }
+  }, [navigate, serverId]);
+
+  return server && !isLoading ? (
+    <SettingsWithServer
+      server={server}
+      handleCloseSettings={handleCloseSettings}
+    />
+  ) : (
+    <SettingsNoServer
+      hasError={!!error}
+      errorMessage={error?.message ?? ''}
+      isLoading={isLoading}
+      handleCloseSettings={handleCloseSettings}
+    />
+  );
+}
+
+function SettingsNoServer({
+  handleCloseSettings,
+  hasError,
+  errorMessage,
+  isLoading,
+}: {
+  handleCloseSettings: () => void;
+  hasError: boolean;
+  errorMessage: string;
+  isLoading: boolean;
+}) {
+  return (
+    <SettingsContainer
+      label="Server settings"
+      onCloseSettings={handleCloseSettings}
+    >
+      {hasError && !isLoading && (
+        <div className="max-w-prose">
+          <ErrorDisplay errorMessage={errorMessage} />
+        </div>
+      )}
+      {isLoading && (
+        <div className="flex grow items-center justify-center">
+          <SyncLoader
+            color={styleConsts.colors.gray[300]}
+            speedMultiplier={0.8}
+            size={10}
+          />
+        </div>
+      )}
+    </SettingsContainer>
+  );
+}
+
+function SettingsWithServer({
   server,
-  onCloseSettings,
+  handleCloseSettings,
 }: {
   server: Server;
-  onCloseSettings: () => void;
+  handleCloseSettings: () => void;
 }) {
   const initialValues = useMemo(
     () => ({
@@ -39,106 +111,114 @@ function ServerSettings({
     isFileUpload: true,
   });
 
-  const [isDeleteServerModalOpen, setIsDeleteServerModalOpen] = useState(false);
-  const handleOpenDeleteServerModal = useCallback(() => {
-    setIsDeleteServerModalOpen(true);
-  }, []);
-  const handleCloseDeleteServerModal = useCallback(() => {
-    setIsDeleteServerModalOpen(false);
-  }, []);
+  const handleSubmitForm = useCallback(
+    (data: FormData) => {
+      setPostData(data);
+      refetch();
+    },
+    [refetch],
+  );
 
   return (
-    <Formik
+    <SettingsFormikProvider
       initialValues={initialValues}
-      enableReinitialize
-      validationSchema={Yup.object({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-        serverImg: Yup.mixed().oneOfSchemas([
-          Yup.string(),
-          // .test(
-          //   'is-empty-string',
-          //   (d) => `${d.path} should be an image file or an empty string`,
-          //   (value) => value === initialValues.serverImg,
-          // )
-          serverSchema.image,
-        ]),
-        name: serverSchema.name.required(
-          'Please enter a name for your server.',
-        ),
-      })}
-      onSubmit={(values) => {
-        const propertiesChanged = getPropertiesChanged(initialValues, values);
-        const patchData = propertiesChanged.map((property) => ({
-          op: 'replace',
-          path: `/${property}`,
-          value: values[property],
-        }));
-
-        const data = new FormData();
-        const patchBlob = new Blob([JSON.stringify(patchData)], {
-          type: 'application/json',
-        });
-        data.append('patch', patchBlob);
-
-        // actual server image blob gets added in a separate
-        // property
-        if (propertiesChanged.includes('serverImg')) {
-          data.append('serverImg', values.serverImg);
-        }
-
-        setPostData(data);
-        refetch();
-      }}
+      onSubmitData={handleSubmitForm}
     >
-      <SettingsOverlay
-        label="Server settings"
-        onCloseSettings={onCloseSettings}
-      >
-        <Form className="flex flex-col">
-          {hasError && (
-            <div className="max-w-prose">
-              <ErrorDisplay errorMessage={errorMessage} />
-            </div>
-          )}
-          <div className="mb-3 w-56">
-            <TextInput label="Server Name" name="name" id="name" type="text" />
-          </div>
-          <div className="mb-5">
-            <ImageFileInput
-              textLabel="Server Image"
-              buttonLabel="Upload server image"
-              // label="Server Image"
-              initialImageUrl={initialValues.serverImg}
-              name="serverImg"
-              id="serverImg"
-            />
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            {/* <label
-              aria-hidden
-              htmlFor="serverImg"
-              className="block cursor-pointer bg-green-500"
-            >
-              <SecondaryButton type="button">Change Image</SecondaryButton>
-            </label> */}
-          </div>
-          <div className="w-40">
-            <DestructiveSecondaryButton
-              type="button"
-              onClickHandler={handleOpenDeleteServerModal}
-            >
-              Delete&nbsp;Server
-            </DestructiveSecondaryButton>
-          </div>
-          {isDeleteServerModalOpen && (
-            <DeleteServerModal
-              onCancel={handleCloseDeleteServerModal}
-              serverId={server._id}
-            />
-          )}
-          <SubmittingUpdater isFetchLoading={isLoading} />
-        </Form>
-      </SettingsOverlay>
-    </Formik>
+      <BlockUnsavedWrapper
+        server={server}
+        handleCloseSettings={handleCloseSettings}
+        errorMessage={errorMessage}
+        hasError={hasError}
+        isLoading={isLoading}
+      />
+    </SettingsFormikProvider>
   );
 }
+
+function BlockUnsavedWrapper({
+  server,
+  handleCloseSettings,
+  hasError,
+  errorMessage,
+  isLoading,
+}: {
+  server: Server;
+  handleCloseSettings: () => void;
+  hasError: boolean;
+  errorMessage: string;
+  isLoading: boolean;
+}) {
+  const { initialValues, values, resetForm, submitForm, isSubmitting } =
+    useFormikContext<ServerSettingsValues>();
+
+  return (
+    <BlockUnsavedProvider
+      onCancelChanges={resetForm}
+      onConfirmChanges={() => void submitForm()}
+      initialValues={initialValues}
+      currentValues={values}
+    >
+      <SettingsWrapper
+        server={server}
+        handleCloseSettings={handleCloseSettings}
+        errorMessage={errorMessage}
+        hasError={hasError}
+        isLoading={isLoading}
+        initialValues={initialValues}
+        isSubmitting={isSubmitting}
+      />
+    </BlockUnsavedProvider>
+  );
+}
+
+function SettingsWrapper({
+  server,
+  handleCloseSettings,
+  initialValues,
+  hasError,
+  errorMessage,
+  isLoading,
+  isSubmitting,
+}: {
+  server: Server;
+  handleCloseSettings: () => void;
+  initialValues: ServerSettingsValues;
+  hasError: boolean;
+  errorMessage: string;
+  isLoading: boolean;
+  isSubmitting: boolean;
+}) {
+  const blockUnsavedProps = useBlockUnsaved();
+  const { blockUntilSaved } = blockUnsavedProps ?? {};
+
+  const blockedHandleCloseSettings = useCallback(() => {
+    if (blockUntilSaved) {
+      blockUntilSaved(handleCloseSettings);
+    }
+    handleCloseSettings();
+  }, [blockUntilSaved, handleCloseSettings]);
+
+  return (
+    <SettingsContainer
+      label="Server settings"
+      onCloseSettings={blockedHandleCloseSettings}
+    >
+      <SettingsForm
+        hasError={hasError}
+        errorMessage={errorMessage}
+        initialValues={initialValues}
+        isUpdateFetchLoading={isLoading}
+        server={server}
+      />
+      {blockUnsavedProps && (
+        <SettingsContainerBlockUnsaved
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          {...blockUnsavedProps}
+          isSaveButtonDisabled={isSubmitting}
+        />
+      )}
+    </SettingsContainer>
+  );
+}
+
 export default ServerSettings;
