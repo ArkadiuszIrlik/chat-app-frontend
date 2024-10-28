@@ -41,6 +41,10 @@
   html {
     @apply bg-gray-800;
   }
+
+  dialog {
+    background-color: transparent;
+  }
 }
 
 @layer components {
