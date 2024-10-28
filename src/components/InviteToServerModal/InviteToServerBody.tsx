@@ -19,12 +19,12 @@ const expTimeOptions = [
 
 const defaultExpTimeSetting = expTimeOptions[0];
 
-function InviteToServerContent({
+function InviteToServerBody({
   serverId,
-  onCloseModal,
+  onNavigateBack,
 }: {
   serverId: string;
-  onCloseModal: () => void;
+  onNavigateBack: () => void;
 }) {
   const { refetch, hasError, errorMessage, data, isLoading, updateParams } =
     useFetch<{ data: { inviteUrl: string } }>({
@@ -91,7 +91,7 @@ function InviteToServerContent({
         <div className="mb-3 flex items-center gap-10">
           <button
             type="button"
-            onClick={onCloseModal}
+            onClick={onNavigateBack}
             className="block w-32 underline-offset-2 hover:underline"
           >
             Back
@@ -110,7 +110,7 @@ function InviteToServerContent({
   );
 }
 
-export default InviteToServerContent;
+export default InviteToServerBody;
 
 function SubmitOnValueChange() {
   const { values, submitForm } = useFormikContext();
