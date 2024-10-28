@@ -18,3 +18,5 @@ export * from './useIsTouchInput';
 export { default as useIsTouchInput } from './useIsTouchInput';
 export * from './useSwipe';
 export { default as useSwipe } from './useSwipe';
+export * from './useBlockUnsaved';
+export { default as useBlockUnsaved } from './useBlockUnsaved';
