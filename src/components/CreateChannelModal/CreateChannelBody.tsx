@@ -11,13 +11,15 @@ import useFetch from '@hooks/useFetch';
 import { useMemo, useState } from 'react';
 import { channelGroupSchema, channelSchema } from '@constants/validationSchema';
 
-function CreateChannelContent({
+function CreateChannelBody({
   server,
   channelCategories,
+  onNavigateBack,
   onCloseModal,
 }: {
   server: Server;
-  channelCategories: Server['channelCategories'];
+  channelCategories: ChannelCategory[];
+  onNavigateBack: () => void;
   onCloseModal: () => void;
 }) {
   const [postData, setPostData] = useState<{
@@ -116,7 +118,7 @@ function CreateChannelContent({
           <div className="mb-3 flex items-center gap-10">
             <button
               type="button"
-              onClick={onCloseModal}
+              onClick={onNavigateBack}
               className="block w-32 underline-offset-2 hover:underline"
             >
               Back
@@ -133,7 +135,7 @@ function CreateChannelContent({
   );
 }
 
-export default CreateChannelContent;
+export default CreateChannelBody;
 
 function NewChannelGroupField() {
   const { values } = useFormikContext<{
