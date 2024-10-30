@@ -48,10 +48,11 @@ function DarkenOverlay({
   switch (true) {
     case isMain: {
       const startsDarkened = swipeIndex !== index;
+      const isOnlyColumn = index === firstIndex && index === lastIndex;
       const isDarkenedByDrag =
         dragIndex !== null &&
         // prevents darken when main is the only column
-        index !== lastIndex &&
+        !isOnlyColumn &&
         (dragIndex - 1 === index || dragIndex + 1 === index);
       const darkenPercentage = getDarkenPercentage(
         startsDarkened,
