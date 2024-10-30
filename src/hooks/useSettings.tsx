@@ -22,6 +22,12 @@ const defaultSettings = {
     uiName: 'Notification sound volume',
     version: 0,
   },
+  ENABLE_VIBRATION: {
+    type: SettingTypes.Check as const,
+    value: true,
+    uiName: 'Enable vibration on supported devices',
+    version: 0,
+  },
 };
 
 export type SettingsKey = keyof typeof defaultSettings;
