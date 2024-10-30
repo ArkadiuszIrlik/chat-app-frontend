@@ -49,7 +49,7 @@ function SwipeColumn({
   switch (true) {
     case isMain: {
       returnComp = (
-        <div className={`relative ${className}`}>
+        <div className={`relative${className ? ` ${className}` : ''}`}>
           {children}
           {darkenLowerColumn && (
             <DarkenOverlay
