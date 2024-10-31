@@ -1,16 +1,11 @@
-import { ModalOverlay } from '@components/ModalOverlay';
 import SettingsIcon from '@assets/settings-icon.png';
-import { createPortal } from 'react-dom';
-import CloseIcon from '@assets/close-icon.png';
 import { ExtendedCSSProperties } from '@src/types';
 import TextChannelIcon from '@assets/text-channel-icon.png';
 import VoiceChannelIcon from '@assets/voice-channel-icon.png';
 import { useCallback, useState } from 'react';
 import { ChannelSettings } from '@components/ChannelSettings';
-
-const closeIconStyles: ExtendedCSSProperties = {
-  '--mask-url': `url(${CloseIcon})`,
-};
+import { ModalContainer } from '@components/ModalContainer';
+import { CloseButton } from '@components/CloseButton';
 
 const textChannelStyle: ExtendedCSSProperties = {
   '--mask-url': `url(${TextChannelIcon})`,
@@ -25,42 +20,35 @@ const settingsIconStyle: ExtendedCSSProperties = {
 };
 
 function ChannelPanelModal({
+  isOpen,
   server,
   channel,
   channelName,
   channelType,
   onCloseModal,
 }: {
+  isOpen: boolean;
   server: Server;
   channel: Channel;
   channelName: string;
   channelType: 'text' | 'voice';
   onCloseModal: () => void;
 }) {
-  return createPortal(
-    <ModalOverlay
-      onMouseDown={() => {
-        onCloseModal();
-      }}
-      darken
+  return (
+    <ModalContainer
+      isOpen={isOpen}
+      onClose={onCloseModal}
+      closeOnClickOutside
+      darkenBackdrop
     >
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, 
-    jsx-a11y/no-static-element-interactions */}
-      <div
-        className="fixed left-1/2 top-1/2 w-11/12 max-w-96
-            -translate-x-1/2 -translate-y-1/2 rounded-lg bg-gray-700 px-5 py-4"
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        <ModalContent
-          server={server}
-          channel={channel}
-          channelName={channelName}
-          channelType={channelType}
-          onCloseModal={onCloseModal}
-        />
-      </div>
-    </ModalOverlay>,
-    document.body,
+      <ModalContent
+        server={server}
+        channel={channel}
+        channelName={channelName}
+        channelType={channelType}
+        onCloseModal={onCloseModal}
+      />
+    </ModalContainer>
   );
 }
 export default ChannelPanelModal;
@@ -93,22 +81,14 @@ function ModalContent({
           />
           {channelName}
         </h1>
-        <button
-          type="button"
-          onClick={onCloseModal}
-          aria-label='Close "Add server" modal'
-          className="group ml-auto block rounded-md p-1 hover:bg-gray-600"
-        >
-          <div
-            className="alpha-mask aspect-square h-5 w-5 shrink-0 grow-0 bg-gray-400
-              group-hover:bg-gray-300"
-            style={closeIconStyles}
-          />
-        </button>
+        <CloseButton
+          ariaLabel='Close "Channel Panel" modal'
+          onClose={onCloseModal}
+        />
       </div>
-      <div className="ml-4 max-w-72">
+      <div className="mx-4 flex flex-col gap-2">
         <ModalButton
-          text="Settings"
+          text="Channel Settings"
           ariaLabel="Open channel settings"
           iconStyleObj={settingsIconStyle}
           onClick={openSettings}

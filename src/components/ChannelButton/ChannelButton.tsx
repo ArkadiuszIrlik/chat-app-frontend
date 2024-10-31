@@ -193,15 +193,14 @@ function ChannelButton({
         isActive={isActive}
         onClick={toggleChannelPanel}
       />
-      {isChannelPanelOpen && (
-        <ChannelPanelModal
-          server={server}
-          channel={channel}
-          channelName={name}
-          channelType={type}
-          onCloseModal={closeChannelPanel}
-        />
-      )}
+      <ChannelPanelModal
+        isOpen={isChannelPanelOpen}
+        server={server}
+        channel={channel}
+        channelName={name}
+        channelType={type}
+        onCloseModal={closeChannelPanel}
+      />
     </div>
   );
 }
