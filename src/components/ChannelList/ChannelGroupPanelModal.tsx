@@ -85,9 +85,9 @@ function ModalContent({
           />
         </button>
       </div>
-      <div className="ml-4 max-w-72">
+      <div className="mx-4 flex flex-col gap-2">
         <ModalButton
-          text="Settings"
+          text="Channel Group Settings"
           ariaLabel="Open channel group settings"
           iconStyleObj={settingsIconStyle}
           onClick={openSettings}
