@@ -30,7 +30,10 @@ function useMessageStore() {
       return {
         ...ms,
         [chatId]: orderMessages(
-          getUniqueObjectArray(nextMessageList, ['_id']) as Message[],
+          getUniqueObjectArray(nextMessageList, [
+            '_id',
+            'clientId',
+          ]) as Message[],
         ),
       };
     });
