@@ -45,6 +45,12 @@ function MessageInput({ channelSocketId }: { channelSocketId: string }) {
             class:
               'prose prose-invert bg-gray-600 mx-auto px-5 py-2 rounded-lg',
           },
+          transformPastedHTML(html) {
+            return (
+              new DOMParser().parseFromString(html, 'text/html').documentElement
+                .textContent ?? ''
+            );
+          },
         }}
       >
         <MessageSender
