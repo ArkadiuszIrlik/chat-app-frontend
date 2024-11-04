@@ -4,7 +4,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import LeftSidebar from '@components/ServerView/LeftSidebar';
 import { useServerStore, useSocket, useUserList } from '@hooks/index';
 import { ServerContextInterface } from '@components/ServerView/useServerContext';
-import useSWR from 'swr';
+import useSWR, { KeyedMutator } from 'swr';
 import { genericFetcherCredentials } from '@helpers/fetch';
 import { SocketEvents } from '@src/types';
 import { ErrorDisplay } from '@components/form-controls';
@@ -55,33 +55,8 @@ function ServerView() {
     genericFetcherCredentials,
   );
 
-  const { socket } = useSocket() ?? {};
-  useEffect(() => {
-    if (!socket) {
-      return undefined;
-    }
-    function onServerUpdated(updatedId: string) {
-      if (updatedId === serverId) {
-        void mutate();
-      }
-    }
+  useSocketInteraction({ serverId, mutate });
 
-    function onServerDeleted(deletedId: string) {
-      if (deletedId === serverId) {
-        navigate('/app/channels', { replace: true });
-      }
-    }
-
-    socket.on(SocketEvents.ServerUpdated, onServerUpdated);
-    socket.on(SocketEvents.ServerDeleted, onServerDeleted);
-
-    return () => {
-      socket.off(SocketEvents.ServerUpdated, onServerUpdated);
-      socket.off(SocketEvents.ServerDeleted, onServerDeleted);
-    };
-  }, [socket, serverId, mutate, navigate]);
-
-  const { addServerUsersToStore } = useUserList() ?? {};
   const activeChannel =
     getChannelList(server?.channelCategories ?? []).find(
       (channel) => channel._id === channelId,
@@ -108,6 +83,7 @@ function ServerView() {
     }
   }, [navigate, server?.channelCategories, server?._id, activeChannel]);
 
+  const { addServerUsersToStore } = useUserList() ?? {};
   useEffect(() => {
     if (server && addServerUsersToStore) {
       void addServerUsersToStore(server._id, server.socketId, server.members);
@@ -159,3 +135,38 @@ function ServerView() {
 }
 
 export default ServerView;
+
+function useSocketInteraction({
+  serverId,
+  mutate,
+}: {
+  serverId: string | undefined;
+  mutate: KeyedMutator<Server>;
+}) {
+  const { socket } = useSocket() ?? {};
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!socket) {
+      return undefined;
+    }
+    function onServerUpdated(updatedId: string) {
+      if (updatedId === serverId) {
+        void mutate();
+      }
+    }
+
+    function onServerDeleted(deletedId: string) {
+      if (deletedId === serverId) {
+        navigate('/app/channels', { replace: true });
+      }
+    }
+
+    socket.on(SocketEvents.ServerUpdated, onServerUpdated);
+    socket.on(SocketEvents.ServerDeleted, onServerDeleted);
+
+    return () => {
+      socket.off(SocketEvents.ServerUpdated, onServerUpdated);
+      socket.off(SocketEvents.ServerDeleted, onServerDeleted);
+    };
+  }, [socket, serverId, mutate, navigate]);
+}
