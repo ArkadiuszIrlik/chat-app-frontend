@@ -1,13 +1,15 @@
 import { UserList } from '@components/UserList';
 import { useEffect, memo } from 'react';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import LeftSidebar from '@components/ServerView/LeftSidebar';
 import { useServerStore, useSocket, useUserList } from '@hooks/index';
-import { ServerContextInterface } from '@components/ServerView/useServerContext';
 import useSWR, { KeyedMutator } from 'swr';
 import { genericFetcherCredentials } from '@helpers/fetch';
 import { SocketEvents } from '@src/types';
-import { ErrorDisplay } from '@components/form-controls';
+import { useMediaQuery } from '@uidotdev/usehooks';
+import styleConsts from '@constants/styleConsts';
+import { SwipeNavigation } from '@components/SwipeNavigation';
+import ServerContent from '@components/ServerView/ServerContent';
 
 function getChannelList(channelCategories: Server['channelCategories']) {
   const channelList: Channel[] = [];
@@ -90,46 +92,54 @@ function ServerView() {
     }
   }, [server, addServerUsersToStore]);
 
-  function renderServerContentSwitch() {
-    switch (true) {
-      case isServerListEmpty:
-        return (
-          <div className="px-2 pt-2 md:px-10 md:pt-12">
-            <div className="max-w-prose text-gray-100">
-              It looks like you haven&apos;t joined any servers yet. Let&apos;s
-              get you set up. Click &quot;Add a server&quot; in the panel to the
-              left to join or create a new server.
-            </div>
-          </div>
-        );
-      case !isLoading && !!error:
-        return (
-          <div className="mx-auto">
-            <ErrorDisplay
-              errorMessage={error.message ?? 'Error loading server'}
-            />
-          </div>
-        );
-      case !isLoading && !!server:
-        return (
-          <Outlet
-            context={{ activeChannel } satisfies ServerContextInterface}
-          />
-        );
-      default:
-        return null;
-    }
-  }
-
+  const isSmallScreen = useMediaQuery(
+    `only screen and (min-width: ${styleConsts.screens.sm}`,
+  );
+  const isExtraSmallScreen = useMediaQuery(
+    `only screen and (min-width: ${styleConsts.screens.xs}`,
+  );
   return (
-    <div className="flex max-h-screen min-h-screen grow">
-      <LeftSidebar
-        isEmptyServerList={isServerListEmpty}
-        isServerLoading={isLoading}
-        server={server}
-      />
-      <div className="flex grow">{renderServerContentSwitch()}</div>
-      {!isServerListEmpty && <MemoizedUserList />}
+    <div className="flex max-h-dvh min-w-0 flex-1 grow">
+      {(() => {
+        switch (true) {
+          case isSmallScreen:
+            return (
+              <DesktopServerView
+                activeChannel={activeChannel}
+                errorMessage={error?.message ?? 'Error loading server'}
+                hasError={!!error}
+                isServerListEmpty={isServerListEmpty}
+                isServerLoaded={!!server}
+                isServerLoading={isLoading}
+                server={server}
+              />
+            );
+          case isExtraSmallScreen:
+            return (
+              <TabletServerView
+                activeChannel={activeChannel}
+                errorMessage={error?.message ?? 'Error loading server'}
+                hasError={!!error}
+                isServerListEmpty={isServerListEmpty}
+                isServerLoaded={!!server}
+                isServerLoading={isLoading}
+                server={server}
+              />
+            );
+          default:
+            return (
+              <PhoneServerView
+                activeChannel={activeChannel}
+                errorMessage={error?.message ?? 'Error loading server'}
+                hasError={!!error}
+                isServerListEmpty={isServerListEmpty}
+                isServerLoaded={!!server}
+                isServerLoading={isLoading}
+                server={server}
+              />
+            );
+        }
+      })()}
     </div>
   );
 }
@@ -169,4 +179,170 @@ function useSocketInteraction({
       socket.off(SocketEvents.ServerDeleted, onServerDeleted);
     };
   }, [socket, serverId, mutate, navigate]);
+}
+
+DesktopServerView.defaultProps = {
+  server: undefined,
+};
+
+function DesktopServerView({
+  isServerListEmpty,
+  isServerLoading,
+  hasError,
+  errorMessage,
+  isServerLoaded,
+  activeChannel,
+  server,
+}: {
+  isServerListEmpty: boolean;
+  isServerLoading: boolean;
+  hasError: boolean;
+  errorMessage: string;
+  isServerLoaded: boolean;
+  activeChannel: Channel | null;
+  server?: Server;
+}) {
+  return (
+    <>
+      <LeftSidebar
+        isEmptyServerList={isServerListEmpty}
+        isServerLoading={isServerLoading}
+        server={server}
+      />
+      <div className="flex min-w-0 grow">
+        <ServerContent
+          activeChannel={activeChannel}
+          errorMessage={errorMessage}
+          hasError={hasError}
+          isServerListEmpty={isServerListEmpty}
+          isServerLoaded={isServerLoaded}
+          isServerLoading={isServerLoading}
+        />
+      </div>
+      {!isServerListEmpty && <MemoizedUserList />}
+    </>
+  );
+}
+
+TabletServerView.defaultProps = {
+  server: undefined,
+};
+
+function TabletServerView({
+  isServerListEmpty,
+  isServerLoading,
+  hasError,
+  errorMessage,
+  isServerLoaded,
+  activeChannel,
+  server,
+}: {
+  isServerListEmpty: boolean;
+  isServerLoading: boolean;
+  hasError: boolean;
+  errorMessage: string;
+  isServerLoaded: boolean;
+  activeChannel: Channel | null;
+  server?: Server;
+}) {
+  return (
+    <SwipeNavigation
+      containerClass="grow"
+      columns={[
+        {
+          content: (
+            <div className="flex h-dvh grow">
+              <LeftSidebar
+                isEmptyServerList={isServerListEmpty}
+                isServerLoading={isServerLoading}
+                server={server}
+              />
+              <div className="flex min-w-0 grow">
+                <ServerContent
+                  activeChannel={activeChannel}
+                  errorMessage={errorMessage}
+                  hasError={hasError}
+                  isServerListEmpty={isServerListEmpty}
+                  isServerLoaded={isServerLoaded}
+                  isServerLoading={isServerLoading}
+                />
+              </div>
+            </div>
+          ),
+          main: true,
+        },
+        {
+          content: (
+            <div className="flex h-full">
+              <MemoizedUserList />
+            </div>
+          ),
+        },
+      ]}
+    />
+  );
+}
+
+PhoneServerView.defaultProps = {
+  server: undefined,
+};
+
+function PhoneServerView({
+  isServerListEmpty,
+  isServerLoading,
+  hasError,
+  errorMessage,
+  isServerLoaded,
+  activeChannel,
+  server,
+}: {
+  isServerListEmpty: boolean;
+  isServerLoading: boolean;
+  hasError: boolean;
+  errorMessage: string;
+  isServerLoaded: boolean;
+  activeChannel: Channel | null;
+  server?: Server;
+}) {
+  return (
+    <SwipeNavigation
+      containerClass="grow"
+      columns={[
+        {
+          content: (
+            <div className="flex h-full">
+              <LeftSidebar
+                isEmptyServerList={isServerListEmpty}
+                isServerLoading={isServerLoading}
+                server={server}
+              />
+            </div>
+          ),
+          className: 'w-2/3',
+        },
+        {
+          content: (
+            <div className="flex">
+              <ServerContent
+                activeChannel={activeChannel}
+                errorMessage={errorMessage}
+                hasError={hasError}
+                isServerListEmpty={isServerListEmpty}
+                isServerLoaded={isServerLoaded}
+                isServerLoading={isServerLoading}
+              />
+            </div>
+          ),
+          main: true,
+        },
+        {
+          content: (
+            <div className="flex h-full">
+              <MemoizedUserList />
+            </div>
+          ),
+        },
+      ]}
+    />
+  );
 }
