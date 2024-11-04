@@ -5,6 +5,10 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { useParams } from 'react-router-dom';
 import { useAuth, useChatMessages } from '@hooks/index';
 
+const urlRegex =
+  // eslint-disable-next-line no-useless-escape
+  /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:;\/~+#-]*[\w@?^=%&\/~+#-])/g;
+
 function MessageInput({ channelSocketId }: { channelSocketId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -83,6 +87,7 @@ function MessageSender({
       if (chatId === undefined || !user) {
         return;
       }
+      const processedText = convertLinksToAnchors(message.text);
       const clientMessage = {
         postedAt: new Date(),
         author: {
@@ -90,7 +95,7 @@ function MessageSender({
           username: user.username,
           profileImg: user.profileImg,
         },
-        text: message.text,
+        text: processedText,
         chatId,
         clientId: crypto.randomUUID(),
       };
@@ -115,4 +120,11 @@ function MessageSender({
     handleSendMessage,
   ]);
   return null;
+}
+
+function convertLinksToAnchors(text: string) {
+  return text.replace(
+    urlRegex,
+    (match) => `<a href="${match}" target="_blank">${match}</a>`,
+  );
 }
