@@ -20,3 +20,5 @@ export * from './useSwipe';
 export { default as useSwipe } from './useSwipe';
 export * from './useBlockUnsaved';
 export { default as useBlockUnsaved } from './useBlockUnsaved';
+export * from './useMessageInput';
+export { default as useMessageInput } from './useMessageInput';

@@ -3,7 +3,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useParams } from 'react-router-dom';
-import { useAuth, useChatMessages } from '@hooks/index';
+import { useAuth, useChatMessages, useMessageInput } from '@hooks/index';
 
 const urlRegex =
   // eslint-disable-next-line no-useless-escape
@@ -12,6 +12,7 @@ const urlRegex =
 function MessageInput({ channelSocketId }: { channelSocketId: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditorCreated, setIsEditorCreated] = useState(false);
+  const { input, handleUpdateInput } = useMessageInput() ?? {};
 
   const ShortcutExtension = useMemo(
     () =>
@@ -47,8 +48,15 @@ function MessageInput({ channelSocketId }: { channelSocketId: string }) {
           <div className="absolute left-0 right-0 top-0 z-10 h-2 bg-gradient-to-t from-gray-600/0 to-gray-600" />
         </div>
         <EditorProvider
+          content={input}
           onCreate={() => {
             setIsEditorCreated(true);
+          }}
+          onUpdate={(props) => {
+            if (handleUpdateInput) {
+              // eslint-disable-next-line react/prop-types
+              handleUpdateInput(props.editor.getHTML());
+            }
           }}
           extensions={[
             StarterKit,

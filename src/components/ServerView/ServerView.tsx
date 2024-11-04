@@ -2,7 +2,12 @@ import { UserList } from '@components/UserList';
 import { useEffect, memo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import LeftSidebar from '@components/ServerView/LeftSidebar';
-import { useServerStore, useSocket, useUserList } from '@hooks/index';
+import {
+  MessageInputProvider,
+  useServerStore,
+  useSocket,
+  useUserList,
+} from '@hooks/index';
 import useSWR, { KeyedMutator } from 'swr';
 import { genericFetcherCredentials } from '@helpers/fetch';
 import { SocketEvents } from '@src/types';
@@ -99,48 +104,50 @@ function ServerView() {
     `only screen and (min-width: ${styleConsts.screens.xs}`,
   );
   return (
-    <div className="flex max-h-dvh min-w-0 flex-1 grow">
-      {(() => {
-        switch (true) {
-          case isSmallScreen:
-            return (
-              <DesktopServerView
-                activeChannel={activeChannel}
-                errorMessage={error?.message ?? 'Error loading server'}
-                hasError={!!error}
-                isServerListEmpty={isServerListEmpty}
-                isServerLoaded={!!server}
-                isServerLoading={isLoading}
-                server={server}
-              />
-            );
-          case isExtraSmallScreen:
-            return (
-              <TabletServerView
-                activeChannel={activeChannel}
-                errorMessage={error?.message ?? 'Error loading server'}
-                hasError={!!error}
-                isServerListEmpty={isServerListEmpty}
-                isServerLoaded={!!server}
-                isServerLoading={isLoading}
-                server={server}
-              />
-            );
-          default:
-            return (
-              <PhoneServerView
-                activeChannel={activeChannel}
-                errorMessage={error?.message ?? 'Error loading server'}
-                hasError={!!error}
-                isServerListEmpty={isServerListEmpty}
-                isServerLoaded={!!server}
-                isServerLoading={isLoading}
-                server={server}
-              />
-            );
-        }
-      })()}
-    </div>
+    <MessageInputProvider>
+      <div className="flex max-h-dvh min-w-0 flex-1 grow">
+        {(() => {
+          switch (true) {
+            case isSmallScreen:
+              return (
+                <DesktopServerView
+                  activeChannel={activeChannel}
+                  errorMessage={error?.message ?? 'Error loading server'}
+                  hasError={!!error}
+                  isServerListEmpty={isServerListEmpty}
+                  isServerLoaded={!!server}
+                  isServerLoading={isLoading}
+                  server={server}
+                />
+              );
+            case isExtraSmallScreen:
+              return (
+                <TabletServerView
+                  activeChannel={activeChannel}
+                  errorMessage={error?.message ?? 'Error loading server'}
+                  hasError={!!error}
+                  isServerListEmpty={isServerListEmpty}
+                  isServerLoaded={!!server}
+                  isServerLoading={isLoading}
+                  server={server}
+                />
+              );
+            default:
+              return (
+                <PhoneServerView
+                  activeChannel={activeChannel}
+                  errorMessage={error?.message ?? 'Error loading server'}
+                  hasError={!!error}
+                  isServerListEmpty={isServerListEmpty}
+                  isServerLoaded={!!server}
+                  isServerLoading={isLoading}
+                  server={server}
+                />
+              );
+          }
+        })()}
+      </div>
+    </MessageInputProvider>
   );
 }
 
