@@ -14,7 +14,7 @@ function ChatDisplay() {
   const { onMessageSent } = useChatAutoScroll({ chatContainerRef, messages });
 
   return (
-    <div className="flex max-h-screen min-w-0 grow flex-col">
+    <div className="flex max-h-dvh min-h-dvh min-w-0 grow flex-col">
       <div className="px-3 py-2">
         <h2 className="text-xl">{activeChannel?.name ?? ''}</h2>
       </div>
@@ -22,7 +22,7 @@ function ChatDisplay() {
         <div
           // needs to be positioned (non-static) for lastElementChild.offsetTop
           // inside useChatAutoScroll to work
-          className="relative flex grow flex-col gap-2 overflow-y-auto px-3"
+          className="relative flex grow flex-col gap-2 overflow-y-auto overscroll-y-contain px-3"
           ref={chatContainerRef}
         >
           {!isLoading && messages.length === 0 && (
@@ -42,7 +42,7 @@ function ChatDisplay() {
             ))}
         </div>
       </div>
-      <div>
+      <div className="mt-auto">
         <MessageInput
           channelSocketId={activeChannel?.socketId ?? ''}
           onMessageSent={onMessageSent}
