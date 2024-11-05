@@ -14,7 +14,7 @@ function ChatDisplay() {
   const { onMessageSent } = useChatAutoScroll({ chatContainerRef, messages });
 
   return (
-    <div className="flex max-h-screen flex-1 flex-col">
+    <div className="flex max-h-screen min-w-0 grow flex-col">
       <div className="px-3 py-2">
         <h2 className="text-xl">{activeChannel?.name ?? ''}</h2>
       </div>

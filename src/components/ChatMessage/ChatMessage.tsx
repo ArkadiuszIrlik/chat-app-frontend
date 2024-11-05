@@ -19,10 +19,14 @@ function ChatMessage({
       <div className="aspect-square h-10 w-10 shrink-0 grow-0">
         <UserProfileImage image={authorImg} />
       </div>
-      <div className="flex flex-col">
-        <div>
-          <span className="mr-2 text-blue-400">{authorName}</span>
-          <span className="text-xs text-gray-200">{formatDate(postedAt)}</span>
+      <div className="flex min-w-0 flex-col">
+        <div className="flex items-baseline gap-2">
+          <span className="min-w-10 shrink truncate text-blue-400">
+            {authorName}
+          </span>
+          <span className="min-w-14 text-right text-xs text-gray-200">
+            {formatDate(postedAt)}
+          </span>
         </div>
         <MessageBody text={messageText} />
         <MessageImageContainer messageText={messageText} />
