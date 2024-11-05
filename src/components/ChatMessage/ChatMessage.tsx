@@ -1,5 +1,6 @@
 import formatDate from '@components/ChatMessage/ChatMessage.helpers';
 import MessageBody from '@components/ChatMessage/MessageBody';
+import MessageImageContainer from '@components/ChatMessage/MessageImageContainer';
 import { UserProfileImage } from '@components/UserProfileImage';
 
 function ChatMessage({
@@ -24,6 +25,7 @@ function ChatMessage({
           <span className="text-xs text-gray-200">{formatDate(postedAt)}</span>
         </div>
         <MessageBody text={messageText} />
+        <MessageImageContainer messageText={messageText} />
       </div>
     </div>
   );
