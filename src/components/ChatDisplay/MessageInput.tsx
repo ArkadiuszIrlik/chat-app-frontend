@@ -9,7 +9,13 @@ const urlRegex =
   // eslint-disable-next-line no-useless-escape
   /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:;\/~+#-]*[\w@?^=%&\/~+#-])/g;
 
-function MessageInput({ channelSocketId }: { channelSocketId: string }) {
+function MessageInput({
+  channelSocketId,
+  onMessageSent,
+}: {
+  channelSocketId: string;
+  onMessageSent: () => void;
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditorCreated, setIsEditorCreated] = useState(false);
   const { input, handleUpdateInput } = useMessageInput() ?? {};
@@ -82,6 +88,7 @@ function MessageInput({ channelSocketId }: { channelSocketId: string }) {
             channelSocketId={channelSocketId}
             isSubmitting={isSubmitting}
             onStopSubmitting={handleStopSubmitting}
+            onMessageSent={onMessageSent}
           />
         </EditorProvider>
       </div>
@@ -93,10 +100,12 @@ export default MessageInput;
 function MessageSender({
   isSubmitting,
   onStopSubmitting,
+  onMessageSent,
   channelSocketId,
 }: {
   isSubmitting: boolean;
   onStopSubmitting: () => void;
+  onMessageSent: () => void;
   channelSocketId: string;
 }) {
   const { editor } = useCurrentEditor();
@@ -122,8 +131,9 @@ function MessageSender({
         clientId: crypto.randomUUID(),
       };
       sendMessage(clientMessage, socketId);
+      onMessageSent();
     },
-    [user, sendMessage],
+    [user, sendMessage, onMessageSent],
   );
 
   useEffect(() => {

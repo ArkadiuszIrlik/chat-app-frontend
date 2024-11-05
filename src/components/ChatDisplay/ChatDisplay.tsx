@@ -1,29 +1,17 @@
 import MessageInput from '@components/ChatDisplay/MessageInput';
 import { ChatMessage } from '@components/ChatMessage';
 import { useChatMessages } from '@hooks/index';
-import { RefObject, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useServerContext } from '@components/ServerView';
-
-function autoScrollToBottom(containerRef: RefObject<HTMLElement>) {
-  if (containerRef.current === null) {
-    return;
-  }
-  const { offsetHeight, scrollHeight, scrollTop } = containerRef.current;
-  if (scrollHeight <= scrollTop + offsetHeight + 100) {
-    containerRef.current.scrollTo(0, scrollHeight);
-  }
-}
+import useChatAutoScroll from '@components/ChatDisplay/useChatAutoScroll';
 
 function ChatDisplay() {
   const { activeChannel } = useServerContext();
-  const chatContainer = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const { channelId } = useParams();
   const { messages, isLoading } = useChatMessages(channelId);
-
-  useEffect(() => {
-    autoScrollToBottom(chatContainer);
-  }, [messages]);
+  const { onMessageSent } = useChatAutoScroll({ chatContainerRef, messages });
 
   return (
     <div className="flex max-h-screen flex-1 flex-col">
@@ -32,8 +20,10 @@ function ChatDisplay() {
       </div>
       <div className="flex grow flex-col overflow-hidden">
         <div
-          className="flex grow flex-col gap-2 overflow-y-auto px-3"
-          ref={chatContainer}
+          // needs to be positioned (non-static) for lastElementChild.offsetTop
+          // inside useChatAutoScroll to work
+          className="relative flex grow flex-col gap-2 overflow-y-auto px-3"
+          ref={chatContainerRef}
         >
           {!isLoading && messages.length === 0 && (
             <p className="text-center italic text-gray-300">
@@ -52,9 +42,11 @@ function ChatDisplay() {
             ))}
         </div>
       </div>
-      <div />
       <div>
-        <MessageInput channelSocketId={activeChannel?.socketId ?? ''} />
+        <MessageInput
+          channelSocketId={activeChannel?.socketId ?? ''}
+          onMessageSent={onMessageSent}
+        />
       </div>
     </div>
   );
