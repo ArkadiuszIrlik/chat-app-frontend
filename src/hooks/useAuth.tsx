@@ -1,4 +1,4 @@
-import { getURL } from '@helpers/fetch';
+import { getURL, HttpError } from '@helpers/fetch';
 import { UserOnlineStatus } from '@src/types';
 import {
   createContext,
@@ -32,9 +32,8 @@ function useAuth() {
         credentials: 'include',
       });
       if (!res.ok) {
-        const error = Error();
-        const apiError = (await res.json()) as BackendError;
-        Object.assign(error, apiError);
+        const data = (await res.json()) as BackendError;
+        const error = new HttpError('Error during login', data, res.status);
         throw error;
       }
       const nextUser = (await res.json()) as UserAuth;

@@ -9,7 +9,7 @@ import {
   useUserList,
 } from '@hooks/index';
 import useSWR, { KeyedMutator } from 'swr';
-import { genericFetcherCredentials } from '@helpers/fetch';
+import { genericFetcherCredentials, HttpError } from '@helpers/fetch';
 import { SocketEvents } from '@src/types';
 import { useMediaQuery } from '@uidotdev/usehooks';
 import styleConsts from '@constants/styleConsts';
@@ -57,7 +57,7 @@ function ServerView() {
     error,
     mutate,
     isLoading,
-  } = useSWR<Server, BackendError>(
+  } = useSWR<Server, HttpError>(
     shouldFetch ? `/servers/${serverId}` : null,
     genericFetcherCredentials,
   );
@@ -112,7 +112,7 @@ function ServerView() {
               return (
                 <DesktopServerView
                   activeChannel={activeChannel}
-                  errorMessage={error?.message ?? 'Error loading server'}
+                  errorMessage={error?.data?.message ?? 'Error loading server'}
                   hasError={!!error}
                   isServerListEmpty={isServerListEmpty}
                   isServerLoaded={!!server}
@@ -124,7 +124,7 @@ function ServerView() {
               return (
                 <TabletServerView
                   activeChannel={activeChannel}
-                  errorMessage={error?.message ?? 'Error loading server'}
+                  errorMessage={error?.data?.message ?? 'Error loading server'}
                   hasError={!!error}
                   isServerListEmpty={isServerListEmpty}
                   isServerLoaded={!!server}
@@ -136,7 +136,7 @@ function ServerView() {
               return (
                 <PhoneServerView
                   activeChannel={activeChannel}
-                  errorMessage={error?.message ?? 'Error loading server'}
+                  errorMessage={error?.data?.message ?? 'Error loading server'}
                   hasError={!!error}
                   isServerListEmpty={isServerListEmpty}
                   isServerLoaded={!!server}

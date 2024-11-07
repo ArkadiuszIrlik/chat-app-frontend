@@ -1,6 +1,5 @@
 import { parseNetworkMessages } from '@helpers/data';
-import { genericFetcherCredentials } from '@helpers/fetch';
-import { useMessageStore, useSocket } from '@hooks/index';
+import { genericFetcherCredentials, HttpError } from '@helpers/fetch';
 import { SocketEvents } from '@src/types';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
@@ -40,7 +39,7 @@ function useChatMessages(chatId: string | undefined) {
   // fetch chat messages from API
   const { data, error, isLoading } = useSWR<
     { message: string; data: { messages: NetworkMessage[] } },
-    BackendError
+    HttpError
   >(() => (shouldFetch ? `/chat/${chatId}` : null), genericFetcherCredentials);
 
   useEffect(() => {

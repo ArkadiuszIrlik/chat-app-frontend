@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { SettingsContainer } from '@components/SettingsContainer';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import useSWR from 'swr';
-import { genericFetcherCredentials } from '@helpers/fetch';
+import { genericFetcherCredentials, HttpError } from '@helpers/fetch';
 import { SyncLoader } from 'react-spinners';
 import styleConsts from '@constants/styleConsts';
 import SettingsContainerBlockUnsaved from '@components/SettingsContainer/SettingsContainerBlockUnsaved';
@@ -19,7 +19,7 @@ function ServerSettings() {
   const { serverId } = useParams();
   const shouldFetch = !state?.server;
 
-  const { data, error, isLoading } = useSWR<Server, BackendError>(
+  const { data, error, isLoading } = useSWR<Server, HttpError>(
     shouldFetch ? `/servers/${serverId}` : null,
     genericFetcherCredentials,
   );
@@ -45,7 +45,7 @@ function ServerSettings() {
   ) : (
     <SettingsNoServer
       hasError={!!error}
-      errorMessage={error?.message ?? ''}
+      errorMessage={error?.data?.message ?? ''}
       isLoading={isLoading}
       handleCloseSettings={handleCloseSettings}
     />

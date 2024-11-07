@@ -1,5 +1,5 @@
 import styleConsts from '@constants/styleConsts';
-import genericFetcher from '@helpers/fetch';
+import genericFetcher, { HttpError } from '@helpers/fetch';
 import { useSearchParams } from 'react-router-dom';
 import { SyncLoader } from 'react-spinners';
 import ExclamationIcon from '@assets/exclamation-point-128.png';
@@ -19,7 +19,7 @@ function EmailVerification() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
-  const { data, isLoading, error } = useSWR<object, BackendError>(
+  const { data, isLoading, error } = useSWR<object, HttpError>(
     `/auth/verify-email?token=${token ?? ''}`,
     genericFetcher,
     {

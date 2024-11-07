@@ -34,19 +34,28 @@ export function getClientURL(url: string) {
   return mainURL + nextUrl;
 }
 
-interface ExtendedError extends Error {
+export class HttpError extends Error {
+  data: BackendError;
+
   status: number;
-  data: object;
+
+  constructor(message: string, data: BackendError, status: number) {
+    super(message);
+    this.data = data;
+    this.status = status;
+  }
 }
 
 export async function genericFetcherCredentials(key: string) {
   const res = await fetch(getURL(key), { credentials: 'include' });
   if (!res.ok) {
-    const error = new Error(
+    const data = (await res.json()) as BackendError;
+    const error = new HttpError(
       'An error occurred while fetching the data.',
-    ) as ExtendedError;
-    error.data = (await res.json()) as object;
-    error.status = res.status;
+      data,
+      res.status,
+    );
+
     throw error;
   }
   return res.json();
@@ -55,11 +64,13 @@ export async function genericFetcherCredentials(key: string) {
 export default async function genericFetcher(key: string) {
   const res = await fetch(getURL(key));
   if (!res.ok) {
-    const error = new Error(
+    const data = (await res.json()) as BackendError;
+    const error = new HttpError(
       'An error occurred while fetching the data.',
-    ) as ExtendedError;
-    error.data = (await res.json()) as object;
-    error.status = res.status;
+      data,
+      res.status,
+    );
+
     throw error;
   }
   return res.json();
