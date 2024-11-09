@@ -8,14 +8,19 @@ function ChatMessage({
   authorImg,
   messageText,
   postedAt,
+  scrollOffset,
 }: {
   authorName: string;
   authorImg: string;
   messageText: string;
   postedAt: Date;
+  scrollOffset: unknown;
 }) {
   return (
-    <div className="flex items-start gap-4 rounded-md bg-gray-700 px-3 py-2">
+    <div
+      className="flex items-start gap-4 rounded-md bg-gray-700 px-3 py-2"
+      data-scroll-offset={scrollOffset}
+    >
       <div className="aspect-square h-10 w-10 shrink-0 grow-0">
         <UserProfileImage image={authorImg} />
       </div>
