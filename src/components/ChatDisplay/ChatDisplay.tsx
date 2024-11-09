@@ -4,14 +4,16 @@ import { useChatMessages } from '@hooks/index';
 import { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useServerContext } from '@components/ServerView';
-import useChatAutoScroll from '@components/ChatDisplay/useChatAutoScroll';
+import useScrollOffset from '@hooks/useScrollOffset';
+import useScrollPosition from '@components/ChatDisplay/useScrollPosition';
 
 function ChatDisplay() {
   const { activeChannel } = useServerContext();
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { channelId } = useParams();
   const { messages, isLoading } = useChatMessages(channelId);
-  const { onMessageSent } = useChatAutoScroll({ chatContainerRef, messages });
+  const { getMessageScrollOffset } = useScrollOffset() ?? {};
+  useScrollPosition({ channelId, chatContainerRef, messages });
 
   return (
     <div className="flex max-h-dvh min-h-dvh min-w-0 grow flex-col">
@@ -20,8 +22,8 @@ function ChatDisplay() {
       </div>
       <div className="flex grow flex-col overflow-hidden">
         <div
-          // needs to be positioned (non-static) for lastElementChild.offsetTop
-          // inside useChatAutoScroll to work
+          // needs to be positioned (non-static) for offsetTop check inside
+          // useScrollPosition to work
           className="relative flex grow flex-col gap-2 overflow-y-auto overscroll-y-contain px-3"
           ref={chatContainerRef}
         >
@@ -38,15 +40,13 @@ function ChatDisplay() {
                 messageText={message.text}
                 authorName={message.author.username}
                 authorImg={message.author.profileImg}
+                scrollOffset={getMessageScrollOffset?.(message)}
               />
             ))}
         </div>
       </div>
       <div className="mt-auto">
-        <MessageInput
-          channelSocketId={activeChannel?.socketId ?? ''}
-          onMessageSent={onMessageSent}
-        />
+        <MessageInput channelSocketId={activeChannel?.socketId ?? ''} />
       </div>
     </div>
   );
