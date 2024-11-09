@@ -37,7 +37,7 @@ function useScrollPosition({
     }
 
     const offsetMessage = messages.find(
-      (message) => message.postedAt >= new Date(scrollOffset),
+      (message) => getMessageScrollOffset(message) >= scrollOffset,
     );
     if (offsetMessage) {
       const messageEl = chatContainerRef.current.querySelector(
