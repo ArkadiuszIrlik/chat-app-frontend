@@ -104,7 +104,7 @@ function useScrollPosition({
     if (scrollOffset === 'bottom') {
       scrollToBottom(chatContainerRef);
     }
-  }, [scrollOffset, chatContainerRef]);
+  }, [messages, scrollOffset, chatContainerRef]);
 
   const handleChatResize = useCallback(() => {
     if (scrollOffset === 'bottom') {
