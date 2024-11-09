@@ -99,9 +99,9 @@ function useScrollPosition({
     };
   }, [channelId, updateScrollOffset, chatContainerRef]);
 
-  // auto scroll to bottom on new messages
+  // auto scroll to bottom on new messages and when no scrollOffset specified
   useEffect(() => {
-    if (scrollOffset === 'bottom') {
+    if (scrollOffset === 'bottom' || scrollOffset === undefined) {
       scrollToBottom(chatContainerRef);
     }
   }, [messages, scrollOffset, chatContainerRef]);
