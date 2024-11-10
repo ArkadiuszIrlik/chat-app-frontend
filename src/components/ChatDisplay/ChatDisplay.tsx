@@ -5,13 +5,18 @@ import { useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useServerContext } from '@components/ServerView';
 import useScrollOffset from '@hooks/useScrollOffset';
+import LoadingBlock from '@components/ChatDisplay/LoadingBlock';
 import useScrollPosition from '@components/ChatDisplay/useScrollPosition';
+import { SyncLoader } from 'react-spinners';
+import styleConsts from '@constants/styleConsts';
+import useDelay from '@hooks/useDelay';
 
 function ChatDisplay() {
   const { activeChannel } = useServerContext();
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { channelId } = useParams();
-  const { messages, isLoading } = useChatMessages(channelId);
+  const { messages, hasFirstMessage, isLoading, loadMoreMessages } =
+    useChatMessages(channelId);
   const { getMessageScrollOffset } = useScrollOffset() ?? {};
   useScrollPosition({ channelId, chatContainerRef, messages });
 
@@ -27,22 +32,29 @@ function ChatDisplay() {
           className="relative flex grow flex-col gap-2 overflow-y-auto overscroll-y-contain px-3"
           ref={chatContainerRef}
         >
-          {!isLoading && messages.length === 0 && (
+          {!messages && <LoadingSpinner />}
+          {!isLoading && messages && messages.length === 0 && (
             <p className="text-center italic text-gray-300">
               It&apos;s empty here, how about you say hi?
             </p>
           )}
-          {!isLoading &&
-            messages.map((message) => (
-              <ChatMessage
-                key={message._id ?? message.clientId}
-                postedAt={message.postedAt}
-                messageText={message.text}
-                authorName={message.author.username}
-                authorImg={message.author.profileImg}
-                scrollOffset={getMessageScrollOffset?.(message)}
-              />
-            ))}
+          {messages && !hasFirstMessage && (
+            <LoadingBlock
+              chatContainerRef={chatContainerRef}
+              isLoading={isLoading}
+              onLoadMoreMessages={loadMoreMessages}
+            />
+          )}
+          {messages?.map((message) => (
+            <ChatMessage
+              key={message._id ?? message.clientId}
+              postedAt={message.postedAt}
+              messageText={message.text}
+              authorName={message.author.username}
+              authorImg={message.author.profileImg}
+              scrollOffset={getMessageScrollOffset?.(message)}
+            />
+          ))}
         </div>
       </div>
       <div className="mt-auto">
@@ -51,4 +63,19 @@ function ChatDisplay() {
     </div>
   );
 }
+
+function LoadingSpinner() {
+  const { isReady } = useDelay({ delay: 300 });
+
+  return isReady ? (
+    <div className="mt-5 flex h-10 grow items-center justify-center">
+      <SyncLoader
+        color={styleConsts.colors.gray[300]}
+        speedMultiplier={0.8}
+        size={10}
+      />
+    </div>
+  ) : null;
+}
+
 export default ChatDisplay;

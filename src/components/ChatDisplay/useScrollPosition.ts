@@ -1,6 +1,12 @@
 import useScrollOffset, { ScrollOffsetValue } from '@hooks/useScrollOffset';
 import useResizeObserver from '@hooks/useResizeObserver';
-import { RefObject, useCallback, useEffect } from 'react';
+import {
+  RefObject,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 
 function useScrollPosition({
   channelId,
@@ -17,6 +23,36 @@ function useScrollPosition({
   if (getScrollOffset && channelId) {
     scrollOffset = getScrollOffset(channelId);
   }
+
+  const prevScrollHeight = chatContainerRef.current?.scrollHeight;
+  const prevScrollTop = chatContainerRef.current?.scrollTop;
+
+  const channelIdBeforeRenderRef = useRef<typeof channelId | undefined>(
+    undefined,
+  );
+
+  // maintain scroll position when new messages load
+  useLayoutEffect(() => {
+    function cleanup() {
+      // holds channelId value from before the effect ran
+      channelIdBeforeRenderRef.current = channelId;
+    }
+    const hasChannelChanged = channelIdBeforeRenderRef.current !== channelId;
+    const containerEl = chatContainerRef.current;
+    if (
+      !containerEl ||
+      prevScrollHeight === undefined ||
+      prevScrollTop === undefined ||
+      hasChannelChanged
+    ) {
+      return cleanup;
+    }
+    const nextScrollPosition =
+      containerEl.scrollHeight - (prevScrollHeight - prevScrollTop);
+    containerEl.scroll(0, nextScrollPosition);
+
+    return cleanup;
+  }, [messages]);
 
   // restore scroll position when changing channels
   useEffect(() => {
