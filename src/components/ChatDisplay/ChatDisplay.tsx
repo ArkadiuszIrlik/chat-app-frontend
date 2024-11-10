@@ -33,6 +33,13 @@ function ChatDisplay() {
           ref={chatContainerRef}
         >
           {!messages && <LoadingSpinner />}
+          {hasFirstMessage && (
+            <div className="flex items-center gap-1">
+              <div className="h-[2px] grow bg-gray-400" />
+              <div className="shrink-0 text-gray-200">Channel created</div>
+              <div className="h-[2px] grow bg-gray-400" />
+            </div>
+          )}
           {!isLoading && messages && messages.length === 0 && (
             <p className="text-center italic text-gray-300">
               It&apos;s empty here, how about you say hi?
