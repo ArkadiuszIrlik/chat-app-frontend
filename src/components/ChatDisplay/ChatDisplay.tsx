@@ -42,7 +42,8 @@ function ChatDisplay() {
           )}
           {!isLoading && messages && messages.length === 0 && (
             <p className="text-center italic text-gray-300">
-              It&apos;s empty here, how about you say hi?
+              It&apos;s looking empty here, let&apos;s get the conversation
+              started!
             </p>
           )}
           {messages && !hasFirstMessage && (
