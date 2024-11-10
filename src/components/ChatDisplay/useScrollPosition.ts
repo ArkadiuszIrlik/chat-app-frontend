@@ -86,7 +86,7 @@ function useScrollPosition({
     }
 
     navigateToBottom();
-    // shouldn't rereun with messages and scrollOffset changes to
+    // shouldn't rerun with messages and scrollOffset changes to
     // prevent janky scroll
   }, [channelId, chatContainerRef, getMessageScrollOffset]);
 
