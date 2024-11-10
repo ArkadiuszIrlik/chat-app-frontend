@@ -5,6 +5,7 @@ import {
   SettingsProvider,
   SocketProvider,
   UserListProvider,
+  MessageCursorStoreProvider,
 } from '@hooks/index';
 import { Outlet } from 'react-router-dom';
 
@@ -14,14 +15,14 @@ function AppScreen() {
       <SettingsProvider>
         <ServerStoreProvider>
           <MessageStoreProvider>
-            <UserListProvider>
+            <MessageCursorStoreProvider>
               <UserListProvider>
                 <div className="flex min-h-screen">
                   <NotificationDisplay />
                   <Outlet />
                 </div>
               </UserListProvider>
-            </UserListProvider>
+            </MessageCursorStoreProvider>
           </MessageStoreProvider>
         </ServerStoreProvider>
       </SettingsProvider>
