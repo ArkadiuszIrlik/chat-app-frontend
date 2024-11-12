@@ -9,6 +9,8 @@ import {
 } from 'react';
 
 interface IOptions {
+  /** Specifies if mouse interactions should trigger swipe. Default: false */
+  allowMouse?: boolean;
   /** Specifies minimum distance (in pixels) for a swipe to be
    *  registered */
   minimumDistance?: number;
@@ -24,6 +26,7 @@ function useSwipeNavigation(
   columns: ISwipeColumn[],
   swipeContainerRef: MutableRefObject<HTMLElement | null>,
   {
+    allowMouse = false,
     minimumDistance = 0,
     minimumDragDistance = 0,
     directionLockThreshold = 5,
@@ -85,19 +88,8 @@ function useSwipeNavigation(
   );
 
   const processSwipeUpdate = useCallback(
-    ({
-      deltaX,
-      deltaY,
-      e,
-    }: {
-      deltaX: number;
-      deltaY: number;
-      e: MouseEvent | TouchEvent;
-    }) => {
+    ({ deltaX, deltaY }: { deltaX: number; deltaY: number }) => {
       if (!swipeDirection) {
-        if (e.cancelable) {
-          e.preventDefault();
-        }
         if (
           Math.abs(deltaX) >= directionLockThreshold ||
           Math.abs(deltaY) >= directionLockThreshold
@@ -114,9 +106,6 @@ function useSwipeNavigation(
       }
 
       if (swipeDirection === 'horizontal') {
-        if (e.cancelable) {
-          e.preventDefault();
-        }
         setDragOffset(Math.round(deltaX));
         if (Math.abs(deltaX) < minimumDragDistance) {
           setDragIndex(null);
@@ -161,6 +150,7 @@ function useSwipeNavigation(
 
   useSwipe(processSwipe, processSwipeUpdate, {
     containerRef: swipeContainerRef,
+    allowMouse,
   });
 
   return useMemo(

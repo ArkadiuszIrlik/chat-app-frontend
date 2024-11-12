@@ -1,6 +1,15 @@
 import { MutableRefObject, useCallback, useEffect, useState } from 'react';
 
-type Options =
+interface BaseOptions {
+  /** Specifies if mouse interactions should trigger swipe. Default: false */
+  allowMouse?: boolean;
+  /** Specifies if onSwipeUpdate handler should be passive. Passive handlers
+   * can freely use preventDefault(), at the cost of possibly jankier scroll
+   * experience. Default: true */
+  passiveUpdateHandler?: boolean;
+}
+
+type ContainerOptions =
   | {
       containerRef: MutableRefObject<HTMLElement | null>;
       constrainToContainer: true;
@@ -9,6 +18,8 @@ type Options =
       containerRef?: MutableRefObject<HTMLElement | null>;
       constrainToContainer?: false;
     };
+
+type Options = BaseOptions & ContainerOptions;
 
 function unifyEvent(e: TouchEvent | MouseEvent) {
   if ('changedTouches' in e) {
@@ -32,7 +43,12 @@ function useSwipe(
         e: MouseEvent | TouchEvent;
       }) => void)
     | null,
-  { containerRef, constrainToContainer = false }: Options = {},
+  {
+    containerRef,
+    constrainToContainer = false,
+    allowMouse = false,
+    passiveUpdateHandler = true,
+  }: Options = {},
 ) {
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
@@ -129,16 +145,20 @@ function useSwipe(
 
   useEffect(() => {
     window.addEventListener('touchstart', handleSwipeStart);
-    window.addEventListener('mousedown', handleSwipeStart);
     window.addEventListener('touchend', handleSwipeEnd);
-    window.addEventListener('mouseup', handleSwipeEnd);
+    if (allowMouse) {
+      window.addEventListener('mousedown', handleSwipeStart);
+      window.addEventListener('mouseup', handleSwipeEnd);
+    }
     if (onSwipeUpdate) {
       window.addEventListener('touchmove', handleSwipeUpdate, {
-        passive: false,
+        passive: passiveUpdateHandler,
       });
-      window.addEventListener('mousemove', handleSwipeUpdate, {
-        passive: false,
-      });
+      if (allowMouse) {
+        window.addEventListener('mousemove', handleSwipeUpdate, {
+          passive: passiveUpdateHandler,
+        });
+      }
     }
 
     // window.addEventListener('touchmove', preventNavigation, { passive: false });
@@ -159,6 +179,8 @@ function useSwipe(
     handleSwipeUpdate,
     // preventNavigation,
     onSwipeUpdate,
+    allowMouse,
+    passiveUpdateHandler,
   ]);
 }
 

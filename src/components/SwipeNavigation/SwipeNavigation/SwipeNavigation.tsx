@@ -12,13 +12,18 @@ SwipeNavigation.defaultProps = {
 interface Options {
   darkenLowerColumns?: boolean;
   maxDarkenPercentage?: number;
+  allowMouseSwipe?: boolean;
 }
 
 function SwipeNavigation({
   children,
   containerClass,
   columns,
-  options: { darkenLowerColumns = true, maxDarkenPercentage = 80 } = {},
+  options: {
+    darkenLowerColumns = true,
+    maxDarkenPercentage = 80,
+    allowMouseSwipe = false,
+  } = {},
 }: {
   children?: ReactNode;
   containerClass?: string;
@@ -32,6 +37,7 @@ function SwipeNavigation({
     swipeContainerRef,
     {
       minimumDistance: Math.min(containerWidth * 0.2, 300),
+      allowMouse: allowMouseSwipe,
     },
   );
   const mainIndex = columns.findIndex((col) => col.main === true);
