@@ -6,6 +6,7 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
 } from 'react';
 
 function useScrollPosition({
@@ -23,6 +24,8 @@ function useScrollPosition({
   if (getScrollOffset && channelId) {
     scrollOffset = getScrollOffset(channelId);
   }
+
+  const [isOffsetUpdateQueued, setIsOffsetUpdateQueued] = useState(false);
 
   const prevScrollHeight = chatContainerRef.current?.scrollHeight;
   const prevScrollTop = chatContainerRef.current?.scrollTop;
@@ -97,7 +100,7 @@ function useScrollPosition({
       return undefined;
     }
 
-    function handleScrollEnd() {
+    function handleScroll() {
       if (!containerEl || !updateScrollOffset || !channelId) {
         return;
       }
@@ -117,7 +120,9 @@ function useScrollPosition({
       const messageEls = [...containerEl.children];
       const topMessage = messageEls.find(
         (el) =>
-          el instanceof HTMLElement && el.offsetTop >= containerEl.scrollTop,
+          el instanceof HTMLElement &&
+          el.offsetTop >= containerEl.scrollTop &&
+          el.dataset.scrollOffset,
       );
       if (topMessage && topMessage instanceof HTMLElement) {
         if (topMessage.dataset.scrollOffset) {
@@ -129,18 +134,37 @@ function useScrollPosition({
       }
     }
 
-    containerEl.addEventListener('scrollend', handleScrollEnd);
+    let timeoutId: NodeJS.Timeout;
+    function debounceScroll() {
+      if (!isOffsetUpdateQueued) {
+        setIsOffsetUpdateQueued(true);
+      }
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleScroll();
+        setIsOffsetUpdateQueued(false);
+      }, 300);
+    }
+
+    containerEl.addEventListener('scroll', debounceScroll);
     return () => {
-      containerEl.removeEventListener('scrollend', handleScrollEnd);
+      containerEl.removeEventListener('scroll', debounceScroll);
+      // ensures incorrect offset doesn't get set when channel changes
+      clearTimeout(timeoutId);
     };
-  }, [channelId, updateScrollOffset, chatContainerRef]);
+  }, [channelId, updateScrollOffset, chatContainerRef, isOffsetUpdateQueued]);
 
   // auto scroll to bottom on new messages
   useEffect(() => {
+    // prevent navigate to bottom when offset not yet updated because of
+    // debounced function
+    if (isOffsetUpdateQueued) {
+      return;
+    }
     if (scrollOffset === 'bottom') {
       scrollToBottom(chatContainerRef);
     }
-  }, [messages, scrollOffset, chatContainerRef]);
+  }, [messages, scrollOffset, chatContainerRef, isOffsetUpdateQueued]);
 
   const handleChatResize = useCallback(() => {
     if (scrollOffset === 'bottom') {
