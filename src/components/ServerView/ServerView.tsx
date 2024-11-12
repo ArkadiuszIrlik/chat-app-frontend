@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import LeftSidebar from '@components/ServerView/LeftSidebar';
 import {
   MessageInputProvider,
+  useIsTouchInput,
   useServerStore,
   useSocket,
   useUserList,
@@ -104,6 +105,8 @@ function ServerView() {
   const isExtraSmallScreen = useMediaQuery(
     `only screen and (min-width: ${styleConsts.screens.xs}`,
   );
+  const isUsingTouch = useIsTouchInput();
+
   return (
     <ScrollOffsetProvider>
       <MessageInputProvider>
@@ -135,6 +138,7 @@ function ServerView() {
                     isServerListEmpty={isServerListEmpty}
                     isServerLoaded={!!server}
                     isServerLoading={isLoading}
+                    isUsingTouch={isUsingTouch}
                     server={server}
                   />
                 );
@@ -149,6 +153,7 @@ function ServerView() {
                     isServerListEmpty={isServerListEmpty}
                     isServerLoaded={!!server}
                     isServerLoading={isLoading}
+                    isUsingTouch={isUsingTouch}
                     server={server}
                   />
                 );
@@ -251,6 +256,7 @@ function TabletServerView({
   errorMessage,
   isServerLoaded,
   activeChannel,
+  isUsingTouch,
   server,
 }: {
   isServerListEmpty: boolean;
@@ -259,11 +265,13 @@ function TabletServerView({
   errorMessage: string;
   isServerLoaded: boolean;
   activeChannel: Channel | null;
+  isUsingTouch: boolean;
   server?: Server;
 }) {
   return (
     <SwipeNavigation
       containerClass="grow"
+      options={{ allowMouseSwipe: !isUsingTouch }}
       columns={[
         {
           content: (
@@ -310,6 +318,7 @@ function PhoneServerView({
   errorMessage,
   isServerLoaded,
   activeChannel,
+  isUsingTouch,
   server,
 }: {
   isServerListEmpty: boolean;
@@ -318,11 +327,13 @@ function PhoneServerView({
   errorMessage: string;
   isServerLoaded: boolean;
   activeChannel: Channel | null;
+  isUsingTouch: boolean;
   server?: Server;
 }) {
   return (
     <SwipeNavigation
       containerClass="grow"
+      options={{ allowMouseSwipe: !isUsingTouch }}
       columns={[
         {
           content: (

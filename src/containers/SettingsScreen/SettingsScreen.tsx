@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import CategoryList from '@containers/SettingsScreen/CategoryList';
 import { useCallback, useState } from 'react';
-import { SettingsKey, useSettings } from '@hooks/index';
+import { SettingsKey, useIsTouchInput, useSettings } from '@hooks/index';
 import SettingControl from '@containers/SettingsScreen/SettingControl';
 import { CloseButton } from '@components/CloseButton';
 import { useMediaQuery } from '@uidotdev/usehooks';
@@ -62,6 +62,8 @@ function SettingsScreen() {
   const isExtraSmallScreen = useMediaQuery(
     `only screen and (min-width: ${styleConsts.screens.xs}`,
   );
+  const isTouchInput = useIsTouchInput();
+
   return isExtraSmallScreen ? (
     <div className="flex grow">
       <div className="w-52 bg-gray-700 px-2 py-2">
@@ -103,6 +105,7 @@ function SettingsScreen() {
   ) : (
     <SwipeNavigation
       containerClass="grow"
+      options={{ allowMouseSwipe: !isTouchInput }}
       columns={[
         {
           content: (
