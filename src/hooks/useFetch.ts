@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { getURL } from '@helpers/fetch';
+import { getURL, HttpError } from '@helpers/fetch';
 
 interface BaseProps {
   initialUrl: string;
@@ -71,6 +71,7 @@ function useFetch<DT = Record<string, any>>({
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [error, setError] = useState<HttpError | null>(null);
   const [refetchIndex, setRefetchIndex] = useState(0);
   const queryString = useMemo(
     () =>
@@ -89,6 +90,7 @@ function useFetch<DT = Record<string, any>>({
       if (onMount === false && refetchIndex === 0) return;
       setIsLoading(true);
       setHasError(false);
+      setError(null);
       setErrorMessage('');
       try {
         const response = await fetch(`${getURL(url)}?${queryString}`, {
@@ -101,9 +103,17 @@ function useFetch<DT = Record<string, any>>({
           const result = (await response.json()) as DT;
           setData(result);
         } else {
-          const result = (await response.json()) as BackendError;
+          const errorData = (await response.json()) as BackendError;
+          const nextError = new HttpError(
+            errorData?.message ?? 'An error occurred while fetching the data.',
+            errorData,
+            response.status,
+          );
           setHasError(true);
-          setErrorMessage(result.message);
+          setError(nextError);
+          setErrorMessage(
+            errorData?.message ?? 'An error occurred while fetching the data.',
+          );
         }
       } catch (err) {
         if (typeof err === 'string') {
@@ -133,6 +143,7 @@ function useFetch<DT = Record<string, any>>({
   return {
     data,
     isLoading,
+    error,
     hasError,
     errorMessage,
     updateUrl,
