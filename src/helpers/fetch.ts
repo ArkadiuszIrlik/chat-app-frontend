@@ -51,7 +51,7 @@ export async function genericFetcherCredentials(key: string) {
   if (!res.ok) {
     const data = (await res.json()) as BackendError;
     const error = new HttpError(
-      'An error occurred while fetching the data.',
+      data?.message ?? 'An error occurred while fetching the data.',
       data,
       res.status,
     );
@@ -66,7 +66,7 @@ export default async function genericFetcher(key: string) {
   if (!res.ok) {
     const data = (await res.json()) as BackendError;
     const error = new HttpError(
-      'An error occurred while fetching the data.',
+      data?.message ?? 'An error occurred while fetching the data.',
       data,
       res.status,
     );
