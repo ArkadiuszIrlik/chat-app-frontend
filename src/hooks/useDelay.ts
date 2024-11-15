@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Params {
   /** Desired delay in miliseconds */
@@ -7,21 +7,26 @@ interface Params {
 
 function useDelay({ delay }: Params) {
   const [isReady, setIsReady] = useState(false);
+  const timeoutIdRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  const startTimeout = useCallback(() => {
+    timeoutIdRef.current = setTimeout(() => setIsReady(true), delay);
+  }, [delay]);
 
   const resetDelay = useCallback(() => {
     setIsReady(false);
-  }, []);
+    clearTimeout(timeoutIdRef.current);
+    startTimeout();
+  }, [startTimeout]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    if (!isReady) {
-      timeoutId = setTimeout(() => setIsReady(true), delay);
-    }
-
+    startTimeout();
     return () => {
-      clearTimeout(timeoutId);
+      clearTimeout(timeoutIdRef.current);
     };
-  }, [isReady, delay]);
+    // leave dependency array empty or timeouts will get reset every time
+    // "delay" param changes
+  }, []);
 
   return {
     isReady,
