@@ -8,6 +8,7 @@ import {
   MessageCursorStoreProvider,
 } from '@hooks/index';
 import { ChatErrorsProvider } from '@hooks/useChatErrors';
+import { DeleteMessageProvider } from '@hooks/useDeleteMessage';
 import { Outlet } from 'react-router-dom';
 
 function AppScreen() {
@@ -17,14 +18,16 @@ function AppScreen() {
         <ServerStoreProvider>
           <ChatErrorsProvider>
             <MessageStoreProvider>
-              <MessageCursorStoreProvider>
-                <UserListProvider>
-                  <div className="flex min-h-screen">
-                    <NotificationDisplay />
-                    <Outlet />
-                  </div>
-                </UserListProvider>
-              </MessageCursorStoreProvider>
+              <DeleteMessageProvider>
+                <MessageCursorStoreProvider>
+                  <UserListProvider>
+                    <div className="flex min-h-screen">
+                      <NotificationDisplay />
+                      <Outlet />
+                    </div>
+                  </UserListProvider>
+                </MessageCursorStoreProvider>
+              </DeleteMessageProvider>
             </MessageStoreProvider>
           </ChatErrorsProvider>
         </ServerStoreProvider>
