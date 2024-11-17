@@ -39,9 +39,28 @@ function useMessageStore() {
     });
   }, []);
 
+  const removeFromStore = useCallback((chatId: string, messageId: string) => {
+    let removedMessage: Message | null = null;
+    setMessageStore((prevMessageStore) => {
+      const prevChat = prevMessageStore[chatId];
+      const nextChat = prevChat.reduce<Message[]>((chat, message) => {
+        if (message._id === messageId) {
+          removedMessage = message;
+        } else {
+          chat.push(message);
+        }
+        return chat;
+      }, []);
+      return { ...prevMessageStore, [chatId]: nextChat };
+    });
+
+    return removedMessage as Message | null;
+  }, []);
+
   return {
     messageStore,
     addToStore,
+    removeFromStore,
   };
 }
 
