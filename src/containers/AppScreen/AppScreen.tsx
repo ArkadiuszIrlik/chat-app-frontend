@@ -7,6 +7,7 @@ import {
   UserListProvider,
   MessageCursorStoreProvider,
 } from '@hooks/index';
+import { ChatErrorsProvider } from '@hooks/useChatErrors';
 import { Outlet } from 'react-router-dom';
 
 function AppScreen() {
@@ -14,16 +15,18 @@ function AppScreen() {
     <SocketProvider>
       <SettingsProvider>
         <ServerStoreProvider>
-          <MessageStoreProvider>
-            <MessageCursorStoreProvider>
-              <UserListProvider>
-                <div className="flex min-h-screen">
-                  <NotificationDisplay />
-                  <Outlet />
-                </div>
-              </UserListProvider>
-            </MessageCursorStoreProvider>
-          </MessageStoreProvider>
+          <ChatErrorsProvider>
+            <MessageStoreProvider>
+              <MessageCursorStoreProvider>
+                <UserListProvider>
+                  <div className="flex min-h-screen">
+                    <NotificationDisplay />
+                    <Outlet />
+                  </div>
+                </UserListProvider>
+              </MessageCursorStoreProvider>
+            </MessageStoreProvider>
+          </ChatErrorsProvider>
         </ServerStoreProvider>
       </SettingsProvider>
     </SocketProvider>
