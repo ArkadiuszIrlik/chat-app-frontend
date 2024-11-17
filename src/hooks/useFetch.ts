@@ -83,7 +83,10 @@ function useFetch<DT = Record<string, any>>({
         .join('&'),
     [params],
   );
-  const refetch = () => setRefetchIndex(refetchIndex + 1);
+
+  const refetch = useCallback(() => {
+    setRefetchIndex((prevIndex) => prevIndex + 1);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
