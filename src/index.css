@@ -199,6 +199,23 @@
     width: 1.2rem;
     border-radius: 100%;
   }
+
+  .error-bar-animation {
+    animation: var(--error-bar-duration, 0s) linear 0s squish-to-left;
+    animation-play-state: running;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes squish-to-left {
+    from {
+      transform-origin: left center;
+      transform: none;
+    }
+    to {
+      transform-origin: left center;
+      transform: scaleX(0);
+    }
+  }
 }
 
 @layer utilities {
