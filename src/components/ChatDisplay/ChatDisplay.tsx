@@ -10,6 +10,8 @@ import useScrollPosition from '@components/ChatDisplay/useScrollPosition';
 import { SyncLoader } from 'react-spinners';
 import styleConsts from '@constants/styleConsts';
 import useDelay from '@hooks/useDelay';
+import ChatErrorDisplay from '@components/ChatDisplay/ChatErrorDisplay';
+import useChatErrors from '@hooks/useChatErrors';
 
 function ChatDisplay() {
   const { activeChannel } = useServerContext();
@@ -19,13 +21,16 @@ function ChatDisplay() {
     useChatMessages(channelId);
   const { getMessageScrollOffset } = useScrollOffset() ?? {};
   useScrollPosition({ channelId, chatContainerRef, messages });
+  const { errors, removeError } = useChatErrors() ?? {};
+
+  const currentError = errors ? errors[0] : undefined;
 
   return (
     <div className="flex max-h-dvh min-h-dvh min-w-0 grow flex-col">
       <div className="px-3 py-2">
         <h2 className="text-xl">{activeChannel?.name ?? ''}</h2>
       </div>
-      <div className="flex grow flex-col overflow-hidden">
+      <div className="relative flex grow flex-col overflow-hidden">
         <div
           // needs to be positioned (non-static) for offsetTop check inside
           // useScrollPosition to work
@@ -64,6 +69,20 @@ function ChatDisplay() {
             />
           ))}
         </div>
+        {currentError && (
+          <div className="absolute bottom-0 left-0 right-0 px-3">
+            <div className="mx-auto">
+              <ChatErrorDisplay
+                errorMessage={currentError.message}
+                onDismiss={() => {
+                  if (removeError) {
+                    removeError(currentError.id);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
       <div className="mt-auto">
         <MessageInput channelSocketId={activeChannel?.socketId ?? ''} />
