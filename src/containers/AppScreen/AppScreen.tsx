@@ -9,6 +9,7 @@ import {
 } from '@hooks/index';
 import { ChatErrorsProvider } from '@hooks/useChatErrors';
 import { DeleteMessageProvider } from '@hooks/useDeleteMessage';
+import { ScrollOffsetProvider } from '@hooks/useScrollOffset';
 import { Outlet } from 'react-router-dom';
 
 function AppScreen() {
@@ -21,10 +22,12 @@ function AppScreen() {
               <DeleteMessageProvider>
                 <MessageCursorStoreProvider>
                   <UserListProvider>
-                    <div className="flex min-h-screen">
-                      <NotificationDisplay />
-                      <Outlet />
-                    </div>
+                    <ScrollOffsetProvider>
+                      <div className="flex min-h-screen">
+                        <NotificationDisplay />
+                        <Outlet />
+                      </div>
+                    </ScrollOffsetProvider>
                   </UserListProvider>
                 </MessageCursorStoreProvider>
               </DeleteMessageProvider>

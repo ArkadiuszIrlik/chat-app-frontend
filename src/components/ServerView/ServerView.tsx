@@ -16,7 +16,6 @@ import { useMediaQuery } from '@uidotdev/usehooks';
 import styleConsts from '@constants/styleConsts';
 import { SwipeNavigation } from '@components/SwipeNavigation';
 import ServerContent from '@components/ServerView/ServerContent';
-import { ScrollOffsetProvider } from '@hooks/useScrollOffset';
 
 function getChannelList(channelCategories: Server['channelCategories']) {
   const channelList: Channel[] = [];
@@ -108,60 +107,52 @@ function ServerView() {
   const isUsingTouch = useIsTouchInput();
 
   return (
-    <ScrollOffsetProvider>
-      <MessageInputProvider>
-        <div className="flex max-h-dvh min-w-0 flex-1 grow">
-          {(() => {
-            switch (true) {
-              case isSmallScreen:
-                return (
-                  <DesktopServerView
-                    activeChannel={activeChannel}
-                    errorMessage={
-                      error?.data?.message ?? 'Error loading server'
-                    }
-                    hasError={!!error}
-                    isServerListEmpty={isServerListEmpty}
-                    isServerLoaded={!!server}
-                    isServerLoading={isLoading}
-                    server={server}
-                  />
-                );
-              case isExtraSmallScreen:
-                return (
-                  <TabletServerView
-                    activeChannel={activeChannel}
-                    errorMessage={
-                      error?.data?.message ?? 'Error loading server'
-                    }
-                    hasError={!!error}
-                    isServerListEmpty={isServerListEmpty}
-                    isServerLoaded={!!server}
-                    isServerLoading={isLoading}
-                    isUsingTouch={isUsingTouch}
-                    server={server}
-                  />
-                );
-              default:
-                return (
-                  <PhoneServerView
-                    activeChannel={activeChannel}
-                    errorMessage={
-                      error?.data?.message ?? 'Error loading server'
-                    }
-                    hasError={!!error}
-                    isServerListEmpty={isServerListEmpty}
-                    isServerLoaded={!!server}
-                    isServerLoading={isLoading}
-                    isUsingTouch={isUsingTouch}
-                    server={server}
-                  />
-                );
-            }
-          })()}
-        </div>
-      </MessageInputProvider>
-    </ScrollOffsetProvider>
+    <MessageInputProvider>
+      <div className="flex max-h-dvh min-w-0 flex-1 grow">
+        {(() => {
+          switch (true) {
+            case isSmallScreen:
+              return (
+                <DesktopServerView
+                  activeChannel={activeChannel}
+                  errorMessage={error?.data?.message ?? 'Error loading server'}
+                  hasError={!!error}
+                  isServerListEmpty={isServerListEmpty}
+                  isServerLoaded={!!server}
+                  isServerLoading={isLoading}
+                  server={server}
+                />
+              );
+            case isExtraSmallScreen:
+              return (
+                <TabletServerView
+                  activeChannel={activeChannel}
+                  errorMessage={error?.data?.message ?? 'Error loading server'}
+                  hasError={!!error}
+                  isServerListEmpty={isServerListEmpty}
+                  isServerLoaded={!!server}
+                  isServerLoading={isLoading}
+                  isUsingTouch={isUsingTouch}
+                  server={server}
+                />
+              );
+            default:
+              return (
+                <PhoneServerView
+                  activeChannel={activeChannel}
+                  errorMessage={error?.data?.message ?? 'Error loading server'}
+                  hasError={!!error}
+                  isServerListEmpty={isServerListEmpty}
+                  isServerLoaded={!!server}
+                  isServerLoading={isLoading}
+                  isUsingTouch={isUsingTouch}
+                  server={server}
+                />
+              );
+          }
+        })()}
+      </div>
+    </MessageInputProvider>
   );
 }
 
