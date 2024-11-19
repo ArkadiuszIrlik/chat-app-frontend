@@ -66,6 +66,8 @@ function ChatDisplay() {
               authorName={message.author.username}
               authorImg={message.author.profileImg}
               scrollOffset={getMessageScrollOffset?.(message)}
+              messageId={message._id}
+              chatId={channelId ?? ''}
             />
           ))}
         </div>
