@@ -117,7 +117,7 @@ function Overlay({
 }) {
   return (
     <div
-      className={`swipe-slide-darken pointer-events-none absolute inset-0 touch-none bg-gray-900 ${
+      className={`swipe-slide-darken pointer-events-none absolute inset-0 z-20 touch-none bg-gray-900 ${
         isDarkenedByDrag ? '' : 'transition-opacity'
       }`}
       style={{ '--darken-percentage': `${darkenPercentage}%` } as CSSProperties}
