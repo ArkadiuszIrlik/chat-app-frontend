@@ -14,12 +14,7 @@ enum SettingsCategories {
 }
 
 const settingCategoriesMap: Record<SettingsCategories, SettingsKey[]> = {
-  [SettingsCategories.General]: [
-    'ENABLE_NOTIFICATION_SOUND',
-    'NOTIFICATION_SOUND_VOLUME',
-    'ENABLE_VIBRATION',
-    'DISPLAY_LINKED_IMAGES',
-  ],
+  [SettingsCategories.General]: ['ENABLE_VIBRATION', 'DISPLAY_LINKED_IMAGES'],
   [SettingsCategories.Audio]: [
     'ENABLE_NOTIFICATION_SOUND',
     'NOTIFICATION_SOUND_VOLUME',
