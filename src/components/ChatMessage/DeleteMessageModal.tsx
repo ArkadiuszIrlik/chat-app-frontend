@@ -76,6 +76,7 @@ function ModalContent({
           messageText={messageText}
           postedAt={postedAt}
           scrollOffset={null}
+          areImagesShown
         />
       </div>
       <div className="flex items-center justify-center gap-10">

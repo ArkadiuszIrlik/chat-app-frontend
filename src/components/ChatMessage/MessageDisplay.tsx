@@ -7,6 +7,7 @@ import { ReactNode } from 'react';
 MessageDisplay.defaultProps = {
   scrollOffset: undefined,
   headerSlot: null,
+  areImagesShown: false,
 };
 
 function MessageDisplay({
@@ -16,6 +17,7 @@ function MessageDisplay({
   postedAt,
   scrollOffset = undefined,
   headerSlot = null,
+  areImagesShown = false,
 }: {
   authorName: string;
   authorImg: string;
@@ -23,6 +25,7 @@ function MessageDisplay({
   postedAt: Date;
   scrollOffset?: unknown;
   headerSlot?: ReactNode;
+  areImagesShown?: boolean;
 }) {
   return (
     <div
@@ -47,7 +50,7 @@ function MessageDisplay({
           {headerSlot}
         </div>
         <MessageBody text={messageText} />
-        <MessageImageContainer messageText={messageText} />
+        {areImagesShown && <MessageImageContainer messageText={messageText} />}
       </div>
     </div>
   );

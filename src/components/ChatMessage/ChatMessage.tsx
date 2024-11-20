@@ -3,6 +3,7 @@ import MeatballTightIcon from '@assets/meatball-tight-icon.png';
 import MessageDisplay from '@components/ChatMessage/MessageDisplay';
 import useMessagePanel from '@components/ChatMessage/useMessagePanel';
 import MessagePanel from '@components/ChatMessage/MessagePanel';
+import { useSettings } from '@hooks/index';
 
 function ChatMessage({
   messageId,
@@ -27,6 +28,7 @@ function ChatMessage({
     toggleOpenMessagePanel,
     handleChangePanelOption,
   } = useMessagePanel();
+  const { settings } = useSettings() ?? {};
 
   return (
     <MessageDisplay
@@ -35,6 +37,7 @@ function ChatMessage({
       messageText={messageText}
       postedAt={postedAt}
       scrollOffset={scrollOffset}
+      areImagesShown={settings?.DISPLAY_LINKED_IMAGES.value ?? false}
       headerSlot={
         <div
           className="relative ml-auto self-center"

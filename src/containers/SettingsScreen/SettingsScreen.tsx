@@ -18,6 +18,7 @@ const settingCategoriesMap: Record<SettingsCategories, SettingsKey[]> = {
     'ENABLE_NOTIFICATION_SOUND',
     'NOTIFICATION_SOUND_VOLUME',
     'ENABLE_VIBRATION',
+    'DISPLAY_LINKED_IMAGES',
   ],
   [SettingsCategories.Audio]: [
     'ENABLE_NOTIFICATION_SOUND',

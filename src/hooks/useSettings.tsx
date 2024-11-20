@@ -28,6 +28,12 @@ const defaultSettings = {
     uiName: 'Enable vibration on supported devices',
     version: 0,
   },
+  DISPLAY_LINKED_IMAGES: {
+    type: SettingTypes.Check as const,
+    value: true,
+    uiName: 'Display images/videos linked in chat',
+    version: 0,
+  },
 };
 
 export type SettingsKey = keyof typeof defaultSettings;
