@@ -6,6 +6,7 @@ import {
   SocketProvider,
   UserListProvider,
   MessageCursorStoreProvider,
+  MessageInputProvider,
 } from '@hooks/index';
 import { ChatErrorsProvider } from '@hooks/useChatErrors';
 import { DeleteMessageProvider } from '@hooks/useDeleteMessage';
@@ -23,10 +24,12 @@ function AppScreen() {
                 <MessageCursorStoreProvider>
                   <UserListProvider>
                     <ScrollOffsetProvider>
-                      <div className="flex min-h-screen">
-                        <NotificationDisplay />
-                        <Outlet />
-                      </div>
+                      <MessageInputProvider>
+                        <div className="flex min-h-screen">
+                          <NotificationDisplay />
+                          <Outlet />
+                        </div>
+                      </MessageInputProvider>
                     </ScrollOffsetProvider>
                   </UserListProvider>
                 </MessageCursorStoreProvider>

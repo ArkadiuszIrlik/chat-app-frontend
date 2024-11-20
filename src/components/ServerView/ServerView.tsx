@@ -3,7 +3,6 @@ import { useEffect, memo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import LeftSidebar from '@components/ServerView/LeftSidebar';
 import {
-  MessageInputProvider,
   useIsTouchInput,
   useServerStore,
   useSocket,
@@ -107,55 +106,52 @@ function ServerView() {
   const isUsingTouch = useIsTouchInput();
 
   return (
-    <MessageInputProvider>
-      <div className="flex max-h-dvh min-w-0 flex-1 grow">
-        {(() => {
-          switch (true) {
-            case isSmallScreen:
-              return (
-                <DesktopServerView
-                  activeChannel={activeChannel}
-                  errorMessage={error?.data?.message ?? 'Error loading server'}
-                  hasError={!!error}
-                  isServerListEmpty={isServerListEmpty}
-                  isServerLoaded={!!server}
-                  isServerLoading={isLoading}
-                  server={server}
-                />
-              );
-            case isExtraSmallScreen:
-              return (
-                <TabletServerView
-                  activeChannel={activeChannel}
-                  errorMessage={error?.data?.message ?? 'Error loading server'}
-                  hasError={!!error}
-                  isServerListEmpty={isServerListEmpty}
-                  isServerLoaded={!!server}
-                  isServerLoading={isLoading}
-                  isUsingTouch={isUsingTouch}
-                  server={server}
-                />
-              );
-            default:
-              return (
-                <PhoneServerView
-                  activeChannel={activeChannel}
-                  errorMessage={error?.data?.message ?? 'Error loading server'}
-                  hasError={!!error}
-                  isServerListEmpty={isServerListEmpty}
-                  isServerLoaded={!!server}
-                  isServerLoading={isLoading}
-                  isUsingTouch={isUsingTouch}
-                  server={server}
-                />
-              );
-          }
-        })()}
-      </div>
-    </MessageInputProvider>
+    <div className="flex max-h-dvh min-w-0 flex-1 grow">
+      {(() => {
+        switch (true) {
+          case isSmallScreen:
+            return (
+              <DesktopServerView
+                activeChannel={activeChannel}
+                errorMessage={error?.data?.message ?? 'Error loading server'}
+                hasError={!!error}
+                isServerListEmpty={isServerListEmpty}
+                isServerLoaded={!!server}
+                isServerLoading={isLoading}
+                server={server}
+              />
+            );
+          case isExtraSmallScreen:
+            return (
+              <TabletServerView
+                activeChannel={activeChannel}
+                errorMessage={error?.data?.message ?? 'Error loading server'}
+                hasError={!!error}
+                isServerListEmpty={isServerListEmpty}
+                isServerLoaded={!!server}
+                isServerLoading={isLoading}
+                isUsingTouch={isUsingTouch}
+                server={server}
+              />
+            );
+          default:
+            return (
+              <PhoneServerView
+                activeChannel={activeChannel}
+                errorMessage={error?.data?.message ?? 'Error loading server'}
+                hasError={!!error}
+                isServerListEmpty={isServerListEmpty}
+                isServerLoaded={!!server}
+                isServerLoading={isLoading}
+                isUsingTouch={isUsingTouch}
+                server={server}
+              />
+            );
+        }
+      })()}
+    </div>
   );
 }
-
 export default ServerView;
 
 function useSocketInteraction({
