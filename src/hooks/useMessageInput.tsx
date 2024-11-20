@@ -7,15 +7,20 @@ import {
 } from 'react';
 
 function useMessageInput() {
-  const [input, setInput] = useState('');
+  const [inputStore, setInputStore] = useState<Record<string, string>>({});
 
-  const handleUpdateInput = useCallback((nextInput: string) => {
-    setInput(nextInput);
+  const getInput = useCallback(
+    (chatId: string): string | undefined => inputStore[chatId],
+    [inputStore],
+  );
+
+  const updateInput = useCallback((nextInput: string, chatId: string) => {
+    setInputStore((prevStore) => ({ ...prevStore, [chatId]: nextInput }));
   }, []);
 
   return {
-    input,
-    handleUpdateInput,
+    getInput,
+    updateInput,
   };
 }
 

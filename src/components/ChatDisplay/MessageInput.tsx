@@ -3,7 +3,8 @@ import StarterKit from '@tiptap/starter-kit';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useParams } from 'react-router-dom';
-import { useAuth, useChatMessages, useMessageInput } from '@hooks/index';
+import { useAuth, useChatMessages } from '@hooks/index';
+import InputRestoreManager from '@components/ChatDisplay/InputRestoreManager';
 
 const urlRegex =
   // eslint-disable-next-line no-useless-escape
@@ -14,15 +15,16 @@ MessageInput.defaultProps = {
 };
 
 function MessageInput({
+  chatId,
   channelSocketId,
   onMessageSent = undefined,
 }: {
+  chatId: string;
   channelSocketId: string;
   onMessageSent?: () => void;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditorCreated, setIsEditorCreated] = useState(false);
-  const { input, handleUpdateInput } = useMessageInput() ?? {};
 
   const ShortcutExtension = useMemo(
     () =>
@@ -58,15 +60,8 @@ function MessageInput({
           <div className="absolute left-0 right-0 top-0 z-10 h-2 bg-gradient-to-t from-gray-600/0 to-gray-600" />
         </div>
         <EditorProvider
-          content={input}
           onCreate={() => {
             setIsEditorCreated(true);
-          }}
-          onUpdate={(props) => {
-            if (handleUpdateInput) {
-              // eslint-disable-next-line react/prop-types
-              handleUpdateInput(props.editor.getHTML());
-            }
           }}
           extensions={[
             StarterKit,
@@ -94,6 +89,7 @@ function MessageInput({
             onStopSubmitting={handleStopSubmitting}
             onMessageSent={onMessageSent}
           />
+          <InputRestoreManager chatId={chatId} />
         </EditorProvider>
       </div>
     </div>
@@ -150,7 +146,8 @@ function MessageSender({
     if (editor && isSubmitting && channelId) {
       const messageContent = editor.getHTML();
       handleSendMessage({ text: messageContent }, channelId, channelSocketId);
-      editor.commands.clearContent();
+      // emitUpdate for InputRestoreManager to get notified
+      editor.commands.clearContent(true);
       onStopSubmitting();
     }
   }, [

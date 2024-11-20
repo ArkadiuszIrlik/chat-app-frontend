@@ -87,7 +87,10 @@ function ChatDisplay() {
         )}
       </div>
       <div className="mt-auto">
-        <MessageInput channelSocketId={activeChannel?.socketId ?? ''} />
+        <MessageInput
+          chatId={channelId ?? ''}
+          channelSocketId={activeChannel?.socketId ?? ''}
+        />
       </div>
     </div>
   );
