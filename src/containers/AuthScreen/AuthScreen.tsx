@@ -44,7 +44,7 @@ function AuthScreen() {
       <div className="flex-1 bg-gray-700">
         <div
           className="flex flex-col
-       items-center justify-center py-3 sm:px-10 sm:py-20"
+       items-center justify-center px-2 py-3 sm:px-10 sm:py-20"
         >
           <div>
             <Outlet />
