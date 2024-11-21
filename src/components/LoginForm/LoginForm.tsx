@@ -38,7 +38,10 @@ function LoginForm() {
 
   return (
     <div>
-      <h2 className="mb-3 text-2xl text-white">Login</h2>
+      {/* same min-w as width of input section wrapper div */}
+      <div className="flex">
+        <h2 className="mx-auto mb-3 min-w-60 text-2xl text-white">Login</h2>
+      </div>
       <Formik
         initialValues={{
           email: '',
@@ -91,7 +94,9 @@ function LoginForm() {
           <div className="mt-10 w-44 self-center">
             <SubmitButtonPrimary>Log&nbsp;in</SubmitButtonPrimary>
           </div>
-          <p className="mt-14 self-center text-gray-300">
+          {/* margin-bottom makes sure the element isn't positioned too
+          close to "back" button on mobile */}
+          <p className="mb-10 mt-14 self-center text-gray-300">
             Don&apos;t have an account yet?{' '}
             <Link
               to="/signup"
