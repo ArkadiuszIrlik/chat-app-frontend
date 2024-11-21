@@ -1,10 +1,13 @@
-import { MutableRefObject, useEffect } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 
 function useResizeObserver(
   ref: MutableRefObject<HTMLElement | null>,
   callback: (entry: ResizeObserverEntry) => void,
+  { runOnInitialObserve = true }: { runOnInitialObserve?: boolean } = {},
 ) {
+  const isInitialObserveRef = useRef(false);
   useEffect(() => {
+    isInitialObserveRef.current = true;
     const element = ref?.current;
 
     if (!element) {
@@ -12,14 +15,17 @@ function useResizeObserver(
     }
 
     const observer = new ResizeObserver((entries) => {
-      callback(entries[0]);
+      if (!isInitialObserveRef.current || runOnInitialObserve) {
+        callback(entries[0]);
+      }
+      isInitialObserveRef.current = false;
     });
 
     observer.observe(element);
     return () => {
       observer.disconnect();
     };
-  }, [callback, ref]);
+  }, [callback, ref, runOnInitialObserve]);
 
   return ref;
 }
