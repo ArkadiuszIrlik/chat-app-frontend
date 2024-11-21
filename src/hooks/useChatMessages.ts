@@ -15,7 +15,7 @@ const defaultCursor = undefined;
 
 function useChatMessages(chatId: string | undefined) {
   const { socket, sendChatMessage: sendMessageToSocket } = useSocket() ?? {};
-  const { messageStore, addToStore } = useMessageStore() ?? {};
+  const { messageStore, addToStore, removeFromStore } = useMessageStore() ?? {};
   const { messageCursorStore, getPreviousCursor, updatePreviousCursor } =
     useMessageCursorStore() ?? {};
   const [shouldFetch, setShouldFetch] = useState(false);
@@ -63,6 +63,30 @@ function useChatMessages(chatId: string | undefined) {
     }
     return undefined;
   }, [socket, addToStore]);
+
+  // remove messages from ChatMessageDeleted events from store
+  useEffect(() => {
+    if (!socket || !removeFromStore) {
+      return cleanup;
+    }
+    function cleanup() {
+      if (socket) {
+        socket.off(SocketEvents.ChatMessageDeleted, deleteFromMessages);
+      }
+    }
+    function deleteFromMessages(
+      networkMessage: NetworkMessage,
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      chatId: string,
+    ) {
+      if (removeFromStore) {
+        removeFromStore(chatId, networkMessage._id ?? '');
+      }
+    }
+
+    socket.on(SocketEvents.ChatMessageDeleted, deleteFromMessages);
+    return cleanup;
+  }, [socket, removeFromStore]);
 
   // fetch chat messages from API
   const messageUrl = getMessageUrl(chatId ?? '', limit, previousCursor);

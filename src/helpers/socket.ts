@@ -24,6 +24,10 @@ interface ClientToServerEvents {
 
 interface ServerToClientEvents {
   [SocketEvents.ChatMessage]: (message: NetworkMessage) => void;
+  [SocketEvents.ChatMessageDeleted]: (
+    message: NetworkMessage,
+    chatId: string,
+  ) => void;
   [SocketEvents.AuthenticationError]: (error: string) => void;
   [SocketEvents.OnlineStatusChanged]: (
     userId: string,
