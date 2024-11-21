@@ -172,7 +172,9 @@ function useScrollPosition({
     }
   }, [scrollOffset, chatContainerRef]);
 
-  useResizeObserver(chatContainerRef, handleChatResize);
+  useResizeObserver(chatContainerRef, handleChatResize, {
+    runOnInitialObserve: false,
+  });
 }
 
 function scrollToBottom(containerRef: RefObject<HTMLElement>) {
