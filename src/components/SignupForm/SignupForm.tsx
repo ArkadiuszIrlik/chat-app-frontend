@@ -46,7 +46,10 @@ function SignupForm() {
     </div>
   ) : (
     <div>
-      <h2 className="mb-3 text-2xl text-white">Sign Up</h2>
+      {/* same min-w as width of input section wrapper div */}
+      <div className="flex">
+        <h2 className="mx-auto mb-3 min-w-60 text-2xl text-white">Sign Up</h2>
+      </div>
       <Formik
         initialValues={{
           email: '',
@@ -65,44 +68,48 @@ function SignupForm() {
           refetch();
         }}
       >
-        <Form className="flex flex-col">
+        <Form className="flex flex-col items-center">
           {hasError && (
-            <div className="max-w-prose">
+            <div className="min-w-60 max-w-prose">
               <ErrorDisplay errorMessage={errorMessage} />
             </div>
           )}
-          <div>
-            <TextInput
-              label="E-mail"
-              name="email"
-              id="email"
-              type="email"
-              autoComplete="email"
-            />
-          </div>
-          <div className="mt-2">
-            <TextInput
-              label="Password"
-              name="password"
-              id="password"
-              type="password"
-              autoComplete="new-password"
-            />
-          </div>
-          <div className="mt-2">
-            <TextInput
-              label="Confirm Password"
-              name="confirmPassword"
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-            />
+          <div className="w-60">
+            <div>
+              <TextInput
+                label="E-mail"
+                name="email"
+                id="email"
+                type="email"
+                autoComplete="email"
+              />
+            </div>
+            <div className="mt-2">
+              <TextInput
+                label="Password"
+                name="password"
+                id="password"
+                type="password"
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="mt-2">
+              <TextInput
+                label="Confirm Password"
+                name="confirmPassword"
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+              />
+            </div>
           </div>
           <SubmittingUpdater isFetchLoading={isLoading} />
           <div className="mt-10 w-44 self-center">
             <SubmitButtonPrimary>Create&nbsp;account</SubmitButtonPrimary>
           </div>
-          <p className="mt-14 self-center text-gray-300">
+          {/* margin-bottom makes sure the element isn't positioned too
+          close to "back" button on mobile */}
+          <p className="mb-10 mt-14 self-center text-gray-300">
             Already have an account?{' '}
             <Link
               to="/login"
