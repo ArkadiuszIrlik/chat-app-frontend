@@ -53,36 +53,40 @@ function LoginForm() {
           refetch();
         }}
       >
-        <Form className="flex flex-col">
+        <Form className="flex flex-col items-center">
           {hasError && (
-            <div className="max-w-prose">
+            <div className="min-w-60 max-w-prose">
               <ErrorDisplay errorMessage={errorMessage} />
             </div>
           )}
-          <div>
-            <TextInput
-              label="E-mail"
-              name="email"
-              id="email"
-              type="email"
-              autoComplete="email"
-            />
+          <div className="w-60">
+            <div>
+              <TextInput
+                label="E-mail"
+                name="email"
+                id="email"
+                type="email"
+                autoComplete="email"
+              />
+            </div>
+            <div className="mt-2">
+              <TextInput
+                label="Password"
+                name="password"
+                id="password"
+                type="password"
+                autoComplete="current-password"
+              />
+            </div>
+            <div className="flex">
+              <Link
+                to="#_"
+                className="ml-auto mt-1 underline-offset-2 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </div>
-          <div className="mt-2">
-            <TextInput
-              label="Password"
-              name="password"
-              id="password"
-              type="password"
-              autoComplete="current-password"
-            />
-          </div>
-          <Link
-            to="#_"
-            className="ml-auto mt-1 underline-offset-2 hover:underline"
-          >
-            Forgot password?
-          </Link>
           <SubmittingUpdater isFetchLoading={isLoading} />
           <div className="mt-10 w-44 self-center">
             <SubmitButtonPrimary>Log&nbsp;in</SubmitButtonPrimary>
