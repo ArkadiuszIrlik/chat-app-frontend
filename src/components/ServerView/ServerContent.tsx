@@ -10,6 +10,7 @@ function ServerContent({
   errorMessage,
   isServerLoaded,
   activeChannel,
+  server,
 }: {
   isServerListEmpty: boolean;
   isServerLoading: boolean;
@@ -17,6 +18,7 @@ function ServerContent({
   errorMessage: string;
   isServerLoaded: boolean;
   activeChannel: Channel | null;
+  server: Server | undefined;
 }) {
   let componentToReturn: ReactNode = null;
   switch (true) {
@@ -38,9 +40,11 @@ function ServerContent({
         </div>
       );
       break;
-    case !isServerLoading && isServerLoaded:
+    case !isServerLoading && isServerLoaded && !!server:
       componentToReturn = (
-        <Outlet context={{ activeChannel } satisfies ServerContextInterface} />
+        <Outlet
+          context={{ activeChannel, server } satisfies ServerContextInterface}
+        />
       );
       break;
     default:

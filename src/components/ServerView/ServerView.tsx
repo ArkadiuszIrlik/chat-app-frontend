@@ -189,10 +189,6 @@ function useSocketInteraction({
   }, [socket, serverId, mutate, navigate]);
 }
 
-DesktopServerView.defaultProps = {
-  server: undefined,
-};
-
 function DesktopServerView({
   isServerListEmpty,
   isServerLoading,
@@ -208,7 +204,7 @@ function DesktopServerView({
   errorMessage: string;
   isServerLoaded: boolean;
   activeChannel: Channel | null;
-  server?: Server;
+  server: Server | undefined;
 }) {
   return (
     <>
@@ -225,16 +221,13 @@ function DesktopServerView({
           isServerListEmpty={isServerListEmpty}
           isServerLoaded={isServerLoaded}
           isServerLoading={isServerLoading}
+          server={server}
         />
       </div>
       {!isServerListEmpty && <MemoizedUserList />}
     </>
   );
 }
-
-TabletServerView.defaultProps = {
-  server: undefined,
-};
 
 function TabletServerView({
   isServerListEmpty,
@@ -253,7 +246,7 @@ function TabletServerView({
   isServerLoaded: boolean;
   activeChannel: Channel | null;
   isUsingTouch: boolean;
-  server?: Server;
+  server: Server | undefined;
 }) {
   return (
     <SwipeNavigation
@@ -276,6 +269,7 @@ function TabletServerView({
                   isServerListEmpty={isServerListEmpty}
                   isServerLoaded={isServerLoaded}
                   isServerLoading={isServerLoading}
+                  server={server}
                 />
               </div>
             </div>
@@ -294,10 +288,6 @@ function TabletServerView({
   );
 }
 
-PhoneServerView.defaultProps = {
-  server: undefined,
-};
-
 function PhoneServerView({
   isServerListEmpty,
   isServerLoading,
@@ -315,7 +305,7 @@ function PhoneServerView({
   isServerLoaded: boolean;
   activeChannel: Channel | null;
   isUsingTouch: boolean;
-  server?: Server;
+  server: Server | undefined;
 }) {
   return (
     <SwipeNavigation
@@ -344,6 +334,7 @@ function PhoneServerView({
                 isServerListEmpty={isServerListEmpty}
                 isServerLoaded={isServerLoaded}
                 isServerLoading={isServerLoading}
+                server={server}
               />
             </div>
           ),
