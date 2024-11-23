@@ -4,22 +4,29 @@ import MessageDisplay from '@components/ChatMessage/MessageDisplay';
 import useMessagePanel from '@components/ChatMessage/useMessagePanel';
 import MessagePanel from '@components/ChatMessage/MessagePanel';
 import { useSettings } from '@hooks/index';
+import { ChatRole } from '@components/ChatDisplay/useChatAuth.types';
+import useMessageAuth from '@components/ChatMessage/useMessageAuth';
+import useMessagePanelOptions from '@components/ChatMessage/useMessagePanelOptions';
 
 function ChatMessage({
   messageId,
+  authorId,
   authorName,
   authorImg,
   messageText,
   postedAt,
   chatId,
+  chatRoles,
   scrollOffset,
 }: {
   messageId: string | undefined;
+  authorId: string;
   authorName: string;
   authorImg: string;
   messageText: string;
   postedAt: Date;
   chatId: string;
+  chatRoles: ChatRole[];
   scrollOffset: unknown;
 }) {
   const {
@@ -29,6 +36,8 @@ function ChatMessage({
     handleChangePanelOption,
   } = useMessagePanel();
   const { settings } = useSettings() ?? {};
+  const { userRoles } = useMessageAuth({ authorId, chatRoles });
+  const { allowedOptions } = useMessagePanelOptions({ userRoles });
 
   return (
     <MessageDisplay
@@ -40,23 +49,30 @@ function ChatMessage({
       areImagesShown={settings?.DISPLAY_LINKED_IMAGES.value ?? false}
       headerSlot={
         <div
-          className="relative ml-auto self-center"
+          // min height necessary to keep layout consistent if toggle isn't
+          // displayed
+          className="relative ml-auto min-h-6 self-center"
           ref={messagePanelContainerRef}
         >
-          <MessagePanelToggle
-            onClick={toggleOpenMessagePanel}
-            isPanelOpen={isOpenMessagePanel}
-          />
-          {isOpenMessagePanel && (
-            <MessagePanel
-              chatId={chatId}
-              messageId={messageId}
-              authorName={authorName}
-              authorImg={authorImg}
-              messageText={messageText}
-              postedAt={postedAt}
-              onChangeActiveOption={handleChangePanelOption}
-            />
+          {allowedOptions.length > 0 && (
+            <>
+              <MessagePanelToggle
+                onClick={toggleOpenMessagePanel}
+                isPanelOpen={isOpenMessagePanel}
+              />
+              {isOpenMessagePanel && (
+                <MessagePanel
+                  chatId={chatId}
+                  messageId={messageId}
+                  authorName={authorName}
+                  authorImg={authorImg}
+                  messageText={messageText}
+                  postedAt={postedAt}
+                  optionsToDisplay={allowedOptions}
+                  onChangeActiveOption={handleChangePanelOption}
+                />
+              )}
+            </>
           )}
         </div>
       }
