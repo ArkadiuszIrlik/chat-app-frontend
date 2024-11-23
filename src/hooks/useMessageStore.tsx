@@ -57,10 +57,32 @@ function useMessageStore() {
     return removedMessage as Message | null;
   }, []);
 
+  const removeClientMsgFromStore = useCallback(
+    (chatId: string, messageClientId: string) => {
+      let removedMessage: Message | null = null;
+      setMessageStore((prevMessageStore) => {
+        const prevChat = prevMessageStore[chatId];
+        const nextChat = prevChat.reduce<Message[]>((chat, message) => {
+          if (message.clientId === messageClientId) {
+            removedMessage = message;
+          } else {
+            chat.push(message);
+          }
+          return chat;
+        }, []);
+        return { ...prevMessageStore, [chatId]: nextChat };
+      });
+
+      return removedMessage as Message | null;
+    },
+    [],
+  );
+
   return {
     messageStore,
     addToStore,
     removeFromStore,
+    removeClientMsgFromStore,
   };
 }
 
