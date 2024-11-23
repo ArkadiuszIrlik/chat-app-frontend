@@ -12,9 +12,11 @@ import styleConsts from '@constants/styleConsts';
 import useDelay from '@hooks/useDelay';
 import ChatErrorDisplay from '@components/ChatDisplay/ChatErrorDisplay';
 import useChatErrors from '@hooks/useChatErrors';
+import useChatAuth from '@components/ChatDisplay/useChatAuth';
 
 function ChatDisplay() {
-  const { activeChannel } = useServerContext();
+  const { activeChannel, server } = useServerContext();
+  const { userRoles } = useChatAuth({ server });
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { channelId } = useParams();
   const { messages, hasFirstMessage, isLoading, loadMoreMessages } =
@@ -63,11 +65,13 @@ function ChatDisplay() {
               key={message._id ?? message.clientId}
               postedAt={message.postedAt}
               messageText={message.text}
+              authorId={message.author._id}
               authorName={message.author.username}
               authorImg={message.author.profileImg}
               scrollOffset={getMessageScrollOffset?.(message)}
               messageId={message._id}
               chatId={channelId ?? ''}
+              chatRoles={userRoles}
             />
           ))}
         </div>
