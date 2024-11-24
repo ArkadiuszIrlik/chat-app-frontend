@@ -103,8 +103,32 @@ function useSocket() {
     (
       message: Parameters<typeof socket.emit<SocketEvents.SendChatMessage>>[1],
       socketId: string,
+      onSuccess?: (savedMessage: NetworkMessage) => void | null,
+      onError?: (
+        message: Parameters<
+          typeof socket.emit<SocketEvents.SendChatMessage>
+        >[1],
+        socketId: string,
+      ) => void | null,
     ) => {
-      socket.emit(SocketEvents.SendChatMessage, message, socketId);
+      async function send() {
+        try {
+          const response = await socket.emitWithAck(
+            SocketEvents.SendChatMessage,
+            message,
+            socketId,
+          );
+          if (onSuccess) {
+            onSuccess(response);
+          }
+        } catch {
+          if (onError) {
+            onError(message, socketId);
+          }
+        }
+      }
+
+      void send();
     },
     [],
   );

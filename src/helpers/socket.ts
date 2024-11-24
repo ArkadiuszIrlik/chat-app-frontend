@@ -14,6 +14,7 @@ interface ClientToServerEvents {
   [SocketEvents.SendChatMessage]: (
     message: { text: string; clientId: string },
     socketId: string,
+    callback: (message: NetworkMessage) => void,
   ) => void;
   [SocketEvents.ChangeOnlineStatus]: (
     nextStatus: UserOnlineStatus,
