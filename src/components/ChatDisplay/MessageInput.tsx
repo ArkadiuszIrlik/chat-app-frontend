@@ -3,8 +3,9 @@ import StarterKit from '@tiptap/starter-kit';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Placeholder from '@tiptap/extension-placeholder';
 import { useParams } from 'react-router-dom';
-import { useAuth, useChatMessages } from '@hooks/index';
+import { useAuth } from '@hooks/index';
 import InputRestoreManager from '@components/ChatDisplay/InputRestoreManager';
+import useSendMessage from '@hooks/useSendMessage';
 
 const urlRegex =
   // eslint-disable-next-line no-useless-escape
@@ -115,11 +116,11 @@ function MessageSender({
   const { editor } = useCurrentEditor();
   const { channelId } = useParams();
   const { user } = useAuth() ?? {};
-  const { sendMessage } = useChatMessages(channelId);
+  const { sendMessageOptimistic } = useSendMessage() ?? {};
 
   const handleSendMessage = useCallback(
     (message: { text: string }, chatId: string, socketId: string) => {
-      if (chatId === undefined || !user) {
+      if (chatId === undefined || !user || !sendMessageOptimistic) {
         return;
       }
       const processedText = convertLinksToAnchors(message.text);
@@ -134,12 +135,12 @@ function MessageSender({
         chatId,
         clientId: crypto.randomUUID(),
       };
-      sendMessage(clientMessage, socketId);
+      sendMessageOptimistic(chatId, socketId, clientMessage);
       if (onMessageSent) {
         onMessageSent();
       }
     },
-    [user, sendMessage, onMessageSent],
+    [user, sendMessageOptimistic, onMessageSent],
   );
 
   useEffect(() => {
