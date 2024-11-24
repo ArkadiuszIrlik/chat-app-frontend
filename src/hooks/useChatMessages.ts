@@ -4,17 +4,14 @@ import {
   CursorValue,
   useMessageCursorStore,
   useMessageStore,
-  useSocket,
 } from '@hooks/index';
-import { SocketEvents } from '@src/types';
 import { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 const defaultLimit = 20;
 const defaultCursor = undefined;
 
-  const { socket } = useSocket() ?? {};
-  const { messageStore, addToStore, removeFromStore } = useMessageStore() ?? {};
+  const { messageStore, addToStore } = useMessageStore() ?? {};
   const { messageCursorStore, getPreviousCursor, updatePreviousCursor } =
     useMessageCursorStore() ?? {};
   const [shouldFetch, setShouldFetch] = useState(false);
@@ -46,46 +43,6 @@ const defaultCursor = undefined;
       setShouldFetch(true);
     }
   }, [messages]);
-
-  // add incoming socket ChatMessage events to store
-  useEffect(() => {
-    if (socket && addToStore) {
-      const addToMessages = (networkMessage: NetworkMessage) => {
-        const nextMessage = parseNetworkMessages(networkMessage)[0];
-        addToStore(nextMessage.chatId, [nextMessage]);
-      };
-      socket.on(SocketEvents.ChatMessage, addToMessages);
-
-      return () => {
-        socket.off(SocketEvents.ChatMessage, addToMessages);
-      };
-    }
-    return undefined;
-  }, [socket, addToStore]);
-
-  // remove messages from ChatMessageDeleted events from store
-  useEffect(() => {
-    if (!socket || !removeFromStore) {
-      return cleanup;
-    }
-    function cleanup() {
-      if (socket) {
-        socket.off(SocketEvents.ChatMessageDeleted, deleteFromMessages);
-      }
-    }
-    function deleteFromMessages(
-      networkMessage: NetworkMessage,
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-      chatId: string,
-    ) {
-      if (removeFromStore) {
-        removeFromStore(chatId, networkMessage._id ?? '');
-      }
-    }
-
-    socket.on(SocketEvents.ChatMessageDeleted, deleteFromMessages);
-    return cleanup;
-  }, [socket, removeFromStore]);
 
   // fetch chat messages from API
   const messageUrl = getMessageUrl(chatId ?? '', limit, previousCursor);

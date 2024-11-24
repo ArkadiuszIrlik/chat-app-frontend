@@ -1,9 +1,13 @@
+import { parseNetworkMessages } from '@helpers/data';
+import { useSocket } from '@hooks/index';
+import { SocketEvents } from '@src/types';
 import { getUniqueObjectArray } from '@src/utils/array';
 import {
   ReactNode,
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 
@@ -17,6 +21,7 @@ function orderMessages(messageList: Message[]) {
 
 function useMessageStore() {
   const [messageStore, setMessageStore] = useState<MessageStore>({});
+  const { socket } = useSocket() ?? {};
 
   const addToStore = useCallback((chatId: string, newMessages: Message[]) => {
     setMessageStore((ms) => {
@@ -77,6 +82,45 @@ function useMessageStore() {
     },
     [],
   );
+
+  // add incoming socket ChatMessage events to store
+  useEffect(() => {
+    if (socket && addToStore) {
+      const addToMessages = (networkMessage: NetworkMessage) => {
+        const nextMessage = parseNetworkMessages(networkMessage)[0];
+        addToStore(nextMessage.chatId, [nextMessage]);
+      };
+      socket.on(SocketEvents.ChatMessage, addToMessages);
+
+      return () => {
+        socket.off(SocketEvents.ChatMessage, addToMessages);
+      };
+    }
+    return undefined;
+  }, [socket, addToStore]);
+
+  // remove messages from ChatMessageDeleted events from store
+  useEffect(() => {
+    if (!socket || !removeFromStore) {
+      return cleanup;
+    }
+    function cleanup() {
+      if (socket) {
+        socket.off(SocketEvents.ChatMessageDeleted, deleteFromMessages);
+      }
+    }
+    function deleteFromMessages(
+      networkMessage: NetworkMessage,
+      chatId: string,
+    ) {
+      if (removeFromStore && networkMessage._id) {
+        removeFromStore(chatId, networkMessage._id);
+      }
+    }
+
+    socket.on(SocketEvents.ChatMessageDeleted, deleteFromMessages);
+    return cleanup;
+  }, [socket, removeFromStore]);
 
   return {
     messageStore,
