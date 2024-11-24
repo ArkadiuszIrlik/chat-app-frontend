@@ -49,30 +49,25 @@ function ChatMessage({
       areImagesShown={settings?.DISPLAY_LINKED_IMAGES.value ?? false}
       headerSlot={
         <div
-          // min height necessary to keep layout consistent if toggle isn't
-          // displayed
-          className="relative ml-auto min-h-6 self-center"
+          className="relative ml-auto self-center"
           ref={messagePanelContainerRef}
         >
-          {allowedOptions.length > 0 && (
-            <>
-              <MessagePanelToggle
-                onClick={toggleOpenMessagePanel}
-                isPanelOpen={isOpenMessagePanel}
-              />
-              {isOpenMessagePanel && (
-                <MessagePanel
-                  chatId={chatId}
-                  messageId={messageId}
-                  authorName={authorName}
-                  authorImg={authorImg}
-                  messageText={messageText}
-                  postedAt={postedAt}
-                  optionsToDisplay={allowedOptions}
-                  onChangeActiveOption={handleChangePanelOption}
-                />
-              )}
-            </>
+          <MessagePanelToggle
+            onClick={toggleOpenMessagePanel}
+            isPanelOpen={isOpenMessagePanel}
+            hidden={allowedOptions.length === 0}
+          />
+          {isOpenMessagePanel && (
+            <MessagePanel
+              chatId={chatId}
+              messageId={messageId}
+              authorName={authorName}
+              authorImg={authorImg}
+              messageText={messageText}
+              postedAt={postedAt}
+              optionsToDisplay={allowedOptions}
+              onChangeActiveOption={handleChangePanelOption}
+            />
           )}
         </div>
       }
@@ -84,23 +79,29 @@ const moreOptionsStyle: ExtendedCSSProperties = {
   '--mask-url': `url(${MeatballTightIcon})`,
 };
 
+MessagePanelToggle.defaultProps = {
+  hidden: false,
+};
+
 function MessagePanelToggle({
   isPanelOpen,
   onClick,
+  hidden = false,
 }: {
   isPanelOpen: boolean;
   onClick: () => void;
+  hidden?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={`${isPanelOpen ? 'Close' : 'Open'} message panel`}
-      className="group/settings flex aspect-square
-        items-center justify-center rounded-md p-1
+      className={`group/settings flex aspect-square 
+        items-center justify-center rounded-md p-1 ${hidden ? 'invisible' : ''}
        opacity-0 outline-offset-4 focus-visible:opacity-100
         using-touch:opacity-100 using-mouse:hover:bg-gray-600
-     using-mouse:group-hover/message-container:opacity-100"
+     using-mouse:group-hover/message-container:opacity-100`}
     >
       <div
         style={moreOptionsStyle}
