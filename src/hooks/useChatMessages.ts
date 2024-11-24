@@ -13,8 +13,7 @@ import useSWR from 'swr';
 const defaultLimit = 20;
 const defaultCursor = undefined;
 
-function useChatMessages(chatId: string | undefined) {
-  const { socket, sendChatMessage: sendMessageToSocket } = useSocket() ?? {};
+  const { socket } = useSocket() ?? {};
   const { messageStore, addToStore, removeFromStore } = useMessageStore() ?? {};
   const { messageCursorStore, getPreviousCursor, updatePreviousCursor } =
     useMessageCursorStore() ?? {};
@@ -137,19 +136,6 @@ function useChatMessages(chatId: string | undefined) {
     updatePreviousCursor,
   ]);
 
-  const sendMessage = useCallback(
-    (
-      message: Message & Required<Pick<Message, 'clientId'>>,
-      chatSocketId: string,
-    ) => {
-      if (addToStore && sendMessageToSocket) {
-        addToStore(message.chatId, [message]);
-        sendMessageToSocket(message, chatSocketId);
-      }
-    },
-    [addToStore, sendMessageToSocket],
-  );
-
   const loadMoreMessages = useCallback(
     (messageCount = defaultLimit) => {
       let nextPreviousCursor;
@@ -172,7 +158,6 @@ function useChatMessages(chatId: string | undefined) {
     hasFirstMessage,
     isLoading,
     error,
-    sendMessage,
     loadMoreMessages,
   };
 }
