@@ -11,6 +11,7 @@ import {
 import { ChatErrorsProvider } from '@hooks/useChatErrors';
 import { DeleteMessageProvider } from '@hooks/useDeleteMessage';
 import { ScrollOffsetProvider } from '@hooks/useScrollOffset';
+import { SendMessageProvider } from '@hooks/useSendMessage';
 import { Outlet } from 'react-router-dom';
 
 function AppScreen() {
@@ -20,20 +21,22 @@ function AppScreen() {
         <ServerStoreProvider>
           <ChatErrorsProvider>
             <MessageStoreProvider>
-              <DeleteMessageProvider>
-                <MessageCursorStoreProvider>
-                  <UserListProvider>
-                    <ScrollOffsetProvider>
-                      <MessageInputProvider>
-                        <div className="flex min-h-screen">
-                          <NotificationDisplay />
-                          <Outlet />
-                        </div>
-                      </MessageInputProvider>
-                    </ScrollOffsetProvider>
-                  </UserListProvider>
-                </MessageCursorStoreProvider>
-              </DeleteMessageProvider>
+              <SendMessageProvider>
+                <DeleteMessageProvider>
+                  <MessageCursorStoreProvider>
+                    <UserListProvider>
+                      <ScrollOffsetProvider>
+                        <MessageInputProvider>
+                          <div className="flex min-h-screen">
+                            <NotificationDisplay />
+                            <Outlet />
+                          </div>
+                        </MessageInputProvider>
+                      </ScrollOffsetProvider>
+                    </UserListProvider>
+                  </MessageCursorStoreProvider>
+                </DeleteMessageProvider>
+              </SendMessageProvider>
             </MessageStoreProvider>
           </ChatErrorsProvider>
         </ServerStoreProvider>
