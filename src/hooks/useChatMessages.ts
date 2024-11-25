@@ -11,6 +11,10 @@ import useSWR from 'swr';
 const defaultLimit = 20;
 const defaultCursor = undefined;
 
+function useChatMessages(
+  chatId: string | undefined,
+  onLoadedMessages?: () => void,
+) {
   const { messageStore, addToStore } = useMessageStore() ?? {};
   const { messageCursorStore, getPreviousCursor, updatePreviousCursor } =
     useMessageCursorStore() ?? {};
@@ -79,6 +83,9 @@ const defaultCursor = undefined;
       }
       const parsedMessages = parseNetworkMessages(nextMessages);
       addToStore(chatId, parsedMessages);
+      if (onLoadedMessages) {
+        onLoadedMessages();
+      }
       if (updatePreviousCursor) {
         updatePreviousCursor(chatId, nextPreviousCursor);
       }
@@ -91,6 +98,7 @@ const defaultCursor = undefined;
     addToStore,
     chatId,
     updatePreviousCursor,
+    onLoadedMessages,
   ]);
 
   const loadMoreMessages = useCallback(
