@@ -1,7 +1,7 @@
 import MessageInput from '@components/ChatDisplay/MessageInput';
 import { ChatMessage } from '@components/ChatMessage';
 import { useChatMessages } from '@hooks/index';
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useServerContext } from '@components/ServerView';
 import useScrollOffset from '@hooks/useScrollOffset';
@@ -19,13 +19,28 @@ function ChatDisplay() {
   const { userRoles } = useChatAuth({ server });
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { channelId } = useParams();
+  const [hasLoadedMessages, setHasLoadedMessages] = useState(false);
+  const handleLoaded = useCallback(() => {
+    setHasLoadedMessages(true);
+  }, []);
   const { messages, hasFirstMessage, isLoading, loadMoreMessages } =
-    useChatMessages(channelId);
+    useChatMessages(channelId, handleLoaded);
   const { getMessageScrollOffset } = useScrollOffset() ?? {};
-  useScrollPosition({ channelId, chatContainerRef, messages });
+  useScrollPosition({
+    channelId,
+    chatContainerRef,
+    messages,
+    isLoadingFromTop: hasLoadedMessages,
+  });
   const { errors, removeError } = useChatErrors() ?? {};
 
   const currentError = errors ? errors[0] : undefined;
+
+  useEffect(() => {
+    if (hasLoadedMessages) {
+      setHasLoadedMessages(false);
+    }
+  }, [hasLoadedMessages]);
 
   return (
     <div className="flex max-h-dvh min-h-dvh min-w-0 grow flex-col">

@@ -13,10 +13,13 @@ function useScrollPosition({
   channelId,
   messages,
   chatContainerRef,
+  isLoadingFromTop,
 }: {
   channelId: string | undefined;
   messages: Message[] | undefined;
   chatContainerRef: RefObject<HTMLDivElement>;
+  /** Specify if new messages are being added at the top of the container */
+  isLoadingFromTop: boolean;
 }) {
   const { getScrollOffset, getMessageScrollOffset, updateScrollOffset } =
     useScrollOffset() ?? {};
@@ -34,7 +37,7 @@ function useScrollPosition({
     undefined,
   );
 
-  // maintain scroll position when new messages load
+  // maintain scroll position when new messages load at the top of the container
   useLayoutEffect(() => {
     function cleanup() {
       // holds channelId value from before the effect ran
@@ -43,6 +46,7 @@ function useScrollPosition({
     const hasChannelChanged = channelIdBeforeRenderRef.current !== channelId;
     const containerEl = chatContainerRef.current;
     if (
+      !isLoadingFromTop ||
       !containerEl ||
       prevScrollHeight === undefined ||
       prevScrollTop === undefined ||
@@ -55,7 +59,7 @@ function useScrollPosition({
     containerEl.scroll(0, nextScrollPosition);
 
     return cleanup;
-  }, [messages]);
+  }, [messages, isLoadingFromTop]);
 
   // restore scroll position when changing channels
   useEffect(() => {
