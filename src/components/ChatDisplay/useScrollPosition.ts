@@ -6,7 +6,6 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
 } from 'react';
 
 function useScrollPosition({
@@ -27,8 +26,6 @@ function useScrollPosition({
   if (getScrollOffset && channelId) {
     scrollOffset = getScrollOffset(channelId);
   }
-
-  const [isOffsetUpdateQueued, setIsOffsetUpdateQueued] = useState(false);
 
   const prevScrollHeight = chatContainerRef.current?.scrollHeight;
   const prevScrollTop = chatContainerRef.current?.scrollTop;
@@ -97,6 +94,7 @@ function useScrollPosition({
     // prevent janky scroll
   }, [channelId, chatContainerRef, getMessageScrollOffset]);
 
+  const isOffsetUpdateQueuedRef = useRef(false);
   // update offset on scroll
   useEffect(() => {
     const containerEl = chatContainerRef.current;
@@ -140,13 +138,11 @@ function useScrollPosition({
 
     let timeoutId: NodeJS.Timeout;
     function debounceScroll() {
-      if (!isOffsetUpdateQueued) {
-        setIsOffsetUpdateQueued(true);
-      }
+      isOffsetUpdateQueuedRef.current = true;
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         handleScroll();
-        setIsOffsetUpdateQueued(false);
+        isOffsetUpdateQueuedRef.current = false;
       }, 300);
     }
 
@@ -156,19 +152,19 @@ function useScrollPosition({
       // ensures incorrect offset doesn't get set when channel changes
       clearTimeout(timeoutId);
     };
-  }, [channelId, updateScrollOffset, chatContainerRef, isOffsetUpdateQueued]);
+  }, [channelId, updateScrollOffset, chatContainerRef]);
 
   // auto scroll to bottom on new messages
   useEffect(() => {
     // prevent navigate to bottom when offset not yet updated because of
     // debounced function
-    if (isOffsetUpdateQueued) {
+    if (isOffsetUpdateQueuedRef.current) {
       return;
     }
-    if (scrollOffset === 'bottom') {
+    if (scrollOffset === 'bottom' || scrollOffset === undefined) {
       scrollToBottom(chatContainerRef);
     }
-  }, [messages, scrollOffset, chatContainerRef, isOffsetUpdateQueued]);
+  }, [messages, chatContainerRef]);
 
   const handleChatResize = useCallback(() => {
     if (scrollOffset === 'bottom') {
