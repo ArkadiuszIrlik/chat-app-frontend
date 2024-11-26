@@ -21,13 +21,14 @@ const serverSchema = {
     // .required('Please provide an image for your server.')
     .test(
       'type',
-      'Only the following formats are accepted: .jpeg, .jpg, .svg, and .png',
+      'Only the following formats are accepted: .jpg, .png, .webp, .svg and .avif.',
       (value) =>
         value &&
         (value.type === 'image/jpeg' ||
-          value.type === 'image/jpg' ||
-          value.type === 'image/svg' ||
-          value.type === 'image/png'),
+          value.type === 'image/avif' ||
+          value.type === 'image/svg+xml' ||
+          value.type === 'image/png' ||
+          value.type === 'image/webp'),
     )
     .test(
       'fileSize',
