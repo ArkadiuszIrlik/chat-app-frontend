@@ -1,28 +1,32 @@
 import { ReactNode } from 'react';
 
-type PrimaryButtonType = RegularButton | SubmitButton;
+interface BaseProps {
+  label?: string;
+  disabled?: boolean;
+  children: ReactNode;
+}
 
 interface RegularButton {
   type: HTMLButtonElement['type'];
-  disabled?: boolean;
-  children: ReactNode;
   onClickHandler: () => void;
 }
 
 interface SubmitButton {
   type: 'submit';
-  disabled?: boolean;
-  children: ReactNode;
   onClickHandler?: never;
 }
 
+type PrimaryButtonType = BaseProps & (RegularButton | SubmitButton);
+
 PrimaryButton.defaultProps = {
+  label: undefined,
   disabled: false,
 };
 
 function PrimaryButton({
   type,
-  disabled,
+  label = undefined,
+  disabled = false,
   children,
   onClickHandler,
 }: PrimaryButtonType) {
@@ -31,6 +35,7 @@ function PrimaryButton({
       <button
         /* eslint-disable-next-line react/button-has-type */
         type={type}
+        aria-label={label}
         disabled={disabled}
         onClick={onClickHandler}
         className="w-full rounded-md bg-gradient-to-tr from-clairvoyant-900 to-cerise-600
