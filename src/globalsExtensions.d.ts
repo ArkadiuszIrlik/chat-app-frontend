@@ -4,7 +4,10 @@ declare module 'yup' {
     TContext extends AnyObject = AnyObject,
     TOut extends TType = TType,
   > extends yup.BaseSchema<TType, TContext, TOut> {
-    oneOfSchemas(schemas: Yup.AnySchema[]): MixedSchema<TType, TContext>;
+    oneOfSchemas(
+      schemas: Yup.AnySchema[],
+      errorMessage?: string,
+    ): MixedSchema<TType, TContext>;
   }
 }
 
