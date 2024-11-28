@@ -1,3 +1,5 @@
+import { OneOfSchemasOptions } from '@src/extendedYup';
+
 declare module 'yup' {
   interface MixedSchema<
     TType extends Maybe<string> = string | undefined,
@@ -6,7 +8,7 @@ declare module 'yup' {
   > extends yup.BaseSchema<TType, TContext, TOut> {
     oneOfSchemas(
       schemas: Yup.AnySchema[],
-      errorMessage?: string,
+      options?: OneOfSchemasOptions,
     ): MixedSchema<TType, TContext>;
   }
 }
