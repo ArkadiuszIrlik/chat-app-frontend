@@ -68,6 +68,7 @@ function ServersMenu({ onCloseMenu }: { onCloseMenu?: () => void }) {
                 serverImg={server.serverImg}
                 serverName={server.name}
                 isActive={isActive}
+                onClick={onCloseMenu}
                 key={server._id}
               />
             );
@@ -89,16 +90,22 @@ function ServersMenu({ onCloseMenu }: { onCloseMenu?: () => void }) {
 
 export default ServersMenu;
 
+ServerLink.defaultProps = {
+  onClick: undefined,
+};
+
 function ServerLink({
   serverId,
   serverName,
   serverImg,
   isActive,
+  onClick = undefined,
 }: {
   serverId: string;
   serverName: string;
   serverImg: string;
   isActive: boolean;
+  onClick?: () => void;
 }) {
   return (
     <Link
@@ -106,6 +113,7 @@ function ServerLink({
       className={`flex items-center gap-2 rounded-md px-2 py-1 ${
         isActive ? 'bg-gray-600 hover:bg-gray-500' : 'hover:bg-gray-600'
       }`}
+      onClick={onClick}
     >
       <div className="aspect-square h-10 w-10 shrink-0 grow-0">
         <ServerImage image={serverImg} />
