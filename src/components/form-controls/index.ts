@@ -8,3 +8,5 @@ export * from './SubmittingUpdater';
 export { default as SubmittingUpdater } from './SubmittingUpdater';
 export * from './ErrorDisplay';
 export { default as ErrorDisplay } from './ErrorDisplay';
+export * from './FormikValueUpdater';
+export { default as FormikValueUpdater } from './FormikValueUpdater';
