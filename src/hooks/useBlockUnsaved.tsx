@@ -28,9 +28,13 @@ function useBlockUnsaved({
   const [haveValuesChanged, setHaveValuesChanged] = useState(false);
   const debouncedValues = useDebounce(currentValues, changeDebounceTime);
 
+  // Debounce necessary to prevent incorrect changes detected when initialValues
+  // change, but the debounced current values haven't updated yet.
+  const debouncedInitialValues = useDebounce(initialValues, changeDebounceTime);
+
   useEffect(() => {
-    setHaveValuesChanged(!deepEqual(initialValues, debouncedValues));
-  }, [debouncedValues, initialValues]);
+    setHaveValuesChanged(!deepEqual(debouncedInitialValues, debouncedValues));
+  }, [debouncedValues, debouncedInitialValues]);
 
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
