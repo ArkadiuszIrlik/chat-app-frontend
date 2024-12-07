@@ -1,66 +1,77 @@
 import { DestructivePrimaryButton } from '@components/DestructivePrimaryButton';
-import { ModalOverlay } from '@components/ModalOverlay';
+import { ModalContainer } from '@components/ModalContainer';
 import { ErrorDisplay } from '@components/form-controls';
 import useFetch from '@hooks/useFetch';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 function DeleteChannelModal({
   serverId,
   channelId,
+  isOpen,
+  onCloseModal,
   onCancel,
 }: {
   serverId: string;
   channelId: string;
+  isOpen: boolean;
+  onCloseModal: () => void;
   onCancel: () => void;
 }) {
-  const { refetch, isLoading, hasError, errorMessage } = useFetch({
+  const { refetch, isLoading, error, updateUrl } = useFetch({
     initialUrl: `servers/${serverId}/channels/${channelId}`,
     method: 'DELETE',
     onMount: false,
   });
 
-  const handleDeleteChannel = useCallback(() => {
+  useEffect(() => {
+    updateUrl(`servers/${serverId}/channels/${channelId}`);
+  }, [channelId, serverId, updateUrl]);
+
+  const handleDeleteServer = useCallback(() => {
     refetch();
   }, [refetch]);
 
+  const description =
+    'Are you sure you want to delete this channel? All the messages sent here will be gone forever. This cannot be reversed.';
+
   return (
-    <ModalOverlay>
-      <div
-        className="fixed left-1/2 top-1/2 w-96 -translate-x-1/2
-       -translate-y-1/2 rounded-md bg-gray-800 px-5 py-4"
-      >
-        <div>
-          <h3 className="mb-1 text-xl text-gray-300">Delete Channel</h3>
-          <p className="mb-4">
-            Are you sure you want to remove this channel? Any messages sent here
-            will also be removed.
-          </p>
-          {hasError && (
-            <div className="max-w-prose">
-              <ErrorDisplay errorMessage={errorMessage} />
-            </div>
-          )}
-          <div className="flex items-center justify-center gap-10">
-            <button
+    <ModalContainer
+      isOpen={isOpen}
+      onClose={onCloseModal}
+      ariaLabel="Confirm delete channel"
+      ariaDescription={description}
+      darkenBackdrop
+      isAlert
+    >
+      <div>
+        <h3 className="mb-1 text-xl text-gray-300">Delete Channel</h3>
+        <p className="mb-4 text-gray-100">{description}</p>
+        {error && (
+          <div className="max-w-prose">
+            <ErrorDisplay errorMessage={error.message} />
+          </div>
+        )}
+        <div className="flex items-center justify-center gap-10">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="block w-36 underline-offset-2 using-mouse:hover:underline"
+          >
+            Cancel
+          </button>
+          <div className="w-44">
+            <DestructivePrimaryButton
               type="button"
-              onClick={onCancel}
-              className="block w-36 underline-offset-2 hover:underline"
+              disabled={isLoading}
+              onClickHandler={handleDeleteServer}
             >
-              Cancel
-            </button>
-            <div className="w-44">
-              <DestructivePrimaryButton
-                type="button"
-                disabled={isLoading}
-                onClickHandler={handleDeleteChannel}
-              >
-                Delete Channel
-              </DestructivePrimaryButton>
-            </div>
+              Delete&nbsp;Channel
+            </DestructivePrimaryButton>
           </div>
         </div>
       </div>
-    </ModalOverlay>
+    </ModalContainer>
   );
 }
+
 export default DeleteChannelModal;

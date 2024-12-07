@@ -1,87 +1,119 @@
 import { DestructiveSecondaryButton } from '@components/DestructiveSecondaryButton';
-import { SettingsOverlay } from '@components/SettingsOverlay';
 import {
   ErrorDisplay,
   SubmittingUpdater,
   TextInput,
 } from '@components/form-controls';
-import useFetch from '@hooks/useFetch';
-import { Form, Formik } from 'formik';
-import { useCallback, useMemo, useState } from 'react';
+import { Form } from 'formik';
+import { useCallback, useEffect } from 'react';
 import DeleteChannelModal from '@components/ChannelSettings/DeleteChannelModal';
-import { getPropertiesChanged } from '@helpers/forms';
-import { channelSchema } from '@constants/validationSchema';
-import Yup from '@src/extendedYup';
+import { SettingsPage } from '@components/SettingsPage';
+import SettingsFormikProvider from '@components/ChannelSettings/SettingsFormikProvider';
+import usePostFormData from '@components/ChannelSettings/usePostFormData';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import useSWR from 'swr';
+import { genericFetcherCredentials, HttpError } from '@helpers/fetch';
+import useToggle from '@hooks/useToggle';
+import { useSocket } from '@hooks/index';
+import { SocketEvents } from '@src/types';
+import FormikValueUpdater from '@components/form-controls/FormikValueUpdater';
 
-function ChannelSettings({
-  server,
-  channel,
-  onCloseSettings,
-}: {
-  server: Server;
-  channel: Channel;
-  onCloseSettings: () => void;
-}) {
-  const initialValues = useMemo(
-    () => ({
-      name: channel.name,
-    }),
-    [channel],
-  );
-  const [postData, setPostData] = useState(new FormData());
-
-  const { refetch, isLoading, hasError, errorMessage } = useFetch({
-    initialUrl: `servers/${server._id}/channels/${channel._id}`,
-    method: 'PATCH',
-    onMount: false,
-    postData,
-    isFileUpload: true,
+function getChannelFromServer(server: Server, channelId: string) {
+  let channelToFind: Channel | undefined;
+  server.channelCategories.find((category) => {
+    const foundChannel = category.channels.find(
+      (channel) => channel._id === channelId,
+    );
+    if (foundChannel) {
+      channelToFind = foundChannel;
+      return true;
+    }
+    return false;
   });
 
-  const [isDeleteChannelModalOpen, setIsDeleteChannelModalOpen] =
-    useState(false);
-  const handleOpenDeleteChannelModal = useCallback(() => {
-    setIsDeleteChannelModalOpen(true);
-  }, []);
-  const handleCloseDeleteChannelModal = useCallback(() => {
-    setIsDeleteChannelModalOpen(false);
-  }, []);
+  return channelToFind;
+}
+
+const channelNotFoundErrorObj = {
+  message: 'Channel not found',
+};
+
+function ChannelSettings() {
+  const { state } = useLocation() as {
+    state: { server?: Server; channel?: Channel } | null;
+  };
+  const { channelId, serverId } = useParams();
+
+  const {
+    data: server,
+    error: errorLoadServer,
+    isLoading: isServerLoading,
+    mutate: refetchServer,
+  } = useSWR<Server, HttpError>(
+    `/servers/${serverId}`,
+    genericFetcherCredentials,
+    {
+      fallbackData: state?.server,
+      revalidateOnMount: !state?.server,
+      revalidateOnFocus: false,
+    },
+  );
+  useSocketInteraction({
+    serverId: serverId ?? '',
+    onRefetchServer: refetchServer,
+  });
+  const channel =
+    server && channelId ? getChannelFromServer(server, channelId) : undefined;
+
+  const navigate = useNavigate();
+  const handleCloseSettings = useCallback(() => {
+    if (window.history?.length && window.history.length > 1) {
+      navigate(-1);
+    } else if (serverId && channelId) {
+      navigate(`/app/channels/${serverId}/${channelId}`);
+    } else {
+      navigate('/app/');
+    }
+  }, [navigate, channelId, serverId]);
+
+  const {
+    isActive: isOpenDeleteChannelModal,
+    activate: openDeleteChannelModal,
+    deactivate: closeDeleteChannelModal,
+  } = useToggle();
+
+  const {
+    updatedValues,
+    error: postError,
+    isLoading: isPostLoading,
+    handleSubmitData,
+  } = usePostFormData({
+    channel,
+    channelId: channel?._id,
+    serverId: server?._id,
+  });
 
   return (
-    <Formik
-      initialValues={initialValues}
-      enableReinitialize
-      validationSchema={Yup.object({
-        name: channelSchema.name.required(
-          'Please enter a name for the channel',
-        ),
-      })}
-      onSubmit={(values) => {
-        const propertiesChanged = getPropertiesChanged(initialValues, values);
-        const patchData = propertiesChanged.map((property) => ({
-          op: 'replace',
-          path: `/${property}`,
-          value: values[property],
-        }));
-
-        const data = new FormData();
-        const patchBlob = new Blob([JSON.stringify(patchData)], {
-          type: 'application/json',
-        });
-        data.append('patch', patchBlob);
-
-        setPostData(data);
-        refetch();
-      }}
+    <SettingsFormikProvider
+      initialValues={updatedValues}
+      updatedInitialValues={updatedValues}
+      onSubmitData={handleSubmitData}
     >
-      <SettingsOverlay
-        label="Channel settings"
-        onCloseSettings={onCloseSettings}
+      <SettingsPage
+        pageLabel="Channel Settings"
+        hasLoadedData={!!(server && channel)}
+        loadError={
+          errorLoadServer ?? !channel ? channelNotFoundErrorObj : undefined
+        }
+        isLoading={isServerLoading}
+        nextInitialValues={updatedValues}
+        nextResetFormValues={updatedValues}
+        onCloseSettings={handleCloseSettings}
       >
         <Form className="flex flex-col">
-          {hasError && (
+          {postError && (
             <div className="max-w-prose">
-              <ErrorDisplay errorMessage={errorMessage} />
+              <ErrorDisplay errorMessage={postError.message} />
             </div>
           )}
           <div className="mb-3 w-56">
@@ -90,22 +122,58 @@ function ChannelSettings({
           <div className="w-40">
             <DestructiveSecondaryButton
               type="button"
-              onClickHandler={handleOpenDeleteChannelModal}
+              onClickHandler={openDeleteChannelModal}
             >
               Delete Channel
             </DestructiveSecondaryButton>
           </div>
-          {isDeleteChannelModalOpen && (
-            <DeleteChannelModal
-              onCancel={handleCloseDeleteChannelModal}
-              serverId={server._id}
-              channelId={channel._id}
-            />
-          )}
-          <SubmittingUpdater isFetchLoading={isLoading} />
+          <DeleteChannelModal
+            serverId={server?._id ?? ''}
+            channelId={channel?._id ?? ''}
+            isOpen={isOpenDeleteChannelModal}
+            onCloseModal={closeDeleteChannelModal}
+            onCancel={closeDeleteChannelModal}
+          />
+          <FormikValueUpdater
+            // @ts-expect-error interface doesn't work with Record type
+            updatedValues={updatedValues}
+          />
+          <SubmittingUpdater isFetchLoading={isPostLoading} />
         </Form>
-      </SettingsOverlay>
-    </Formik>
+      </SettingsPage>
+    </SettingsFormikProvider>
   );
 }
+
+function useSocketInteraction({
+  serverId,
+  onRefetchServer,
+}: {
+  serverId: string;
+  onRefetchServer: () => unknown;
+}) {
+  const { socket } = useSocket() ?? {};
+
+  useEffect(() => {
+    function cleanup() {
+      if (socket) {
+        socket.off(SocketEvents.ServerUpdated, onServerUpdated);
+      }
+    }
+
+    function onServerUpdated(updatedServerId: string) {
+      if (updatedServerId === serverId) {
+        onRefetchServer();
+      }
+    }
+
+    if (!socket) {
+      return cleanup;
+    }
+
+    socket.on(SocketEvents.ServerUpdated, onServerUpdated);
+    return cleanup;
+  }, [serverId, socket, onRefetchServer]);
+}
+
 export default ChannelSettings;
