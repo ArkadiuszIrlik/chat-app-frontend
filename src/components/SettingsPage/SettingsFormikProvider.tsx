@@ -1,6 +1,35 @@
 import { getPropertiesChanged } from '@helpers/forms';
-import { Formik, FormikProps } from 'formik';
+import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { ReactNode } from 'react';
+
+interface BaseProps<V> {
+  initialValues: V;
+  /** Updated initialValues object to use when detecting form changes inside
+   * the onSubmit handler. Use this instead of passing new initialValues if
+   * you don't want to lose your current changes.
+   */
+  updatedInitialValues?: V;
+  // onSubmit?: (values: V, formik: FormikHelpers<V>) => void | Promise<unknown>;
+  // onSubmitData: (data: FormData) => void;
+  enableReinitialize?: boolean;
+  validationSchema: unknown;
+  children: ReactNode | ((pro: FormikProps<V>) => ReactNode);
+}
+
+type SubmitProps<V> =
+  | {
+      onSubmit: (
+        values: V,
+        formik: FormikHelpers<V>,
+      ) => void | Promise<unknown>;
+      onSubmitData?: never;
+    }
+  | {
+      onSubmit?: never;
+      onSubmitData: (data: FormData) => void;
+    };
+
+type Props<V> = BaseProps<V> & SubmitProps<V>;
 
 SettingsFormikProvider.defaultProps = {
   updatedInitialValues: undefined,
@@ -10,28 +39,22 @@ SettingsFormikProvider.defaultProps = {
 function SettingsFormikProvider<V extends Record<string, unknown>>({
   initialValues,
   updatedInitialValues = undefined,
+  onSubmit,
   onSubmitData,
   enableReinitialize = false,
   validationSchema,
   children,
-}: {
-  initialValues: V;
-  /** Updated initialValues object to use when detecting form changes inside
-   * the onSubmit handler. Use this instead of passing new initialValues if
-   * you don't want to lose your current changes.
-   */
-  updatedInitialValues?: V;
-  onSubmitData: (data: FormData) => void;
-  enableReinitialize?: boolean;
-  validationSchema: unknown;
-  children: ReactNode | ((pro: FormikProps<V>) => ReactNode);
-}) {
+}: Props<V>) {
   return (
     <Formik
       initialValues={initialValues}
       enableReinitialize={enableReinitialize}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
+      onSubmit={(values, formik) => {
+        if (onSubmit) {
+          void onSubmit(values, formik);
+          return;
+        }
         const propertiesChanged = getPropertiesChanged(
           updatedInitialValues ?? initialValues,
           values,
