@@ -9,6 +9,7 @@ import { CreateChannelModalContent } from '@components/CreateChannelModal';
 import { LeaveServerModalContent } from '@components/LeaveServerModal';
 import { useAuth } from '@hooks/index';
 import { Navigate } from 'react-router-dom';
+import { ServerImage } from '@components/ServerImage';
 
 const settingsIconStyle: ExtendedCSSProperties = {
   '--mask-url': `url(${SettingsIcon})`,
@@ -85,12 +86,9 @@ function MainContent({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between gap-2">
-        <img
-          src={server.serverImg}
-          alt=""
-          className="aspect-square h-12 w-12 shrink-0 grow-0 select-none rounded-full"
-          draggable="false"
-        />
+        <div className="aspect-square h-12 w-12 shrink-0 grow-0">
+          <ServerImage image={server.serverImg} />
+        </div>
         <h1 className="flex items-center gap-2 truncate text-xl text-gray-300">
           {server.name}
         </h1>
