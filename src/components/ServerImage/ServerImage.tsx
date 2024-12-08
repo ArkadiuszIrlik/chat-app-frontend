@@ -5,7 +5,7 @@ function ServerImage({ image }: { image: string }) {
         <img
           src={image}
           alt=""
-          className={`relative -z-10 aspect-square select-none rounded-full
+          className={`relative -z-10 aspect-square w-full select-none rounded-full
              object-cover object-center ${image === '' ? 'bg-gray-800' : ''}`}
           draggable="false"
         />

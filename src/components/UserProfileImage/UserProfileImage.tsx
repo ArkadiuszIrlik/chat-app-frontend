@@ -47,7 +47,7 @@ function UserProfileImage({
         <img
           src={image}
           alt=""
-          className="relative -z-10 aspect-square rounded-full object-cover object-center"
+          className="relative -z-10 aspect-square w-full rounded-full object-cover object-center"
         />
       </div>
     </div>
