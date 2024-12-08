@@ -96,12 +96,15 @@ function useFetch<DT = Record<string, any>>({
       setError(null);
       setErrorMessage('');
       try {
-        const response = await fetch(`${getURL(url)}?${queryString}`, {
-          headers: formatHeaders(headers, isFileUpload),
-          body: formatRequestBody(postData, isFileUpload),
-          method,
-          credentials,
-        });
+        const response = await fetch(
+          `${getURL(url)}${queryString ? `?${queryString}` : ''}`,
+          {
+            headers: formatHeaders(headers, isFileUpload),
+            body: formatRequestBody(postData, isFileUpload),
+            method,
+            credentials,
+          },
+        );
         if (response.ok) {
           const result = (await response.json()) as DT;
           setData(result);
