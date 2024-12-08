@@ -214,14 +214,13 @@ function ChannelGroupSection({
           </div>
         </div>
       </div>
-      {isGroupPanelOpen && (
-        <ChannelGroupPanelModal
-          server={server}
-          channelGroup={category}
-          groupName={name}
-          onCloseModal={closeGroupPanel}
-        />
-      )}
+      <ChannelGroupPanelModal
+        isOpen={isGroupPanelOpen}
+        server={server}
+        channelGroup={category}
+        groupName={name}
+        onCloseModal={closeGroupPanel}
+      />
       {isExpanded &&
         channelList.map((channel) => {
           const isActive = channel._id === activeChannelId;
