@@ -10,6 +10,7 @@ import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
 import { EmailVerification } from '@components/EmailVerification';
 import { ServerSettings } from '@components/ServerSettings';
+import { ChannelSettings } from '@components/ChannelSettings';
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
               {
                 path: 'server-settings/:serverId',
                 element: <ServerSettings />,
+              },
+              {
+                path: 'channel-settings/:serverId/:channelId',
+                element: <ChannelSettings />,
               },
             ],
           },
