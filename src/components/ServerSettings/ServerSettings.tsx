@@ -1,30 +1,61 @@
-import { ErrorDisplay } from '@components/form-controls';
-import useFetch from '@hooks/useFetch';
-import { useFormikContext } from 'formik';
-import { useCallback, useMemo, useState } from 'react';
-import { SettingsContainer } from '@components/SettingsContainer';
+import { DestructiveSecondaryButton } from '@components/DestructiveSecondaryButton';
+import {
+  ErrorDisplay,
+  ImageFileInput,
+  ResetAfterSubmit,
+  SubmittingUpdater,
+  TextInput,
+} from '@components/form-controls';
+import { Form } from 'formik';
+import { useCallback, useEffect } from 'react';
+import { SettingsFormikProvider, SettingsPage } from '@components/SettingsPage';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { genericFetcherCredentials, HttpError } from '@helpers/fetch';
-import { SyncLoader } from 'react-spinners';
-import styleConsts from '@constants/styleConsts';
-import SettingsContainerBlockUnsaved from '@components/SettingsContainer/SettingsContainerBlockUnsaved';
-import { BlockUnsavedProvider, useBlockUnsaved } from '@hooks/index';
+import useToggle from '@hooks/useToggle';
+import { useSocket } from '@hooks/index';
+import { SocketEvents } from '@src/types';
+import FormikValueUpdater from '@components/form-controls/FormikValueUpdater';
+import usePostFormData from '@components/ServerSettings/usePostFormData';
+import DeleteServerModal from '@components/ServerSettings/DeleteServerModal';
+import Yup from '@src/extendedYup';
+import { serverSchema } from '@constants/validationSchema';
 import { ServerSettingsValues } from '@components/ServerSettings/types';
-import SettingsForm from '@components/ServerSettings/SettingsForm';
-import SettingsFormikProvider from '@components/ServerSettings/SettingsFormikProvider';
+import { getPropertiesChanged } from '@helpers/forms';
+
+const serverNotFoundErrorObj = {
+  message: 'Server not found',
+};
+
+const serverValidationSchema = Yup.object({
+  serverImg: Yup.mixed().oneOfSchemas([Yup.string(), serverSchema.image]),
+  name: serverSchema.name.required('Please enter a name for your server.'),
+});
 
 function ServerSettings() {
-  const { state } = useLocation() as { state: { server?: Server } | null };
+  const { state } = useLocation() as {
+    state: { server?: Server } | null;
+  };
   const { serverId } = useParams();
-  const shouldFetch = !state?.server;
 
-  const { data, error, isLoading } = useSWR<Server, HttpError>(
-    shouldFetch ? `/servers/${serverId}` : null,
+  const {
+    data: server,
+    error: errorLoadServer,
+    isLoading: isServerLoading,
+    mutate: refetchServer,
+  } = useSWR<Server, HttpError>(
+    `/servers/${serverId}`,
     genericFetcherCredentials,
+    {
+      fallbackData: state?.server,
+      revalidateOnMount: !state?.server,
+      revalidateOnFocus: false,
+    },
   );
-
-  const server = state?.server ?? data;
+  useSocketInteraction({
+    serverId: serverId ?? '',
+    onRefetchServer: refetchServer,
+  });
 
   const navigate = useNavigate();
   const handleCloseSettings = useCallback(() => {
@@ -35,190 +66,145 @@ function ServerSettings() {
     } else {
       navigate('/app/');
     }
-  }, [navigate, serverId]);
+  }, [serverId, navigate]);
 
-  return server && !isLoading ? (
-    <SettingsWithServer
-      server={server}
-      handleCloseSettings={handleCloseSettings}
-    />
-  ) : (
-    <SettingsNoServer
-      hasError={!!error}
-      errorMessage={error?.data?.message ?? ''}
-      isLoading={isLoading}
-      handleCloseSettings={handleCloseSettings}
-    />
-  );
-}
+  const {
+    isActive: isOpenDeleteServerModal,
+    activate: openDeleteServerModal,
+    deactivate: closeDeleteServerModal,
+  } = useToggle();
 
-function SettingsNoServer({
-  handleCloseSettings,
-  hasError,
-  errorMessage,
-  isLoading,
-}: {
-  handleCloseSettings: () => void;
-  hasError: boolean;
-  errorMessage: string;
-  isLoading: boolean;
-}) {
-  return (
-    <SettingsContainer
-      label="Server settings"
-      onCloseSettings={handleCloseSettings}
-    >
-      {hasError && !isLoading && (
-        <div className="max-w-prose">
-          <ErrorDisplay errorMessage={errorMessage} />
-        </div>
-      )}
-      {isLoading && (
-        <div className="flex grow items-center justify-center">
-          <SyncLoader
-            color={styleConsts.colors.gray[300]}
-            speedMultiplier={0.8}
-            size={10}
-          />
-        </div>
-      )}
-    </SettingsContainer>
-  );
-}
-
-function SettingsWithServer({
-  server,
-  handleCloseSettings,
-}: {
-  server: Server;
-  handleCloseSettings: () => void;
-}) {
-  const initialValues = useMemo(
-    () => ({
-      name: server.name,
-      serverImg: server.serverImg,
-    }),
-    [server],
-  );
-
-  const [postData, setPostData] = useState(new FormData());
-
-  const { refetch, isLoading, hasError, errorMessage } = useFetch({
-    initialUrl: `servers/${server._id}`,
-    method: 'PATCH',
-    onMount: false,
-    postData,
-    isFileUpload: true,
+  const {
+    updatedValues,
+    error: postError,
+    isLoading: isPostLoading,
+    hasSubmitted,
+    handleSubmitData,
+  } = usePostFormData({
+    server,
+    serverId: server?._id,
   });
-
-  const handleSubmitForm = useCallback(
-    (data: FormData) => {
-      setPostData(data);
-      refetch();
-    },
-    [refetch],
-  );
 
   return (
     <SettingsFormikProvider
-      initialValues={initialValues}
-      onSubmitData={handleSubmitForm}
+      initialValues={updatedValues}
+      updatedInitialValues={updatedValues}
+      validationSchema={serverValidationSchema}
+      onSubmit={(values) => {
+        handleFormSubmit(updatedValues, values, handleSubmitData);
+      }}
     >
-      <BlockUnsavedWrapper
-        server={server}
-        handleCloseSettings={handleCloseSettings}
-        errorMessage={errorMessage}
-        hasError={hasError}
-        isLoading={isLoading}
-      />
+      <SettingsPage
+        pageLabel="Server Settings"
+        hasLoadedData={!!server}
+        loadError={
+          errorLoadServer ?? !server ? serverNotFoundErrorObj : undefined
+        }
+        isLoading={isServerLoading}
+        nextInitialValues={updatedValues}
+        nextResetFormValues={updatedValues}
+        onCloseSettings={handleCloseSettings}
+      >
+        <Form className="flex flex-col">
+          {postError && (
+            <div className="max-w-prose">
+              <ErrorDisplay errorMessage={postError.message} />
+            </div>
+          )}
+          <div className="mb-3 w-56">
+            <TextInput label="Server Name" name="name" id="name" type="text" />
+          </div>
+          <div className="mb-5">
+            <ImageFileInput
+              textLabel="Server Image"
+              buttonLabel="Upload server image"
+              initialImageUrl={updatedValues.serverImg}
+              name="serverImg"
+              id="serverImg"
+            />
+          </div>
+          <div className="w-40">
+            <DestructiveSecondaryButton
+              type="button"
+              onClickHandler={openDeleteServerModal}
+            >
+              Delete Server
+            </DestructiveSecondaryButton>
+          </div>
+          <DeleteServerModal
+            serverId={server?._id ?? ''}
+            isOpen={isOpenDeleteServerModal}
+            onCloseModal={closeDeleteServerModal}
+            onCancel={closeDeleteServerModal}
+          />
+          <ResetAfterSubmit
+            hasSubmitted={hasSubmitted}
+            updatedValues={updatedValues}
+          />
+          <FormikValueUpdater updatedValues={updatedValues} />
+          <SubmittingUpdater isFetchLoading={isPostLoading} />
+        </Form>
+      </SettingsPage>
     </SettingsFormikProvider>
   );
 }
 
-function BlockUnsavedWrapper({
-  server,
-  handleCloseSettings,
-  hasError,
-  errorMessage,
-  isLoading,
+function useSocketInteraction({
+  serverId,
+  onRefetchServer,
 }: {
-  server: Server;
-  handleCloseSettings: () => void;
-  hasError: boolean;
-  errorMessage: string;
-  isLoading: boolean;
+  serverId: string;
+  onRefetchServer: () => unknown;
 }) {
-  const { initialValues, values, resetForm, submitForm, isSubmitting } =
-    useFormikContext<ServerSettingsValues>();
+  const { socket } = useSocket() ?? {};
 
-  return (
-    <BlockUnsavedProvider
-      onCancelChanges={resetForm}
-      onConfirmChanges={() => void submitForm()}
-      initialValues={initialValues}
-      currentValues={values}
-    >
-      <SettingsWrapper
-        server={server}
-        handleCloseSettings={handleCloseSettings}
-        errorMessage={errorMessage}
-        hasError={hasError}
-        isLoading={isLoading}
-        initialValues={initialValues}
-        isSubmitting={isSubmitting}
-      />
-    </BlockUnsavedProvider>
-  );
+  useEffect(() => {
+    function cleanup() {
+      if (socket) {
+        socket.off(SocketEvents.ServerUpdated, onServerUpdated);
+      }
+    }
+
+    function onServerUpdated(updatedServerId: string) {
+      if (updatedServerId === serverId) {
+        onRefetchServer();
+      }
+    }
+
+    if (!socket) {
+      return cleanup;
+    }
+
+    socket.on(SocketEvents.ServerUpdated, onServerUpdated);
+    return cleanup;
+  }, [serverId, socket, onRefetchServer]);
 }
 
-function SettingsWrapper({
-  server,
-  handleCloseSettings,
-  initialValues,
-  hasError,
-  errorMessage,
-  isLoading,
-  isSubmitting,
-}: {
-  server: Server;
-  handleCloseSettings: () => void;
-  initialValues: ServerSettingsValues;
-  hasError: boolean;
-  errorMessage: string;
-  isLoading: boolean;
-  isSubmitting: boolean;
-}) {
-  const blockUnsavedProps = useBlockUnsaved();
-  const { blockUntilSaved } = blockUnsavedProps ?? {};
+function handleFormSubmit(
+  initialValues: ServerSettingsValues,
+  values: ServerSettingsValues,
+  onSubmitData: (data: FormData) => void,
+) {
+  const propertiesChanged = getPropertiesChanged(initialValues, values);
+  const patchData = propertiesChanged.map((property) => ({
+    op: 'replace',
+    path: `/${property}`,
+    value: values[property],
+  }));
 
-  const blockedHandleCloseSettings = useCallback(() => {
-    if (blockUntilSaved) {
-      blockUntilSaved(handleCloseSettings);
-    }
-    handleCloseSettings();
-  }, [blockUntilSaved, handleCloseSettings]);
+  const data = new FormData();
+  const patchBlob = new Blob([JSON.stringify(patchData)], {
+    type: 'application/json',
+  });
+  data.append('patch', patchBlob);
 
-  return (
-    <SettingsContainer
-      label="Server settings"
-      onCloseSettings={blockedHandleCloseSettings}
-    >
-      <SettingsForm
-        hasError={hasError}
-        errorMessage={errorMessage}
-        initialValues={initialValues}
-        isUpdateFetchLoading={isLoading}
-        server={server}
-      />
-      {blockUnsavedProps && (
-        <SettingsContainerBlockUnsaved
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          {...blockUnsavedProps}
-          isSaveButtonDisabled={isSubmitting}
-        />
-      )}
-    </SettingsContainer>
-  );
+  // actual server image blob gets added in a separate
+  // property
+  if (propertiesChanged.includes('serverImg')) {
+    data.append('serverImg', values.serverImg);
+  }
+
+  onSubmitData(data);
 }
 
 export default ServerSettings;
