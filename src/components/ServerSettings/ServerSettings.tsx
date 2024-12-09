@@ -8,7 +8,12 @@ import {
 } from '@components/form-controls';
 import { Form } from 'formik';
 import { useCallback, useEffect } from 'react';
-import { SettingsFormikProvider, SettingsPage } from '@components/SettingsPage';
+import {
+  SettingsFormikProvider,
+  SettingsPage,
+  TIME_UNTIL_STALE_LINK_STATE,
+  useClearStaleLocationState,
+} from '@components/SettingsPage';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { genericFetcherCredentials, HttpError } from '@helpers/fetch';
@@ -33,10 +38,16 @@ const serverValidationSchema = Yup.object({
 });
 
 function ServerSettings() {
-  const { state } = useLocation() as {
+  const location = useLocation();
+  const { state } = location as {
     state: { server?: Server } | null;
   };
   const { serverId } = useParams();
+
+  useClearStaleLocationState({
+    location,
+    timeToStale: TIME_UNTIL_STALE_LINK_STATE,
+  });
 
   const {
     data: server,

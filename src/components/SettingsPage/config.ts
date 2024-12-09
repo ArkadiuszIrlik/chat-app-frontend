@@ -1,0 +1,3 @@
+const TIME_UNTIL_STALE_LINK_STATE = 10 * 1000; // ms
+
+export { TIME_UNTIL_STALE_LINK_STATE };

@@ -7,7 +7,11 @@ import {
 import { Form } from 'formik';
 import { useCallback, useEffect } from 'react';
 import DeleteChannelModal from '@components/ChannelSettings/DeleteChannelModal';
-import { SettingsPage } from '@components/SettingsPage';
+import {
+  SettingsPage,
+  TIME_UNTIL_STALE_LINK_STATE,
+  useClearStaleLocationState,
+} from '@components/SettingsPage';
 import SettingsFormikProvider from '@components/ChannelSettings/SettingsFormikProvider';
 import usePostFormData from '@components/ChannelSettings/usePostFormData';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -39,10 +43,16 @@ const channelNotFoundErrorObj = {
 };
 
 function ChannelSettings() {
-  const { state } = useLocation() as {
+  const location = useLocation();
+  const { state } = location as {
     state: { server?: Server; channel?: Channel } | null;
   };
   const { channelId, serverId } = useParams();
+
+  useClearStaleLocationState({
+    location,
+    timeToStale: TIME_UNTIL_STALE_LINK_STATE,
+  });
 
   const {
     data: server,
