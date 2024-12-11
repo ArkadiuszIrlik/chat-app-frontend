@@ -136,12 +136,22 @@ function useFetch<DT = Record<string, any>>({
           );
         }
       } catch (err) {
+        let nextError: HttpError;
         if (typeof err === 'string') {
           setErrorMessage(err);
+          nextError = new HttpError(err, { message: err }, 404);
         } else if (err instanceof Error) {
           setErrorMessage(err.message);
+          nextError = new HttpError(err.message, { message: err.message }, 404);
+        } else {
+          nextError = new HttpError(
+            'Request failed',
+            { message: 'Request failed' },
+            404,
+          );
         }
         setHasError(true);
+        setError(nextError);
       } finally {
         setRefetchIndex(0);
         setIsLoading(false);
