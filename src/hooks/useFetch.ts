@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { getURL, HttpError } from '@helpers/fetch';
 
 interface BaseProps {
@@ -73,6 +73,7 @@ function useFetch<DT = Record<string, any>>({
   const [errorMessage, setErrorMessage] = useState('');
   const [error, setError] = useState<HttpError | null>(null);
   const [refetchIndex, setRefetchIndex] = useState(0);
+  const abortControllerRef = useRef(new AbortController());
   const queryString = useMemo(
     () =>
       Object.keys(params)
@@ -88,6 +89,15 @@ function useFetch<DT = Record<string, any>>({
     setRefetchIndex((prevIndex) => prevIndex + 1);
   }, []);
 
+  const abort = useCallback(() => {
+    abortControllerRef.current.abort();
+    setIsLoading(false);
+    setData(null);
+    setHasError(false);
+    setErrorMessage('');
+    setError(null);
+  }, []);
+
   useEffect(() => {
     async function fetchData() {
       if (onMount === false && refetchIndex === 0) return;
@@ -95,6 +105,9 @@ function useFetch<DT = Record<string, any>>({
       setHasError(false);
       setError(null);
       setErrorMessage('');
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+      const abortSignal = abortController.signal;
       try {
         const response = await fetch(
           `${getURL(url)}${queryString ? `?${queryString}` : ''}`,
@@ -103,6 +116,7 @@ function useFetch<DT = Record<string, any>>({
             body: formatRequestBody(postData, isFileUpload),
             method,
             credentials,
+            signal: abortSignal,
           },
         );
         if (response.ok) {
@@ -155,6 +169,7 @@ function useFetch<DT = Record<string, any>>({
     updateUrl,
     updateParams,
     refetch,
+    abort,
   };
 }
 export default useFetch;
