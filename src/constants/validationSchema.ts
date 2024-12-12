@@ -1,4 +1,11 @@
-import { exampleServerInviteLink, serverInviteRegex } from '@constants/apiData';
+import {
+  exampleServerInviteLink,
+  serverInviteRegex,
+  SUPPORTED_PROFILE_IMG_FORMATS_HUMAN,
+  SUPPORTED_PROFILE_IMG_MIME_TYPES,
+  SUPPORTED_SERVER_IMG_FORMATS_HUMAN,
+  SUPPORTED_SERVER_IMG_MIME_TYPES,
+} from '@constants/apiData';
 import Yup from '@src/extendedYup';
 
 const channelSchema = {
@@ -21,14 +28,10 @@ const serverSchema = {
     // .required('Please provide an image for your server.')
     .test(
       'type',
-      'Only the following formats are accepted: .jpg, .png, .webp, .svg and .avif.',
-      (value) =>
-        value &&
-        (value.type === 'image/jpeg' ||
-          value.type === 'image/avif' ||
-          value.type === 'image/svg+xml' ||
-          value.type === 'image/png' ||
-          value.type === 'image/webp'),
+      `Only the following formats are accepted: ${SUPPORTED_SERVER_IMG_FORMATS_HUMAN}${
+        SUPPORTED_SERVER_IMG_FORMATS_HUMAN.endsWith('.') ? '' : '.'
+      }`,
+      (value) => value && SUPPORTED_SERVER_IMG_MIME_TYPES.includes(value.type),
     )
     .test(
       'fileSize',
