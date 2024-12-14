@@ -1,12 +1,13 @@
 import styleConsts from '@constants/styleConsts';
 import genericFetcher, { HttpError } from '@helpers/fetch';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SyncLoader } from 'react-spinners';
 import ExclamationIcon from '@assets/exclamation-point-128.png';
 import CheckmarkIcon from '@assets/checkmark.png';
 import useSWR from 'swr';
 import { ExtendedCSSProperties } from '@src/types';
-import { PrimaryLink } from '@components/Link';
+import useDelay from '@hooks/useDelay';
+import { useEffect } from 'react';
 
 const errorStyles: ExtendedCSSProperties = {
   '--mask-url': `url(${ExclamationIcon})`,
@@ -14,6 +15,9 @@ const errorStyles: ExtendedCSSProperties = {
 const successStyles: ExtendedCSSProperties = {
   '--mask-url': `url(${CheckmarkIcon})`,
 };
+
+const REDIRECT_DELAY = 3 * 1000; // ms
+const REDIRECT_URL = '/app/';
 
 function EmailVerification() {
   const [searchParams] = useSearchParams();
@@ -54,13 +58,8 @@ function EmailVerification() {
           </h2>
           <p className="mb-6">
             Sorry, but we couldn&apos;t verify your e-mail. Remember that the
-            verification link is only valid for 24 hours. If you would like to
-            create a new account again, you can do so by clicking the link
-            below.
+            verification link is only valid for 24 hours.
           </p>
-          <div className="mx-auto w-44">
-            <PrimaryLink to="/signup">Create account</PrimaryLink>
-          </div>
         </div>
       );
     case !!data:
@@ -74,16 +73,26 @@ function EmailVerification() {
               style={successStyles}
             />
           </h2>
-          <p className="mb-6">Thank you. You can log into your account now.</p>
-          <div className="mx-auto w-36">
-            <PrimaryLink to="/login" replace>
-              Log in
-            </PrimaryLink>
-          </div>
+          <p className="mb-6">You will be redirected shortly...</p>
+          <AppRedirect />
         </div>
       );
     default:
       return null;
   }
 }
+
+function AppRedirect() {
+  const { isReady } = useDelay({ delay: REDIRECT_DELAY });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isReady) {
+      navigate(REDIRECT_URL, { replace: true });
+    }
+  }, [isReady, navigate]);
+
+  return null;
+}
+
 export default EmailVerification;
