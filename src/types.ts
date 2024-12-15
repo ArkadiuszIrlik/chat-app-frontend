@@ -26,4 +26,14 @@ enum SocketEvents {
   UpdateServerList = 'update server list',
 }
 
-export { UserOnlineStatus, type ExtendedCSSProperties, SocketEvents };
+enum UserAccountStatus {
+  Pending = 'PENDING',
+  Approved = 'APPROVED',
+}
+
+export {
+  UserOnlineStatus,
+  type ExtendedCSSProperties,
+  SocketEvents,
+  UserAccountStatus,
+};

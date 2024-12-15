@@ -1,5 +1,5 @@
 import { getURL, HttpError } from '@helpers/fetch';
-import { UserOnlineStatus } from '@src/types';
+import { UserAccountStatus, UserOnlineStatus } from '@src/types';
 import {
   createContext,
   ReactNode,
@@ -16,6 +16,7 @@ interface UserAuth {
   onlineStatus: UserOnlineStatus;
   prefersOnlineStatus: UserOnlineStatus;
   serversIn: Server[];
+  accountStatus: UserAccountStatus;
 }
 
 function useAuth() {
@@ -23,6 +24,7 @@ function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isFirstLogin, setIsFirstLogin] = useState(true);
+  const isSetupComplete = user?.accountStatus === UserAccountStatus.Approved;
 
   const login = useCallback(async () => {
     setIsLoggingIn(true);
@@ -85,6 +87,7 @@ function useAuth() {
     login,
     isLoggingIn,
     isFirstLogin,
+    isSetupComplete,
     changeOnlineStatus,
   };
 }
