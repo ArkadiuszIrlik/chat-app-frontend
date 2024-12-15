@@ -6,7 +6,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 
@@ -79,28 +78,15 @@ function useAuth() {
     });
   }, []);
 
-  const authObj = useMemo(
-    () => ({
-      user,
-      isAuthenticated,
-      logout,
-      login,
-      isLoggingIn,
-      isFirstLogin,
-      changeOnlineStatus,
-    }),
-    [
-      user,
-      isAuthenticated,
-      logout,
-      login,
-      isLoggingIn,
-      isFirstLogin,
-      changeOnlineStatus,
-    ],
-  );
-
-  return authObj;
+  return {
+    user,
+    isAuthenticated,
+    logout,
+    login,
+    isLoggingIn,
+    isFirstLogin,
+    changeOnlineStatus,
+  };
 }
 
 const AuthContext = createContext<ReturnType<typeof useAuth> | null>(null);
