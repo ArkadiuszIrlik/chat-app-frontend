@@ -62,7 +62,7 @@ function SettingsScreen() {
 
   return isExtraSmallScreen ? (
     <div className="flex grow">
-      <div className="w-52 bg-gray-700 px-2 py-2">
+      <div className="w-48 shrink-0 bg-gray-700 px-2 py-2">
         <h1 className="mb-2 text-xl text-gray-200">Settings</h1>
         <CategoryList
           categories={settingsCategories.map((category) => category.uiName)}

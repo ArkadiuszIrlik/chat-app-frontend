@@ -58,7 +58,7 @@ function LeftSidebar({ server, isServerLoading, isEmptyServerList }: Props) {
   }
 
   return (
-    <div className="flex min-h-0 w-52 flex-col bg-gray-700 px-2 py-2">
+    <div className="flex min-h-0 w-full shrink-0 flex-col bg-gray-700 px-2 py-2 xs:w-48">
       {renderSwitch()}
       <div className="mt-auto flex flex-col">
         <DesktopNavBar
