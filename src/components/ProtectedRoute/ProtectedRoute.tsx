@@ -1,14 +1,25 @@
 import { useAuth } from '@hooks/index';
 import { ReactNode } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 function ProtectedRoute() {
-  const { isAuthenticated, isLoggingIn, isFirstLogin } = useAuth() ?? {};
+  const { isAuthenticated, isLoggingIn, isFirstLogin, isSetupComplete } =
+    useAuth() ?? {};
+  const location = useLocation();
   let returnedComponent: ReactNode;
 
   switch (true) {
-    case isAuthenticated:
+    case isAuthenticated && isSetupComplete:
       returnedComponent = <Outlet />;
+      break;
+    case isAuthenticated && !isSetupComplete:
+      returnedComponent = (
+        <Navigate
+          to="/complete-account"
+          replace
+          state={{ returnTo: location.pathname }}
+        />
+      );
       break;
     case isFirstLogin:
     case isLoggingIn:
