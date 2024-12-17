@@ -22,7 +22,10 @@ const channelGroupSchema = {
 };
 
 const serverSchema = {
-  name: Yup.string().trim(),
+  name: Yup.string()
+    .typeError('Invalid "name" type')
+    .trim()
+    .max(30, "Server name can't be longer than 30 characters."),
   // .required('Please enter a name for your server.'),
   image: Yup.mixed<Blob>()
     // .required('Please provide an image for your server.')
