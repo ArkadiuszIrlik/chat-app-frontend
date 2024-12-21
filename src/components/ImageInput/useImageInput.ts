@@ -18,6 +18,7 @@ function useImageInput({
   currentImageProps,
   isUploadingImageProps,
   imageUploadUrl,
+  isCurrentImageUrl = false,
   updateImgUrl,
 }: {
   uploadedImageProps: UploadImageProps;
@@ -25,6 +26,11 @@ function useImageInput({
   currentImageProps: CurrentImageProps;
   isUploadingImageProps: IsUploadingImageProps;
   imageUploadUrl: string;
+  /** When set to true, it will call updateImgUrl with currentImage value
+   * instead of null when uploadedImage and presetImage are empty.
+   * Default: false
+   */
+  isCurrentImageUrl?: boolean;
   updateImgUrl: (nextUrl: string | null) => void;
 }) {
   const [fieldPreset, metaPreset] = useField(presetImageProps);
@@ -141,11 +147,22 @@ function useImageInput({
       return;
     }
 
+    if (
+      isCurrentImageUrl &&
+      fieldCurrent.value &&
+      typeof fieldCurrent.value === 'string'
+    ) {
+      updateImgUrl(fieldCurrent.value);
+      return;
+    }
+
     updateImgUrl(null);
   }, [
     fieldPreset.value,
     fieldUpload.value,
+    fieldCurrent.value,
     metaUpload.error,
+    isCurrentImageUrl,
     resetUploadInput,
     updateImgUrl,
   ]);

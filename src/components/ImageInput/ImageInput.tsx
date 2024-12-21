@@ -25,11 +25,16 @@ interface ImageInputInterface {
   imageUploadUrl: string;
   selectPresetModalLabel: string;
   acceptedFileFormats?: string[];
+  /** When set to true, it will use currentImage value as displayed image URL
+   * when uploadedImage and presetImage are empty. Default: false
+   */
+  isCurrentImageUrl?: boolean;
 }
 
 ImageInput.defaultProps = {
   initialImageUrl: '',
   acceptedFileFormats: undefined,
+  isCurrentImageUrl: false,
 };
 
 const imageButtonClass =
@@ -47,6 +52,7 @@ function ImageInput({
   imageUploadUrl,
   selectPresetModalLabel,
   acceptedFileFormats = undefined,
+  isCurrentImageUrl = false,
 }: ImageInputInterface) {
   const [imgUrl, setImgUrl] = useState<string | null>(initialImageUrl ?? null);
   const {
@@ -71,6 +77,7 @@ function ImageInput({
     updateImgUrl: setImgUrl,
     uploadedImageProps,
     imageUploadUrl,
+    isCurrentImageUrl,
   });
 
   return (
