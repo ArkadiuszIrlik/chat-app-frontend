@@ -13,7 +13,7 @@ import { useServerStore } from '@hooks/index';
 import { useNavigate } from 'react-router-dom';
 import { ImageInput } from '@components/ImageInput';
 import { SUPPORTED_SERVER_IMG_MIME_TYPES } from '@constants/apiData';
-import usePresetPictures from '@components/AddServerModal/usePresetPictures';
+import usePresetPictures from '@hooks/usePresetPictures';
 
 const initialValues = {
   serverName: '',
@@ -33,7 +33,9 @@ function CreateServerContent({
   onCloseServersMenu: () => void;
 }) {
   const [postData, setPostData] = useState({});
-  const presetPictures = usePresetPictures();
+  const { pictures: presetPictures } = usePresetPictures({
+    type: 'server image',
+  });
 
   const { refetch, isLoading, data, hasError, errorMessage } = useFetch({
     initialUrl: 'servers',

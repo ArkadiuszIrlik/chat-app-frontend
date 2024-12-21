@@ -3,10 +3,10 @@ import SetupForm from '@components/CompleteAccountSetup/SetupForm';
 import { userSchema } from '@constants/validationSchema';
 import { useAuth } from '@hooks/index';
 import useFetch from '@hooks/useFetch';
+import usePresetPictures from '@hooks/usePresetPictures';
 import Yup from '@src/extendedYup';
 import { Formik } from 'formik';
 import { useEffect, useState } from 'react';
-import usePresetPictures from '@components/CompleteAccountSetup/usePresetPictures';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const initialValues: FormValues = {
@@ -20,7 +20,9 @@ const initialValues: FormValues = {
 function CompleteAccountSetup() {
   const { user, login } = useAuth() ?? {};
   const [postData, setPostData] = useState({});
-  const presetPictures = usePresetPictures();
+  const { pictures: presetPictures } = usePresetPictures({
+    type: 'profile picture',
+  });
   const navigate = useNavigate();
   const location = useLocation();
 
