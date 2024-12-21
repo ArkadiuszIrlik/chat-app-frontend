@@ -18,7 +18,7 @@ const initialValues: FormValues = {
 };
 
 function CompleteAccountSetup() {
-  const { user, login } = useAuth() ?? {};
+  const { user, isSetupComplete, login } = useAuth() ?? {};
   const [postData, setPostData] = useState({});
   const { pictures: presetPictures } = usePresetPictures({
     type: 'profile picture',
@@ -38,17 +38,18 @@ function CompleteAccountSetup() {
   }, [user?._id, updateUrl]);
 
   useEffect(() => {
-    async function finishSetup() {
-      if (login) {
-        await login();
-      }
-      const { returnTo } = location.state as { returnTo?: string };
+    if (data && login) {
+      void login();
+    }
+  }, [data, login]);
+
+  useEffect(() => {
+    if (isSetupComplete) {
+      const returnTo = (location.state as null | { returnTo?: string })
+        ?.returnTo;
       navigate(returnTo ?? '/app/', { replace: true });
     }
-    if (data) {
-      void finishSetup();
-    }
-  }, [data, location.state, navigate, login]);
+  }, [isSetupComplete, location.state, navigate]);
 
   return (
     <div className="w-96">
