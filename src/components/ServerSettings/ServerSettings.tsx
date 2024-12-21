@@ -1,7 +1,6 @@
 import { DestructiveSecondaryButton } from '@components/DestructiveSecondaryButton';
 import {
   ErrorDisplay,
-  ImageFileInput,
   ResetAfterSubmit,
   SubmittingUpdater,
   TextInput,
@@ -27,14 +26,31 @@ import Yup from '@src/extendedYup';
 import { serverSchema } from '@constants/validationSchema';
 import { ServerSettingsValues } from '@components/ServerSettings/types';
 import { getPropertiesChanged } from '@helpers/forms';
+import { ImageInput } from '@components/ImageInput';
+import { SUPPORTED_SERVER_IMG_MIME_TYPES } from '@constants/apiData';
+import usePresetPictures from '@hooks/usePresetPictures';
 
 const serverNotFoundErrorObj = {
   message: 'Server not found',
 };
 
 const serverValidationSchema = Yup.object({
-  serverImg: Yup.mixed().oneOfSchemas([Yup.string(), serverSchema.image]),
+  serverImg: Yup.mixed().required('Please select or upload a server image'),
   name: serverSchema.name.required('Please enter a name for your server.'),
+  selectServerImg: Yup.mixed().nullable(),
+  uploadServerImg: Yup.mixed()
+    .oneOfSchemas(
+      [
+        // this schema is here just to allow null values
+        Yup.string().nullable(),
+        serverSchema.image,
+      ],
+      { passNestedError: 1 },
+    )
+    .nullable(),
+  isUploadingServerImg: Yup.boolean()
+    .isFalse('Please wait while your server image is uploaded')
+    .required(),
 });
 
 function ServerSettings() {
@@ -43,6 +59,9 @@ function ServerSettings() {
     state: { server?: Server } | null;
   };
   const { serverId } = useParams();
+  const { pictures: presetPictures } = usePresetPictures({
+    type: 'server image',
+  });
 
   useClearStaleLocationState({
     location,
@@ -123,15 +142,38 @@ function ServerSettings() {
             </div>
           )}
           <div className="mb-3 w-56">
-            <TextInput label="Server Name" name="name" id="name" type="text" />
+            <TextInput
+              label="Server Name"
+              name="name"
+              type="text"
+              maxLength={30}
+            />
           </div>
           <div className="mb-5">
-            <ImageFileInput
-              textLabel="Server Image"
-              buttonLabel="Upload server image"
-              initialImageUrl={updatedValues.serverImg}
-              name="serverImg"
-              id="serverImg"
+            <ImageInput
+              uploadedImageProps={{
+                name: 'uploadServerImg',
+                id: 'uploadServerImg',
+              }}
+              presetImageProps={{
+                name: 'selectServerImg',
+                id: 'selectServerImg',
+              }}
+              currentImageProps={{
+                name: 'serverImg',
+                id: 'serverImg',
+              }}
+              isUploadingImageProps={{
+                name: 'isUploadingServerImg',
+                id: 'isUploadingServerImg',
+              }}
+              imageUploadUrl="images/server-img"
+              presetImages={presetPictures}
+              sectionAriaLabel="Choose your server image"
+              sectionTextLabel="Server Image"
+              selectPresetModalLabel="Select Server Image"
+              acceptedFileFormats={SUPPORTED_SERVER_IMG_MIME_TYPES}
+              isCurrentImageUrl
             />
           </div>
           <div className="w-40">
@@ -194,28 +236,28 @@ function useSocketInteraction({
 function handleFormSubmit(
   initialValues: ServerSettingsValues,
   values: ServerSettingsValues,
-  onSubmitData: (data: FormData) => void,
+  onSubmitData: (data: { patch: Record<string, unknown>[] }) => void,
 ) {
-  const propertiesChanged = getPropertiesChanged(initialValues, values);
-  const patchData = propertiesChanged.map((property) => ({
+  const patchableProperties = ['name', 'serverImg'] as const;
+
+  const initialValuesSubset = Object.fromEntries(
+    patchableProperties.map((key) => [key, initialValues[key]]),
+  ) as Record<keyof ServerSettingsValues, unknown>;
+  const valuesSubset = Object.fromEntries(
+    patchableProperties.map((key) => [key, values[key]]),
+  ) as Record<keyof ServerSettingsValues, unknown>;
+  const propertiesChanged = getPropertiesChanged(
+    initialValuesSubset,
+    valuesSubset,
+  );
+
+  const patch = propertiesChanged.map((property) => ({
     op: 'replace',
     path: `/${property}`,
     value: values[property],
   }));
 
-  const data = new FormData();
-  const patchBlob = new Blob([JSON.stringify(patchData)], {
-    type: 'application/json',
-  });
-  data.append('patch', patchBlob);
-
-  // actual server image blob gets added in a separate
-  // property
-  if (propertiesChanged.includes('serverImg')) {
-    data.append('serverImg', values.serverImg);
-  }
-
-  onSubmitData(data);
+  onSubmitData({ patch });
 }
 
 export default ServerSettings;

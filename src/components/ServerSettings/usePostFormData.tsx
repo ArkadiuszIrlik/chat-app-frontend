@@ -13,12 +13,15 @@ function usePostFormData({
     () => ({
       name: server?.name ?? '',
       serverImg: server?.serverImg ?? '',
+      selectServerImg: null,
+      uploadServerImg: null,
+      isUploadingServerImg: false,
     }),
     [server],
   );
 
   const [initialValues] = useState(updatedValues);
-  const [postData, setPostData] = useState(new FormData());
+  const [postData, setPostData] = useState({});
   // Used to inform other components when data submitted successfully
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
@@ -27,7 +30,6 @@ function usePostFormData({
     method: 'PATCH',
     onMount: false,
     postData,
-    isFileUpload: true,
   });
 
   useEffect(() => {
@@ -48,7 +50,7 @@ function usePostFormData({
   }, [hasSubmitted]);
 
   const handleSubmitData = useCallback(
-    (data: FormData) => {
+    (data: { patch: Record<string, unknown>[] }) => {
       setPostData(data);
       refetch();
     },
