@@ -21,6 +21,7 @@ interface ClientToServerEvents {
     callback: () => void,
   ) => void;
   [SocketEvents.UpdateServerList]: (callback: () => void) => void;
+  [SocketEvents.StartDemo]: () => void;
 }
 
 interface ServerToClientEvents {
