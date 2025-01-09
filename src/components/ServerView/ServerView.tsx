@@ -187,6 +187,12 @@ function useSocketInteraction({
       socket.off(SocketEvents.ServerDeleted, onServerDeleted);
     };
   }, [socket, serverId, mutate, navigate]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit(SocketEvents.StartDemo);
+    }
+  }, [socket]);
 }
 
 function DesktopServerView({
