@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '@hooks/index';
 import InputRestoreManager from '@components/ChatDisplay/InputRestoreManager';
 import useSendMessage from '@hooks/useSendMessage';
+import NewlineExtension from '@components/ChatDisplay/NewlineExtension';
 
 const urlRegex =
   // eslint-disable-next-line no-useless-escape
@@ -70,6 +71,7 @@ function MessageInput({
               placeholder: 'Say something...',
             }),
             ShortcutExtension,
+            NewlineExtension,
           ]}
           editorProps={{
             attributes: {
