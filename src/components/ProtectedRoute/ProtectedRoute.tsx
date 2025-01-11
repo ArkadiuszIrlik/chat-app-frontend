@@ -1,4 +1,5 @@
 import { useAuth } from '@hooks/index';
+import useDelay from '@hooks/useDelay';
 import { ReactNode } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
@@ -33,11 +34,12 @@ function ProtectedRoute() {
 }
 
 function LoadingScreen() {
-  return (
+  const { isReady } = useDelay({ delay: 300 });
+  return isReady ? (
     <div className="flex min-h-screen w-full items-center justify-center">
       Loading...
     </div>
-  );
+  ) : null;
 }
 
 export default ProtectedRoute;
