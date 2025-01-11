@@ -1,4 +1,4 @@
-import { getURL, HttpError } from '@helpers/fetch';
+import useFetch from '@hooks/useFetch';
 import { UserAccountStatus, UserOnlineStatus } from '@src/types';
 import {
   createContext,
@@ -22,46 +22,44 @@ interface UserAuth {
 function useAuth() {
   const [user, setUser] = useState<UserAuth | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isFirstLogin, setIsFirstLogin] = useState(true);
   const isSetupComplete = user?.accountStatus === UserAccountStatus.Approved;
 
-  const login = useCallback(async () => {
-    setIsLoggingIn(true);
-    try {
-      const res = await fetch(getURL('/users/self'), {
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        const data = (await res.json()) as BackendError;
-        const error = new HttpError('Error during login', data, res.status);
-        throw error;
-      }
-      const nextUser = (await res.json()) as UserAuth;
-      setUser({ ...nextUser, onlineStatus: nextUser.prefersOnlineStatus });
-      setIsAuthenticated(true);
-    } catch {
-      setUser(null);
-      setIsAuthenticated(false);
-    }
-    setIsLoggingIn(false);
+  const handleUserLogin = useCallback((nextUser: UserAuth) => {
+    const nextUserProcessed = {
+      ...nextUser,
+      onlineStatus: nextUser.prefersOnlineStatus,
+    };
+    setUser(nextUserProcessed);
   }, []);
 
-  const logout = useCallback(async () => {
-    const res = await fetch(getURL('/auth/logout'), {
-      credentials: 'include',
-    });
-    if (res.ok) {
-      setUser(null);
-    }
-  }, [setUser]);
+  const { loginData, loginIsLoading, loginError, login } = useLogin({
+    onSuccess: handleUserLogin,
+  });
 
   useEffect(() => {
-    void (async () => {
-      await login();
-      setIsFirstLogin(false);
-    })();
+    if (loginError) {
+      setUser(null);
+    }
+  }, [loginError]);
+  const isLoggingIn = loginIsLoading;
+
+  useEffect(() => {
+    login();
   }, [login]);
+
+  useEffect(() => {
+    if (loginData ?? loginError) {
+      setIsFirstLogin(false);
+    }
+  }, [loginData, loginError]);
+  const handleUserLogout = useCallback(() => {
+    setUser(null);
+  }, []);
+
+  const { logoutData, logoutIsLoading, logoutError, logout } = useLogout({
+    onSuccess: handleUserLogout,
+  });
 
   useEffect(() => {
     if (user !== null) {
@@ -84,7 +82,13 @@ function useAuth() {
     user,
     isAuthenticated,
     logout,
+    logoutData,
+    logoutIsLoading,
+    logoutError,
     login,
+    loginData,
+    loginIsLoading,
+    loginError,
     isLoggingIn,
     isFirstLogin,
     isSetupComplete,
@@ -101,6 +105,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 function AuthConsumer() {
   return useContext(AuthContext);
+}
+
+function useLogin({ onSuccess }: { onSuccess: (data: UserAuth) => unknown }) {
+  const { refetch, isLoading, data, error } = useFetch<UserAuth>({
+    initialUrl: '/users/self',
+    method: 'GET',
+    onMount: false,
+  });
+
+  useEffect(() => {
+    if (data && !error) {
+      onSuccess(data);
+    }
+  }, [data, error, onSuccess]);
+
+  return {
+    loginData: data,
+    loginIsLoading: isLoading,
+    loginError: error,
+    login: refetch,
+  };
+}
+
+function useLogout({ onSuccess }: { onSuccess: () => unknown }) {
+  const { refetch, isLoading, data, error } = useFetch({
+    initialUrl: '/auth/logout',
+    method: 'GET',
+    onMount: false,
+  });
+
+  useEffect(() => {
+    if (data && !error) {
+      onSuccess();
+    }
+  }, [data, error, onSuccess]);
+
+  return {
+    logoutData: data,
+    logoutIsLoading: isLoading,
+    logoutError: error,
+    logout: refetch,
+  };
 }
 
 export default AuthConsumer;
