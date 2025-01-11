@@ -13,12 +13,12 @@ function useChatAuth({ server }: { server: Server }) {
       setUserRoles(allowedRoles);
       return;
     }
-    if (user._id === server._id) {
+    if (user._id === server.ownerId) {
       allowedRoles.push(ChatRole.Admin);
     }
 
     setUserRoles(allowedRoles);
-  }, [user?._id, server._id]);
+  }, [user?._id, server.ownerId]);
 
   return { userRoles };
 }
