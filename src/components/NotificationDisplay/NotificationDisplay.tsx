@@ -36,16 +36,20 @@ function NotificationDisplay() {
     };
   }, [socket, channelId]);
 
+  const dismissCurrentEvent = useCallback(() => {
+    setEventQueue((eq) => eq.slice(1));
+    setCurrentEvent(null);
+  }, []);
+
   // display queued events
   useEffect(() => {
     if (eventQueue.length > 0 && currentEvent === null) {
       setCurrentEvent(eventQueue[0]);
       setTimeout(() => {
-        setEventQueue((eq) => eq.slice(1));
-        setCurrentEvent(null);
+        dismissCurrentEvent();
       }, NOTIFICATION_DISPLAY_TIME);
     }
-  }, [eventQueue, currentEvent]);
+  }, [eventQueue, currentEvent, dismissCurrentEvent]);
 
   const handleClickNotification = useCallback(() => {
     if (currentEvent === null) {
@@ -55,7 +59,8 @@ function NotificationDisplay() {
     if (serverId && chatId) {
       navigate(`/app/channels/${serverId}/${chatId}`);
     }
-  }, [currentEvent, navigate]);
+    dismissCurrentEvent();
+  }, [currentEvent, navigate, dismissCurrentEvent]);
 
   return currentEvent ? (
     <Notification
