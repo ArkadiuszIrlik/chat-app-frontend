@@ -3,9 +3,6 @@ import { Extension } from '@tiptap/core';
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     NewlineExtension: {
-      /**
-       * Comments will be added to the autocomplete.
-       */
       addNewline: () => ReturnType;
     };
   }
@@ -22,6 +19,7 @@ const NewlineExtension = Extension.create({
           const { paragraph } = schema.nodes;
 
           const transaction = tr
+            .deleteSelection()
             .replaceSelectionWith(paragraph.create(), true)
             .scrollIntoView();
           if (dispatch) dispatch(transaction);
@@ -31,7 +29,7 @@ const NewlineExtension = Extension.create({
   },
   addKeyboardShortcuts() {
     return {
-      'Ctrl-Enter': () => this.editor.commands.addNewline(),
+      'Mod-Enter': () => this.editor.commands.addNewline(),
     };
   },
 });
