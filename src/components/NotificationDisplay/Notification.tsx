@@ -1,3 +1,4 @@
+import { UserProfileImage } from '@components/UserProfileImage';
 import { useEffect } from 'react';
 
 function Notification({
@@ -22,30 +23,26 @@ function Notification({
     <div className="fixed bottom-10 right-10 z-30">
       <button
         type="button"
-        className="h-40 w-64 rounded-lg bg-gray-600 px-5 py-4 shadow-md"
+        className="flex h-40 w-64 items-stretch overflow-hidden rounded-lg bg-gray-600 px-5 py-4 shadow-md"
         onClick={onClick}
       >
-        <div className="mb-1 flex items-center gap-3">
-          <img
-            src={authorImg}
-            alt=""
-            className="aspect-square w-10 rounded-full"
-          />
-          <div>
-            <h4 className="overflow-hidden text-ellipsis whitespace-nowrap font-semibold leading-tight">
-              {authorName}
-            </h4>
-            {channelName && (
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                (#{channelName})
-              </div>
-            )}
+        <div className="overflow-hidden">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="aspect-square h-10 w-10 shrink-0 grow-0">
+              <UserProfileImage image={authorImg} />
+            </div>
+            <div className="overflow-hidden">
+              <h4 className="truncate font-semibold leading-tight">
+                {authorName}
+              </h4>
+              {channelName && <div className="truncate">(#{channelName})</div>}
+            </div>
           </div>
+          <div
+            className="line-clamp-3 text-left text-gray-100"
+            dangerouslySetInnerHTML={{ __html: text }}
+          />
         </div>
-        <div
-          className="line-clamp-3 text-left"
-          dangerouslySetInnerHTML={{ __html: text }}
-        />
       </button>
     </div>
   );
