@@ -21,8 +21,8 @@ interface UserAuth {
 
 function useAuth() {
   const [user, setUser] = useState<UserAuth | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isFirstLogin, setIsFirstLogin] = useState(true);
+  const isAuthenticated = !!user;
   const isSetupComplete = user?.accountStatus === UserAccountStatus.Approved;
 
   const handleUserLogin = useCallback((nextUser: UserAuth) => {
@@ -60,14 +60,6 @@ function useAuth() {
   const { logoutData, logoutIsLoading, logoutError, logout } = useLogout({
     onSuccess: handleUserLogout,
   });
-
-  useEffect(() => {
-    if (user !== null) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, [user]);
 
   const changeOnlineStatus = useCallback((nextStatus: UserOnlineStatus) => {
     setUser((u) => {
