@@ -36,7 +36,7 @@ function ProtectedRoute() {
 function LoadingScreen() {
   const { isReady } = useDelay({ delay: 300 });
   return isReady ? (
-    <div className="flex min-h-screen w-full items-center justify-center">
+    <div className="flex min-h-dvh w-full items-center justify-center">
       Loading...
     </div>
   ) : null;
