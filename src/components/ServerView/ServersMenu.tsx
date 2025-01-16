@@ -40,7 +40,7 @@ function ServersMenu({ onCloseMenu }: { onCloseMenu?: () => void }) {
           onCloseServersMenu={onCloseMenu ?? defaultOnCloseServerMenu}
         />
       )}
-      <div className="flex items-center gap-1">
+      <div className="mb-2 flex items-center gap-1 py-1">
         {onCloseMenu && (
           <button
             type="button"

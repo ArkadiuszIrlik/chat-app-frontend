@@ -53,7 +53,7 @@ function ChannelList({
     <div className="flex min-h-0 w-full flex-col">
       <div className="relative">
         <div
-          className="group relative z-0 mb-2 flex overflow-clip rounded-md p-1
+          className="group relative z-0 mb-2 flex overflow-clip rounded-md py-1
            using-mouse:hover:bg-gray-600"
           ref={serverHeaderDropdown}
         >

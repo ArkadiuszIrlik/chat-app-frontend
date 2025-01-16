@@ -29,13 +29,13 @@ function SettingsContainer({
       >
         {isExtraSmallScreen && (
           <div className="w-52 bg-gray-700 px-2 py-2">
-            <h1 className="mb-2 text-xl text-gray-200">{label}</h1>
+            <h1 className="mb-2 py-1 text-xl text-gray-200">{label}</h1>
           </div>
         )}
         <div className="grow bg-gray-700">
           <div className="flex px-4 py-3">
             {!isExtraSmallScreen && (
-              <h1 className="mb-2 text-xl text-gray-200">{label}</h1>
+              <h1 className="mb-2 py-1 text-xl text-gray-200">{label}</h1>
             )}
             <button
               type="button"
