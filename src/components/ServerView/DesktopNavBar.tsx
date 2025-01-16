@@ -18,11 +18,12 @@ function DesktopNavBar({
       <div>
         <button
           type="button"
-          className={`group mb-1 flex w-full items-center gap-2 truncate rounded-md px-2 py-1 ${
-            isServersMenuOpen
-              ? 'bg-gray-600 hover:bg-gray-500'
-              : 'hover:bg-gray-600'
-          }`}
+          className={`group mb-1 flex w-full items-center gap-2 truncate
+             rounded-md px-2 py-1 ${
+               isServersMenuOpen
+                 ? 'bg-gray-600 using-mouse:hover:bg-gray-500'
+                 : 'using-mouse:hover:bg-gray-600'
+             }`}
           onClick={onOpenServers}
         >
           <div
