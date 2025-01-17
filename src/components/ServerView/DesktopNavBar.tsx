@@ -9,9 +9,11 @@ const serversStyles: ExtendedCSSProperties = {
 function DesktopNavBar({
   isServersMenuOpen,
   onOpenServers,
+  onCloseServers,
 }: {
   isServersMenuOpen: boolean;
   onOpenServers: () => void;
+  onCloseServers: () => unknown;
 }) {
   return (
     <div className="mb-1 border-t-2 border-t-gray-500 pt-1">
@@ -19,12 +21,18 @@ function DesktopNavBar({
         <button
           type="button"
           className={`group mb-1 flex w-full items-center gap-2 truncate
-             rounded-md px-2 py-1 ${
-               isServersMenuOpen
-                 ? 'bg-gray-600 using-mouse:hover:bg-gray-500'
-                 : 'using-mouse:hover:bg-gray-600'
-             }`}
-          onClick={onOpenServers}
+            rounded-md px-2 py-1 ${
+              isServersMenuOpen
+                ? 'bg-gray-600 using-mouse:hover:bg-gray-500'
+                : 'using-mouse:hover:bg-gray-600'
+            }`}
+          onClick={() => {
+            if (isServersMenuOpen) {
+              onCloseServers();
+            } else {
+              onOpenServers();
+            }
+          }}
         >
           <div
             className={`alpha-mask ${

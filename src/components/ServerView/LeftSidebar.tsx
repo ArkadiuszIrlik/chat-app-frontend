@@ -64,6 +64,7 @@ function LeftSidebar({ server, isServerLoading, isEmptyServerList }: Props) {
         <DesktopNavBar
           isServersMenuOpen={isEmptyServerList ? true : isServersMenuOpen}
           onOpenServers={handleOpenServersMenu}
+          onCloseServers={handleCloseServersMenu}
         />
         <UserBar />
       </div>
