@@ -1,6 +1,7 @@
 {
   "name": "chat-app",
   "private": false,
+  "sideEffects": false,
   "description": "A real-time communications app built on WebHooks.",
   "version": "0.0.1",
   "type": "module",
