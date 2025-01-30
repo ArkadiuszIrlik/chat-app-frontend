@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import eslint from 'vite-plugin-eslint';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -25,7 +26,7 @@ export default defineConfig(({ mode }) => {
         key,
       },
     },
-    plugins: [react(), eslint()],
+    plugins: [react(), eslint(), mode === 'development' && visualizer()],
     resolve: {
       alias: [
         { find: '@assets', replacement: '/src/assets' },
