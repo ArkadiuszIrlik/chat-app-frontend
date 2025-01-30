@@ -1,17 +1,50 @@
-import { AppScreen, NavigateAwayFromAppScreen } from '@containers/AppScreen';
+import { NavigateAwayFromAppScreen } from '@containers/AppScreen';
 import { HomeScreen } from '@containers/HomeScreen';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@src/App';
 import { ProtectedRoute } from '@components/ProtectedRoute';
-import { ServerView, ServerViewLoader } from '@components/ServerView';
-import { ChatDisplay } from '@components/ChatDisplay';
+import { ServerViewLoader } from '@components/ServerView';
 import { AuthScreen } from '@containers/AuthScreen';
 import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
 import { EmailVerification } from '@components/EmailVerification';
-import { ServerSettings } from '@components/ServerSettings';
-import { ChannelSettings } from '@components/ChannelSettings';
-import { ChannelGroupSettings } from '@components/ChannelGroupSettings';
+import { lazy } from 'react';
+
+const LazyAppScreen = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.AppScreen,
+  })),
+);
+const LazyServerView = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.ServerView,
+  })),
+);
+const LazyChatDisplay = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.ChatDisplay,
+  })),
+);
+const LazySettingsScreen = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.SettingsScreen,
+  })),
+);
+const LazyServerSettings = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.ServerSettings,
+  })),
+);
+const LazyChannelGroupSettings = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.ChannelGroupSettings,
+  })),
+);
+const LazyChannelSettings = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.ChannelSettings,
+  })),
+);
 
 const router = createBrowserRouter([
   {
@@ -43,31 +76,35 @@ const router = createBrowserRouter([
         children: [
           {
             path: '/app',
-            element: <AppScreen />,
+            element: <LazyAppScreen />,
             children: [
               { path: '', element: <NavigateAwayFromAppScreen /> },
               {
                 path: 'channels/:serverId?',
-                element: <ServerView />,
+                element: <LazyServerView />,
                 loader: ServerViewLoader,
                 children: [
                   {
                     path: ':channelId',
-                    element: <ChatDisplay />,
+                    element: <LazyChatDisplay />,
                   },
                 ],
               },
               {
+                path: 'settings',
+                element: <LazySettingsScreen />,
+              },
+              {
                 path: 'server-settings/:serverId',
-                element: <ServerSettings />,
+                element: <LazyServerSettings />,
               },
               {
                 path: 'channel-group-settings/:serverId/:channelGroupId',
-                element: <ChannelGroupSettings />,
+                element: <LazyChannelGroupSettings />,
               },
               {
                 path: 'channel-settings/:serverId/:channelId',
-                element: <ChannelSettings />,
+                element: <LazyChannelSettings />,
               },
             ],
           },
