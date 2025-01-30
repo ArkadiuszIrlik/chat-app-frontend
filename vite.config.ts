@@ -39,5 +39,36 @@ export default defineConfig(({ mode }) => {
         { find: '@utils', replacement: '/utils' },
       ],
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              const chatVendorDeps = ['@tiptap'];
+              const isChatVendorDep = chatVendorDeps.some((dep) =>
+                id.includes(dep),
+              );
+              if (isChatVendorDep) {
+                return 'chat-vendor';
+              }
+
+              const vendorDeps = [
+                'react',
+                'socket.io-client',
+                'swr',
+                'formik',
+                'yup',
+                'tailwindcss',
+                'dayjs',
+              ];
+              const isVendorDep = vendorDeps.some((dep) => id.includes(dep));
+              if (isVendorDep) {
+                return 'vendor';
+              }
+            }
+          },
+        },
+      },
+    },
   };
 });
