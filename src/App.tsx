@@ -3,8 +3,20 @@ import { Outlet } from 'react-router-dom';
 import { AuthProvider } from '@hooks/useAuth';
 import { SWRConfigProvider } from '@components/SWRConfigProvider';
 import { IsTouchInputProvider } from '@hooks/useIsTouchInput';
+import { useEffect } from 'react';
 
 function App() {
+  useEffect(() => {
+    function handlePreloadError() {
+      window.location.reload();
+    }
+    window.addEventListener('vite:preloadError', handlePreloadError);
+
+    return () => {
+      window.removeEventListener('vite:preloadError', handlePreloadError);
+    };
+  }, []);
+
   // const isSocketConnected = useSocketStatus();
   return (
     <AuthProvider>
