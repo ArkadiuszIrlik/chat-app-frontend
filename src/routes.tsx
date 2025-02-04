@@ -8,7 +8,7 @@ import { AuthScreen } from '@containers/AuthScreen';
 import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
 import { EmailVerification } from '@components/EmailVerification';
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 
 const LazyAppScreen = lazy(() =>
   import('@src/routes/app').then((module) => ({
@@ -76,7 +76,11 @@ const router = createBrowserRouter([
         children: [
           {
             path: '/app',
-            element: <LazyAppScreen />,
+            element: (
+              <Suspense>
+                <LazyAppScreen />
+              </Suspense>
+            ),
             children: [
               { path: '', element: <NavigateAwayFromAppScreen /> },
               {
