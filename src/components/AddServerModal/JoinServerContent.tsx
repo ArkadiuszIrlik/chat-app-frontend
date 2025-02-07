@@ -1,30 +1,31 @@
-import { Formik, Form } from 'formik';
-import Yup from '@src/extendedYup';
-import {
-  ErrorDisplay,
-  SubmitButtonPrimary,
-  SubmittingUpdater,
-  TextInput,
-} from '@components/form-controls';
+import { ErrorDisplay } from '@components/form-controls';
 import useFetch from '@hooks/useFetch';
-import { serverInviteSchema } from '@constants/validationSchema';
 import { useServerStore } from '@hooks/index';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { exampleServerInviteLink, serverInviteRegex } from '@constants/apiData';
+import { ServerImage } from '@components/ServerImage';
+import { PrimaryButton } from '@components/PrimaryButton';
 
 function JoinServerContent({
+  inviteCode,
+  server,
   onNavigateBack,
   onCloseModal,
   onCloseServersMenu,
 }: {
+  inviteCode: string;
+  server: Server | null;
   onNavigateBack: () => void;
   onCloseModal: () => void;
   onCloseServersMenu: () => void;
 }) {
   const [postData, setPostData] = useState<{ inviteCode: string }>({
-    inviteCode: '',
+    inviteCode,
   });
+  useEffect(() => {
+    setPostData({ inviteCode });
+  }, [inviteCode]);
+
   const { refetch, hasError, errorMessage, data, isLoading } = useFetch({
     initialUrl: `servers/invites`,
     method: 'POST',
@@ -37,12 +38,14 @@ function JoinServerContent({
 
   useEffect(() => {
     if (!hasError && data && addToStore) {
-      const { server } = data.data as { server: Server | undefined };
-      if (!server) {
+      const { server: nextServer } = data.data as {
+        server: Server | undefined;
+      };
+      if (!nextServer) {
         return;
       }
-      addToStore(server);
-      navigate(`/app/channels/${server._id}`);
+      addToStore(nextServer);
+      navigate(`/app/channels/${nextServer._id}`);
       onCloseModal();
       onCloseServersMenu();
     }
@@ -50,57 +53,47 @@ function JoinServerContent({
 
   return (
     <div className="flex flex-col items-start">
-      <Formik
-        initialValues={{
-          invite: '',
-        }}
-        validationSchema={Yup.object({
-          invite: serverInviteSchema.invite.required(
-            'Please enter an invite link or code.',
-          ),
-        })}
-        onSubmit={(values, { setSubmitting }) => {
-          const inviteMatch = values.invite.match(serverInviteRegex);
-
-          if (inviteMatch === null) {
-            setSubmitting(false);
-            return;
-          }
-          const inviteCode = inviteMatch[1] || inviteMatch[2];
-          setPostData({ inviteCode });
-          refetch();
-        }}
-      >
-        <Form className="flex flex-col">
-          {hasError && (
-            <div className="max-w-prose">
-              <ErrorDisplay errorMessage={errorMessage} />
-            </div>
-          )}
-          <div className="mb-4 w-80">
-            <TextInput
-              label="Enter your invite link or code"
-              name="invite"
-              id="invite"
-              type="text"
-              placeholder={exampleServerInviteLink}
-            />
+      {hasError && (
+        <div className="max-w-prose">
+          <ErrorDisplay errorMessage={errorMessage} />
+        </div>
+      )}
+      {server ? (
+        <div className="flex items-center gap-4">
+          <div className="aspect-square h-20 w-20">
+            <ServerImage image={server.serverImg} />
           </div>
-          <SubmittingUpdater isFetchLoading={isLoading} />
-          <div className="mb-3 flex items-center gap-10">
-            <button
-              type="button"
-              onClick={onNavigateBack}
-              className="block w-32 underline-offset-2 hover:underline"
-            >
-              Back
-            </button>
-            <div className="w-32">
-              <SubmitButtonPrimary>Join&nbsp;server</SubmitButtonPrimary>
+          <div>
+            <div className="text-xl text-gray-100">{server.name}</div>
+            <div className="text-gray-200">
+              <span className="font-bold">
+                {server.members.length.toLocaleString('en-US')}
+              </span>{' '}
+              members
             </div>
           </div>
-        </Form>
-      </Formik>
+        </div>
+      ) : (
+        <div className="text-gray-200">Server not found</div>
+      )}
+      <div className="mx-auto mb-3 mt-2 flex items-center gap-10">
+        <button
+          type="button"
+          onClick={onNavigateBack}
+          className="block w-32 underline-offset-2 hover:underline"
+        >
+          Back
+        </button>
+        <div className="w-32">
+          <PrimaryButton
+            type="button"
+            onClickHandler={() => refetch()}
+            disabled={isLoading}
+          >
+            Join&nbsp;server
+          </PrimaryButton>
+        </div>
+      </div>
     </div>
   );
 }
