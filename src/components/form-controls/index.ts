@@ -6,6 +6,8 @@ export * from './ImageFileInput';
 export { default as ImageFileInput } from './ImageFileInput';
 export * from './SubmittingUpdater';
 export { default as SubmittingUpdater } from './SubmittingUpdater';
+export * from './SelectInput';
+export { default as SelectInput } from './SelectInput';
 export * from './ErrorDisplay';
 export { default as ErrorDisplay } from './ErrorDisplay';
 export * from './FormikValueUpdater';
