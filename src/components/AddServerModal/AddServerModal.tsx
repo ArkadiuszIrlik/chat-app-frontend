@@ -1,16 +1,22 @@
 import { ModalOverlay } from '@components/ModalOverlay';
 import CloseIcon from '@assets/close-icon.png';
 import { ExtendedCSSProperties } from '@src/types';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import AddServerContent from '@components/AddServerModal/AddServerContent';
-import JoinServerContent from '@components/AddServerModal/JoinServerContent';
 import CreateServerContent from '@components/AddServerModal/CreateServerContent';
+import EnterServerInviteContent from '@components/AddServerModal/EnterServerInviteContent';
+import JoinServerContent from '@components/AddServerModal/JoinServerContent';
 
 const closeIconStyles: ExtendedCSSProperties = {
   '--mask-url': `url(${CloseIcon})`,
 };
 
-const modalRouteKeys = ['addServer', 'joinServer', 'createServer'] as const;
+const modalRouteKeys = [
+  'addServer',
+  'enterInvite',
+  'joinServer',
+  'createServer',
+] as const;
 
 function AddServerModal({
   onCloseModal,
@@ -22,20 +28,39 @@ function AddServerModal({
   const [activeRouteId, setActiveRouteId] =
     useState<(typeof modalRouteKeys)[number]>('addServer');
 
+  const [inviteCode, setInviteCode] = useState('');
+  const [serverToJoin, setServerToJoin] = useState<Server | null>(null);
+  const handleValidInvite = useCallback((invite: string, server: Server) => {
+    setInviteCode(invite);
+    setServerToJoin(server);
+    setActiveRouteId('joinServer');
+  }, []);
+
   const modalRoutes = {
     addServer: {
       header: 'Add server',
       content: (
         <AddServerContent
-          onJoinServer={() => setActiveRouteId('joinServer')}
+          onJoinServer={() => setActiveRouteId('enterInvite')}
           onCreateServer={() => setActiveRouteId('createServer')}
         />
       ),
     },
-    joinServer: {
+    enterInvite: {
       header: 'Join server',
       content: (
+        <EnterServerInviteContent
+          onValidInvite={handleValidInvite}
+          onNavigateBack={() => setActiveRouteId('addServer')}
+        />
+      ),
+    },
+    joinServer: {
+      header: 'Invited to server',
+      content: (
         <JoinServerContent
+          inviteCode={inviteCode}
+          server={serverToJoin}
           onNavigateBack={() => setActiveRouteId('addServer')}
           onCloseModal={onCloseModal}
           onCloseServersMenu={onCloseServersMenu}
