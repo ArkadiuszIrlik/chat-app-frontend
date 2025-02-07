@@ -5,3 +5,4 @@ export { SettingsScreen } from '@containers/SettingsScreen';
 export { ServerSettings } from '@components/ServerSettings';
 export { ChannelSettings } from '@components/ChannelSettings';
 export { ChannelGroupSettings } from '@components/ChannelGroupSettings';
+export { ServerInviteScreen } from '@containers/ServerInviteScreen';

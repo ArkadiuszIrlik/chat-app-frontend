@@ -45,6 +45,11 @@ const LazyChannelSettings = lazy(() =>
     default: module.ChannelSettings,
   })),
 );
+const LazyServerInviteScreen = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.ServerInviteScreen,
+  })),
+);
 
 const router = createBrowserRouter([
   {
@@ -109,6 +114,19 @@ const router = createBrowserRouter([
               {
                 path: 'channel-settings/:serverId/:channelId',
                 element: <LazyChannelSettings />,
+              },
+              {
+                element: (
+                  <div className="w-full">
+                    <AuthScreen />
+                  </div>
+                ),
+                children: [
+                  {
+                    path: 'invite/:inviteCode?',
+                    element: <LazyServerInviteScreen />,
+                  },
+                ],
               },
             ],
           },
