@@ -74,20 +74,6 @@
 }
 
 @layer components {
-  .beluga-mask {
-    mask-image: url(./assets/beluga-black-logo.png);
-    mask-mode: alpha;
-    mask-size: contain;
-    mask-position: center;
-  }
-
-  .exclamation-mask {
-    mask-image: url(./assets/exclamation-point-128.png);
-    mask-mode: alpha;
-    mask-size: contain;
-    mask-position: center;
-  }
-
   .alpha-mask {
     mask-image: var(--mask-url);
     mask-mode: alpha;
