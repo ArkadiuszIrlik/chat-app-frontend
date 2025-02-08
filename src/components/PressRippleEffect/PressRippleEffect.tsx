@@ -1,5 +1,6 @@
 import usePressRippleEffect from '@components/PressRippleEffect/usePressRippleEffect';
 
+/** Requires "relative z-0" on parent */
 function PressRippleEffect({
   attributes,
 }: {
