@@ -1,5 +1,7 @@
 export * from './TextInput';
 export { default as TextInput } from './TextInput';
+export * from './TextOutput';
+export { default as TextOutput } from './TextOutput';
 export * from './SubmitButtonPrimary';
 export { default as SubmitButtonPrimary } from './SubmitButtonPrimary';
 export * from './ImageFileInput';
