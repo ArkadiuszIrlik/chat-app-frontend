@@ -1,5 +1,5 @@
 export { ChatDisplay } from '@components/ChatDisplay';
-export { default as AppScreen } from '@containers/AppScreen';
+export { AppScreen } from '@containers/AppScreen';
 export { ServerView } from '@components/ServerView';
 export { SettingsScreen } from '@containers/SettingsScreen';
 export { ServerSettings } from '@components/ServerSettings';
