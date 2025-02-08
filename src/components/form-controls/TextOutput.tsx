@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import FieldError from '@components/form-controls/FieldError';
 import styleConsts from '@constants/styleConsts';
 import { useField, FieldHookConfig } from 'formik';
 import { ClassAttributes, OutputHTMLAttributes } from 'react';
@@ -54,10 +55,7 @@ function TextOutput({
         )}
       </output>
       {meta.touched && meta.error ? (
-        <div className="flex items-center gap-2">
-          <div className="exclamation-mask aspect-square h-5 w-5 bg-red-300" />
-          <p className="text-red-300">{meta.error}</p>
-        </div>
+        <FieldError errorMessage={meta.error} />
       ) : null}
     </>
   );
