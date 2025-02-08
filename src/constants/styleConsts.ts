@@ -53,10 +53,10 @@ export default {
     },
   },
   screens: {
-    xs: '36rem',
-    sm: '48rem',
-    md: '64rem',
-    lg: '85.375rem',
+    xs: '36rem', // 576px
+    sm: '48rem', // 768px
+    md: '64rem', // 1024px
+    lg: '85.375rem', // 1366px
     xl: '120rem',
     '2xl': '160rem',
   },
