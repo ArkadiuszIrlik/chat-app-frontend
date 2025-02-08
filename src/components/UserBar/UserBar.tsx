@@ -59,10 +59,11 @@ function UserBar() {
   );
 }
 
+const styleObj: ExtendedCSSProperties = {
+  '--mask-url': `url(${SettingsIcon})`,
+};
+
 function SettingsLink() {
-  const styleObj: ExtendedCSSProperties = {
-    '--mask-url': `url(${SettingsIcon})`,
-  };
 
   return (
     <Link
