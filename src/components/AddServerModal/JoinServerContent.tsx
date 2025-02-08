@@ -74,7 +74,7 @@ function JoinServerContent({
           </div>
         </div>
       ) : (
-        <div className="text-gray-200">Server not found</div>
+        <div className="mx-auto mb-5 mt-3 text-gray-200">Server not found</div>
       )}
       <div className="mx-auto mb-3 mt-2 flex items-center gap-10">
         <button
@@ -88,7 +88,7 @@ function JoinServerContent({
           <PrimaryButton
             type="button"
             onClickHandler={() => refetch()}
-            disabled={isLoading}
+            disabled={!server || isLoading}
           >
             Join&nbsp;server
           </PrimaryButton>
