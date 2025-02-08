@@ -8,6 +8,7 @@ import { AuthScreen } from '@containers/AuthScreen';
 import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
 import { EmailVerification } from '@components/EmailVerification';
+import { CompleteAccountSetup } from '@components/CompleteAccountSetup';
 import { lazy, Suspense } from 'react';
 
 const LazyAppScreen = lazy(() =>
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
           {
             path: '/verify-email',
             element: <EmailVerification />,
+          },
+          {
+            path: '/complete-account',
+            element: <CompleteAccountSetup />,
           },
         ],
       },
