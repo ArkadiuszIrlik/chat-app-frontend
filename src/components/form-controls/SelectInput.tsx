@@ -28,11 +28,12 @@ function SelectInput({
       </label>
       <div className="relative flex w-full items-center">
         <select
-          className={`mb-1 w-full appearance-none rounded-lg border-solid ${
-            meta.touched && meta.error
-              ? 'border-2 border-red-400'
-              : 'border-b-2 border-[hsla(0,_0%,_70%,_.15)]'
-          } bg-gray-800 p-2 shadow-inner`}
+          className={`mb-1 w-full appearance-none rounded-lg border-solid
+             text-gray-100 ${
+               meta.touched && meta.error
+                 ? 'border-2 border-red-400'
+                 : 'border-b-2 border-[hsla(0,_0%,_70%,_.15)]'
+             } bg-gray-800 p-2 shadow-inner`}
           {...field}
           {...props}
         />

@@ -24,7 +24,7 @@ function TextOutput({
         {label}
       </label>
       <output
-        className={`mb-1 block w-full rounded-lg border-solid ${
+        className={`mb-1 block w-full rounded-lg border-solid text-gray-100 ${
           meta.touched && meta.error
             ? 'border-2 border-red-400'
             : 'border-b-2 border-[hsla(0,_0%,_70%,_.15)]'
