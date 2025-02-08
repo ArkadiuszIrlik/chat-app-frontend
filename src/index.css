@@ -42,6 +42,11 @@
     @apply bg-gray-800;
   }
 
+  /* Disables browser back/forward navigation on swipe gestures */
+  body {
+    overscroll-behavior-x: none;
+  }
+
   dialog {
     background-color: transparent;
   }
