@@ -13,12 +13,6 @@ import { SocketEvents, UserOnlineStatus } from '@src/types';
 function useSocket() {
   const { logout } = useAuth()!;
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [messageEvents, setMessageEvents] = useState<Message[]>([]);
-  const [statusEvents, setStatusEvents] = useState<
-    { userId: string; nextStatus: UserOnlineStatus }[]
-  >([]);
-  const [serverUpdateEvents, setServerUpdateEvents] = useState<string[]>([]);
-  const [serverDeleteEvents, setServerDeleteEvents] = useState<string[]>([]);
 
   useEffect(() => {
     socket.connect();
@@ -42,45 +36,19 @@ function useSocket() {
   }, []);
 
   useEffect(() => {
-    function onMessageEvent(nextEvent: NetworkMessage) {
-      const nextMessageEvent: Message = {
-        ...nextEvent,
-        postedAt: new Date(nextEvent.postedAt),
-      };
-      setMessageEvents((me) => [...me, nextMessageEvent]);
-    }
-
     function onAuthError() {
       void logout();
     }
 
-    function onStatusEvent(userId: string, nextStatus: UserOnlineStatus) {
-      const nextStatusEvent = {
-        userId,
-        nextStatus,
-      };
-      setStatusEvents((se) => [...se, nextStatusEvent]);
+    function onServerUpdateEvent() {
+      socket.emit(SocketEvents.UpdateServerList, () => undefined);
     }
 
-    function onServerUpdateEvent(serverId: string) {
-      setServerUpdateEvents((se) => [...se, serverId]);
-    }
-
-    function onServerDeleteEvent(serverId: string) {
-      setServerDeleteEvents((se) => [...se, serverId]);
-    }
-
-    socket.on(SocketEvents.ChatMessage, onMessageEvent);
     socket.on(SocketEvents.AuthenticationError, onAuthError);
-    socket.on(SocketEvents.OnlineStatusChanged, onStatusEvent);
     socket.on(SocketEvents.ServerUpdated, onServerUpdateEvent);
-    socket.on(SocketEvents.ServerDeleted, onServerDeleteEvent);
     return () => {
-      socket.off(SocketEvents.ChatMessage, onMessageEvent);
       socket.off(SocketEvents.AuthenticationError, onAuthError);
-      socket.off(SocketEvents.OnlineStatusChanged, onStatusEvent);
       socket.off(SocketEvents.ServerUpdated, onServerUpdateEvent);
-      socket.off(SocketEvents.ServerDeleted, onServerDeleteEvent);
     };
   }, [logout]);
 
@@ -147,10 +115,6 @@ function useSocket() {
   return {
     socket,
     isConnected,
-    messageEvents,
-    statusEvents,
-    serverUpdateEvents,
-    serverDeleteEvents,
     getUsersStatus,
     sendChatMessage,
     changeOnlineStatus,
