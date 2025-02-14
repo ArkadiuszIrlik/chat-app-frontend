@@ -1,4 +1,4 @@
-import MessageInput from '@components/ChatDisplay/MessageInput';
+import MessageInput from '@components/ChatDisplay/MessageInput/MessageInput';
 import { ChatMessage } from '@components/ChatMessage';
 import { useChatMessages } from '@hooks/index';
 import { useCallback, useEffect, useRef, useState } from 'react';
