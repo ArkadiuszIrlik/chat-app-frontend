@@ -5,7 +5,6 @@ const serversStyles: ExtendedCSSProperties = {
   '--mask-url': `url(${ServersIcon})`,
 };
 
-
 function DesktopNavBar({
   isServersMenuOpen,
   onOpenServers,
