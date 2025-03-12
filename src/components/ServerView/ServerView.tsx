@@ -161,7 +161,7 @@ function useSocketInteraction({
   serverId: string | undefined;
   mutate: KeyedMutator<Server>;
 }) {
-  const { socket } = useSocket() ?? {};
+  const { socket, isConnected } = useSocket() ?? {};
   const navigate = useNavigate();
   useEffect(() => {
     if (!socket) {
@@ -189,10 +189,12 @@ function useSocketInteraction({
   }, [socket, serverId, mutate, navigate]);
 
   useEffect(() => {
-    if (socket) {
-      socket.emit(SocketEvents.StartDemo);
+    if (socket && isConnected) {
+      setTimeout(() => {
+        socket.emit(SocketEvents.StartDemo);
+      }, 1000);
     }
-  }, [socket]);
+  }, [socket, isConnected]);
 }
 
 function DesktopServerView({
