@@ -9,6 +9,7 @@ import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
 import { EmailVerification } from '@components/EmailVerification';
 import { CompleteAccountSetup } from '@components/CompleteAccountSetup';
+import { DemoLoadingScreen } from '@containers/DemoLoadingScreen';
 import { lazy, Suspense } from 'react';
 
 const LazyAppScreen = lazy(() =>
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <HomeScreen />,
+      },
+      {
+        path: '/demo',
+        element: <DemoLoadingScreen />,
       },
       {
         element: <AuthScreen />,
