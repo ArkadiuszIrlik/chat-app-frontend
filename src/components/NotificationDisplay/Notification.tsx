@@ -20,10 +20,14 @@ function Notification({
     onDisplayNotification();
   }, [onDisplayNotification]);
   return (
-    <div className="fixed bottom-10 right-10 z-30">
+    <div
+      className="fixed left-2 right-2 top-10 z-30 xs:left-auto sm:bottom-10
+     sm:left-auto sm:right-10 sm:top-auto"
+    >
       <button
         type="button"
-        className="flex h-40 w-64 items-stretch overflow-hidden rounded-lg bg-gray-600 px-5 py-4 shadow-md"
+        className="flex max-h-32 w-full items-stretch overflow-hidden
+        rounded-lg bg-gray-600 px-5 py-4 shadow-md xs:w-64 sm:h-40 sm:max-h-none sm:w-64"
         onClick={onClick}
       >
         <div className="overflow-hidden">
@@ -39,7 +43,7 @@ function Notification({
             </div>
           </div>
           <div
-            className="line-clamp-3 text-left text-gray-100"
+            className="line-clamp-2 text-left text-gray-100 sm:line-clamp-3"
             dangerouslySetInnerHTML={{ __html: text }}
           />
         </div>

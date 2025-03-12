@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-import { styleConsts } from './src/constants';
+import styleConsts from './src/constants/styleConsts';
 import plugin from 'tailwindcss/plugin';
 
 export default {

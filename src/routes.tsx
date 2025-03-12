@@ -8,7 +8,8 @@ import { AuthScreen } from '@containers/AuthScreen';
 import { SignupForm } from '@components/SignupForm';
 import { LoginForm } from '@components/LoginForm';
 import { EmailVerification } from '@components/EmailVerification';
-import { lazy } from 'react';
+import { CompleteAccountSetup } from '@components/CompleteAccountSetup';
+import { lazy, Suspense } from 'react';
 
 const LazyAppScreen = lazy(() =>
   import('@src/routes/app').then((module) => ({
@@ -45,6 +46,11 @@ const LazyChannelSettings = lazy(() =>
     default: module.ChannelSettings,
   })),
 );
+const LazyServerInviteScreen = lazy(() =>
+  import('@src/routes/app').then((module) => ({
+    default: module.ServerInviteScreen,
+  })),
+);
 
 const router = createBrowserRouter([
   {
@@ -69,6 +75,10 @@ const router = createBrowserRouter([
             path: '/verify-email',
             element: <EmailVerification />,
           },
+          {
+            path: '/complete-account',
+            element: <CompleteAccountSetup />,
+          },
         ],
       },
       {
@@ -76,7 +86,11 @@ const router = createBrowserRouter([
         children: [
           {
             path: '/app',
-            element: <LazyAppScreen />,
+            element: (
+              <Suspense>
+                <LazyAppScreen />
+              </Suspense>
+            ),
             children: [
               { path: '', element: <NavigateAwayFromAppScreen /> },
               {
@@ -105,6 +119,19 @@ const router = createBrowserRouter([
               {
                 path: 'channel-settings/:serverId/:channelId',
                 element: <LazyChannelSettings />,
+              },
+              {
+                element: (
+                  <div className="w-full">
+                    <AuthScreen />
+                  </div>
+                ),
+                children: [
+                  {
+                    path: 'invite/:inviteCode?',
+                    element: <LazyServerInviteScreen />,
+                  },
+                ],
               },
             ],
           },

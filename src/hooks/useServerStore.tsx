@@ -1,18 +1,24 @@
+import { genericFetcherCredentials, HttpError } from '@helpers/fetch';
 import { useAuth, useSocket } from '@hooks/index';
 import { SocketEvents } from '@src/types';
 import {
+  Dispatch,
   ReactNode,
+  SetStateAction,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useState,
 } from 'react';
+import useSWR from 'swr';
 
 function useServerStore() {
   const { user } = useAuth() ?? {};
   const [serverList, setServerList] = useState<Server[]>(user?.serversIn ?? []);
   const { socket } = useSocket() ?? {};
+
+  useUpdateOnSocketEvent({ setServerList });
 
   const addToStore = useCallback(
     (serversToAdd: Server | Server[]) => {
@@ -86,6 +92,61 @@ export function ServerStoreProvider({ children }: { children: ReactNode }) {
 
 function ServerStoreConsumer() {
   return useContext(ServerStoreContext);
+}
+
+function useUpdateOnSocketEvent({
+  setServerList,
+}: {
+  setServerList: Dispatch<SetStateAction<Server[]>>;
+}) {
+  const { socket } = useSocket() ?? {};
+
+  const [serverIdToFetch, setServerIdToFetch] = useState('');
+  const {
+    data: fetchedServer,
+    error: errorLoadServer,
+    isLoading: isServerLoading,
+    mutate: refetchServer,
+  } = useSWR<Server, HttpError>(
+    `/servers/${serverIdToFetch}`,
+    genericFetcherCredentials,
+    {
+      revalidateOnMount: false,
+      revalidateOnFocus: false,
+    },
+  );
+
+  useEffect(() => {
+    function handleServerUpdate(serverId: string) {
+      setServerIdToFetch(serverId);
+      void refetchServer();
+    }
+    if (!socket) {
+      return undefined;
+    }
+    socket.on(SocketEvents.ServerUpdated, handleServerUpdate);
+
+    return () => {
+      socket.off(SocketEvents.ServerUpdated, handleServerUpdate);
+    };
+  }, [socket, refetchServer]);
+
+  useEffect(() => {
+    if (fetchedServer && !isServerLoading && !errorLoadServer) {
+      setServerList((sl) => {
+        const updatedId = fetchedServer._id;
+        const indexToReplace = sl.findIndex((el) => el._id === updatedId);
+        if (indexToReplace === -1) {
+          return sl;
+        }
+
+        const nextSL = [...sl];
+        nextSL.splice(indexToReplace, 1, fetchedServer);
+
+        return nextSL;
+      });
+    }
+  }, [fetchedServer, isServerLoading, errorLoadServer, setServerList]);
 }
 
 export default ServerStoreConsumer;

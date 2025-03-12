@@ -1,4 +1,10 @@
 import WaveImage from '@assets/wave.svg';
+import BelugaLogo from '@assets/beluga-black-logo.png';
+import { ExtendedCSSProperties } from '@src/types';
+
+const belugaLogoStyles: ExtendedCSSProperties = {
+  '--mask-url': `url(${BelugaLogo})`,
+};
 
 function HeaderSmall() {
   return (
@@ -6,7 +12,8 @@ function HeaderSmall() {
       <div className="relative mx-auto mt-20 w-4/5 max-w-80">
         <WaveImageEl />
         <div
-          className="beluga-mask aspect-square bg-gradient-to-tr
+          style={belugaLogoStyles}
+          className="alpha-mask aspect-square bg-gradient-to-tr
              from-clairvoyant-900 to-cerise-600 text-white"
         />
       </div>
@@ -27,7 +34,8 @@ function HeaderLarge() {
     <div className="relative ml-[10%] mt-20 w-[28%]">
       <WaveImageEl />
       <div
-        className="beluga-mask aspect-square bg-gradient-to-tr
+        style={belugaLogoStyles}
+        className="alpha-mask aspect-square bg-gradient-to-tr
                  from-clairvoyant-900 to-cerise-600 text-white"
       />
       <div className="absolute left-[65%] top-[70%] w-[50dvw]">

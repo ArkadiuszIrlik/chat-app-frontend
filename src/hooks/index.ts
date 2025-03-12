@@ -22,3 +22,5 @@ export * from './useBlockUnsaved';
 export { default as useBlockUnsaved } from './useBlockUnsaved';
 export * from './useMessageInput';
 export { default as useMessageInput } from './useMessageInput';
+export * from './useMessageCursorStore';
+export { default as useMessageCursorStore } from './useMessageCursorStore';

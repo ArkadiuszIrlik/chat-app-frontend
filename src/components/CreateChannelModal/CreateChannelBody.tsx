@@ -11,6 +11,22 @@ import useFetch from '@hooks/useFetch';
 import { useMemo, useState } from 'react';
 import { channelGroupSchema, channelSchema } from '@constants/validationSchema';
 
+interface PostDataNewCategory {
+  isNewCategory: true;
+  channelName: string;
+  channelCategoryName: string;
+  channelCategoryId?: never;
+}
+
+interface PostDataExistingCategory {
+  isNewCategory: false;
+  channelName: string;
+  channelCategoryId: string;
+  channelCategoryName?: never;
+}
+
+type PostDataType = PostDataNewCategory | PostDataExistingCategory;
+
 function CreateChannelBody({
   server,
   channelCategories,
@@ -22,14 +38,10 @@ function CreateChannelBody({
   onNavigateBack: () => void;
   onCloseModal: () => void;
 }) {
-  const [postData, setPostData] = useState<{
-    channelName: string;
-    channelCategory: string;
-    newChannelCategoryName: string;
-  }>({
+  const [postData, setPostData] = useState<PostDataType>({
+    isNewCategory: false,
     channelName: '',
-    channelCategory: '',
-    newChannelCategoryName: '',
+    channelCategoryId: '',
   });
 
   const channelCategoryOptionsList = useMemo(() => {
@@ -80,7 +92,20 @@ function CreateChannelBody({
           ),
         })}
         onSubmit={(values) => {
-          setPostData(values);
+          const isNewCategory = values.channelCategory === 'createNewCategory';
+          if (isNewCategory) {
+            setPostData({
+              channelName: values.channelName,
+              isNewCategory: true,
+              channelCategoryName: values.newChannelCategoryName,
+            });
+          } else {
+            setPostData({
+              channelName: values.channelName,
+              isNewCategory: false,
+              channelCategoryId: values.channelCategory,
+            });
+          }
           refetch();
         }}
       >

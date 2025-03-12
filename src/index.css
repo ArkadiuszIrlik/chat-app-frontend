@@ -42,6 +42,11 @@
     @apply bg-gray-800;
   }
 
+  /* Disables browser back/forward navigation on swipe gestures */
+  body {
+    overscroll-behavior-x: none;
+  }
+
   dialog {
     background-color: transparent;
   }
@@ -69,20 +74,6 @@
 }
 
 @layer components {
-  .beluga-mask {
-    mask-image: url(./assets/beluga-black-logo.png);
-    mask-mode: alpha;
-    mask-size: contain;
-    mask-position: center;
-  }
-
-  .exclamation-mask {
-    mask-image: url(./assets/exclamation-point-128.png);
-    mask-mode: alpha;
-    mask-size: contain;
-    mask-position: center;
-  }
-
   .alpha-mask {
     mask-image: var(--mask-url);
     mask-mode: alpha;
@@ -215,6 +206,12 @@
       transform-origin: left center;
       transform: scaleX(0);
     }
+  }
+
+  .indent-shadow {
+    box-shadow:
+      inset 0 -0.125rem 0 theme('backgroundColor.gray.500'),
+      inset 0 0.125rem 0.125rem theme('backgroundColor.gray.900');
   }
 }
 

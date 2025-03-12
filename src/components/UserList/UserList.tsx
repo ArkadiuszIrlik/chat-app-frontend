@@ -65,7 +65,7 @@ function UserList() {
       {isUserListLoading ? null : (
         <div>
           {onlineUsers.length > 0 && (
-            <div className="mb-1">
+            <div className="mb-5">
               <h3 className="mb-1">Online - {onlineUsers.length}</h3>
               {onlineUsers.map((user) => (
                 <UserCard

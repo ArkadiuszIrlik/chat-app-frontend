@@ -27,7 +27,7 @@ function AppScreen() {
                     <UserListProvider>
                       <ScrollOffsetProvider>
                         <MessageInputProvider>
-                          <div className="flex min-h-screen">
+                          <div className="flex min-h-dvh">
                             <NotificationDisplay />
                             <Outlet />
                           </div>

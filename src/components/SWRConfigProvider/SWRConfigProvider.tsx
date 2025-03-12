@@ -3,12 +3,12 @@ import { SWRConfig } from 'swr';
 import { useAuth } from '@hooks/index';
 
 function SWRConfigProvider({ children }: { children: ReactNode }) {
-  const { logout } = useAuth()!;
+  const { logout } = useAuth() ?? {};
   return (
     <SWRConfig
       value={{
         onError: (error: { status: number }) => {
-          if (error.status === 401) {
+          if (error.status === 401 && logout) {
             void logout();
           }
         },

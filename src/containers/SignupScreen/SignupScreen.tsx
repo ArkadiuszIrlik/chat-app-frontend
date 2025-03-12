@@ -2,6 +2,12 @@ import WaveImage from '@assets/wave.svg';
 import { SignupForm } from '@components/SignupForm';
 import { useMediaQuery } from '@uidotdev/usehooks';
 import styleConsts from '@constants/styleConsts';
+import BelugaLogo from '@assets/beluga-black-logo.png';
+import { ExtendedCSSProperties } from '@src/types';
+
+const belugaLogoStyles: ExtendedCSSProperties = {
+  '--mask-url': `url(${BelugaLogo})`,
+};
 
 function SignupScreen() {
   const isMediumScreen = useMediaQuery(
@@ -24,7 +30,8 @@ function SignupScreen() {
               />
               <div className="absolute left-0 right-0 top-1/4">
                 <div
-                  className="beluga-mask mx-auto aspect-square
+                  style={belugaLogoStyles}
+                  className="alpha-mask mx-auto aspect-square
                  w-1/2 bg-gradient-to-tr from-clairvoyant-900
                   to-cerise-600 text-white"
                 />

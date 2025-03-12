@@ -1,6 +1,6 @@
 import { useAuth } from '@hooks/index';
 import SettingsIcon from '@assets/settings-icon.png';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ExtendedCSSProperties, UserOnlineStatus } from '@src/types';
 import { UserProfileImage } from '@components/UserProfileImage';
 import { useCallback, useRef, useState } from 'react';
@@ -30,7 +30,9 @@ function UserBar() {
   return (
     <div className="relative flex items-center gap-1">
       <button
-        className="flex min-w-0 items-center gap-2 rounded-md p-1 hover:bg-gray-600"
+        className={`flex min-w-0 items-center gap-2 rounded-md p-1 using-mouse:hover:bg-gray-600 ${
+          isUserDropdownOpen ? 'bg-gray-600' : ''
+        }`}
         type="button"
         ref={userButtonRef}
         onClick={handleToggleOpenUserDropdown}
@@ -59,18 +61,23 @@ function UserBar() {
   );
 }
 
+const styleObj: ExtendedCSSProperties = {
+  '--mask-url': `url(${SettingsIcon})`,
+};
+
 function SettingsLink() {
-  const styleObj: ExtendedCSSProperties = {
-    '--mask-url': `url(${SettingsIcon})`,
-  };
+  const location = useLocation();
 
   return (
     <Link
       to="/app/settings"
-      className="group ml-auto shrink-0 rounded-lg p-1 hover:bg-gray-600"
+      className="group ml-auto shrink-0 rounded-lg p-1
+       using-mouse:hover:bg-gray-600"
+      state={{ returnTo: location.pathname }}
     >
       <div
-        className="alpha-mask aspect-square h-5 w-5 bg-gray-400 group-hover:bg-gray-300"
+        className="alpha-mask aspect-square h-5 w-5 bg-gray-400
+         using-mouse:group-hover:bg-gray-300"
         style={styleObj}
       />
     </Link>
